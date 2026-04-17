@@ -64,9 +64,46 @@
             border-top-color: #4f46e5; border-radius: 50%; animation: spin 1s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Custom Alert Modal */
+        #custom-alert-modal { z-index: 9999; }
+        #custom-alert-modal .modal-container { max-width: 24rem; padding: 2rem; overflow: visible; }
     </style>
 
     <script>
+        // Custom Alert & Confirm Modals
+        window.customAlertModal = function(msg, isConfirm = false, onConfirm = null) {
+            const modal = document.getElementById('custom-alert-modal');
+            document.getElementById('alert-msg').innerText = msg;
+            const btnCancel = document.getElementById('alert-cancel-btn');
+            const btnOk = document.getElementById('alert-ok-btn');
+
+            if(isConfirm) {
+                btnCancel.classList.remove('hidden-el');
+                document.getElementById('alert-icon').innerHTML = '<i class="fas fa-question-circle text-blue-500"></i>';
+                document.getElementById('alert-title').innerText = 'Konfirmasi';
+                btnOk.innerText = 'Ya, Lanjutkan';
+            } else {
+                btnCancel.classList.add('hidden-el');
+                document.getElementById('alert-icon').innerHTML = '<i class="fas fa-exclamation-circle text-amber-500"></i>';
+                document.getElementById('alert-title').innerText = 'Pemberitahuan';
+                btnOk.innerText = 'Mengerti';
+            }
+
+            modal.classList.add('modal-active');
+
+            btnOk.onclick = function() {
+                modal.classList.remove('modal-active');
+                if(isConfirm && onConfirm) onConfirm();
+            };
+            btnCancel.onclick = function() {
+                modal.classList.remove('modal-active');
+            };
+        };
+
+        window.showAlert = (msg) => window.customAlertModal(msg, false);
+        window.showConfirm = (msg, onConfirm) => window.customAlertModal(msg, true, onConfirm);
+
         // Fungsi UI Sederhana
         window.showRegister = function() {
             document.getElementById('login-view').classList.add('hidden-el');
@@ -135,31 +172,6 @@
                 if(target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }, 100);
         };
-
-        window.sharePortal = function() {
-            const link = window.location.origin + window.location.pathname;
-            const fallbackCopy = (text) => {
-                const el = document.createElement('textarea');
-                el.value = text;
-                document.body.appendChild(el);
-                el.select();
-                try {
-                    document.execCommand('copy');
-                    alert("Link portal berhasil disalin: " + text + "\n\nSetiap orang yang membuka link ini akan diarahkan ke Halaman Utama (Login/Daftar).");
-                } catch(e) {
-                    alert("Gagal menyalin link. Silakan salin manual: " + text);
-                }
-                document.body.removeChild(el);
-            };
-
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(link).then(() => {
-                    alert("Link portal berhasil disalin: " + link + "\n\nSetiap orang yang membuka link ini akan diarahkan ke Halaman Utama (Login/Daftar).");
-                }).catch(() => fallbackCopy(link));
-            } else {
-                fallbackCopy(link);
-            }
-        };
     </script>
 </head>
 <body class="bg-slate-50 text-slate-900 min-h-screen text-left">
@@ -168,6 +180,19 @@
     <div id="cloud-loader" class="fixed inset-0 z-[999] bg-slate-950 flex flex-col items-center justify-center transition-opacity duration-500">
         <div class="w-12 h-12 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin mb-4"></div>
         <p class="text-white font-bold tracking-widest uppercase text-xs animate-pulse">Menghubungkan Database Cloud...</p>
+    </div>
+
+    <!-- CUSTOM ALERT MODAL -->
+    <div id="custom-alert-modal" class="modal-overlay text-left">
+        <div class="modal-container bg-white rounded-3xl mx-auto shadow-2xl transform transition-all text-center">
+            <div id="alert-icon" class="text-4xl text-amber-500 mb-4"><i class="fas fa-exclamation-circle"></i></div>
+            <h3 id="alert-title" class="text-xl font-black italic uppercase text-slate-900 mb-2">Pemberitahuan</h3>
+            <p id="alert-msg" class="text-sm font-medium text-slate-600 mb-6"></p>
+            <div id="alert-buttons" class="flex gap-3 justify-center w-full">
+                <button id="alert-ok-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold transition-all flex-1">Mengerti</button>
+                <button id="alert-cancel-btn" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-6 py-3 rounded-xl font-bold transition-all flex-1 hidden-el">Batal</button>
+            </div>
+        </div>
     </div>
 
     <!-- LAYAR AUTENTIKASI -->
@@ -270,7 +295,7 @@
 
     <!-- MAIN APP DASHBOARD -->
     <div id="app-content" class="hidden-el">
-        <aside class="fixed left-0 top-0 h-full w-64 sidebar-gradient text-white p-6 no-print hidden lg:block z-50 text-left">
+        <aside class="fixed left-0 top-0 h-full w-64 sidebar-gradient text-white p-6 no-print hidden lg:block z-50 text-left overflow-y-auto">
             <div class="flex items-center gap-3 mb-10">
                 <div class="h-10 w-10 bg-indigo-500/20 border border-indigo-400/30 rounded-lg flex items-center justify-center text-white">
                     <i class="fas fa-bolt text-amber-400"></i>
@@ -289,16 +314,12 @@
                         <i class="fas fa-th-large w-5"></i> Dashboard Utama
                     </button>
 
-                    <!-- PUSAT PESAN (DAPAT DIAKSES SEMUA ROLE) DENGAN BADGE -->
+                    <!-- PUSAT PESAN -->
                     <button onclick="openChatView()" class="w-full flex items-center justify-between px-4 py-3 hover:bg-white/5 rounded-xl text-sm font-medium text-slate-300 hover:text-white text-left transition-all">
                         <div class="flex items-center gap-3">
                             <i class="fas fa-comments w-5"></i> Pusat Pesan
                         </div>
                         <span id="global-unread-badge" class="hidden-el bg-red-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-sm">0</span>
-                    </button>
-
-                    <button id="admin-share-btn" onclick="sharePortal()" class="hidden-el w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 rounded-xl text-sm font-medium text-slate-300 hover:text-white text-left transition-all">
-                        <i class="fas fa-share-nodes w-5"></i> Bagikan Link Portal
                     </button>
                     
                     <!-- MENU ADMIN -->
@@ -325,13 +346,17 @@
                             <i class="fas fa-microchip w-5"></i> Input kWh Real
                         </button>
 
-                        <button onclick="clearAllData()" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-500/20 rounded-xl text-sm font-medium text-red-400 text-left transition-all mt-4">
-                            <i class="fas fa-trash w-5"></i> Hapus Database
-                        </button>
+                        <div id="danger-zone" class="hidden-el pt-6 mt-4 border-t border-red-500/20">
+                            <button onclick="clearAllData()" class="w-full flex items-center gap-3 px-4 py-3 bg-red-500/10 hover:bg-red-500/20 rounded-xl text-sm font-medium text-red-400 text-left transition-all border border-red-500/30">
+                                <i class="fas fa-trash w-5 text-red-500"></i> Hapus Database
+                            </button>
+                        </div>
                     </div>
                 </div>
-                <div class="pt-4 border-t border-white/5">
-                    <button onclick="doLogout()" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-500/20 rounded-xl text-sm font-bold text-red-400 transition-all text-left">
+                
+                <!-- Pemisahan Navigasi: Logout ditaruh di bawah sendirian -->
+                <div class="pt-8 border-t border-white/5 mt-10">
+                    <button onclick="doLogout()" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-700 rounded-xl text-sm font-bold text-slate-300 transition-all text-left">
                         <i class="fas fa-sign-out-alt w-5"></i> Keluar Sistem
                     </button>
                 </div>
@@ -350,7 +375,6 @@
             <!-- PROFIL PENGGUNA -->
             <div class="bg-white rounded-[32px] p-8 card-shadow border border-slate-100 mb-8 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 text-left">
                 <div class="flex items-center gap-6">
-                    <!-- FOTO PROFIL BISA DIKLIK UNTUK UPLOAD -->
                     <div class="relative h-20 w-20 group cursor-pointer shrink-0" onclick="document.getElementById('profile-upload').click()" title="Ubah Foto Profil">
                         <div class="h-20 w-20 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center text-3xl shadow-inner border-4 border-white overflow-hidden relative">
                             <i id="profile-default-icon" class="fas fa-user-circle absolute"></i>
@@ -364,7 +388,7 @@
 
                     <div>
                         <h3 id="profile-name" class="text-2xl font-black italic uppercase text-slate-900 leading-none">-</h3>
-                        <p id="profile-role" class="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mt-2 flex items-center">-</p>
+                        <p id="profile-role" class="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mt-2">-</p>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-6 w-full lg:w-auto border-t lg:border-t-0 lg:border-l border-slate-100 pt-6 lg:pt-0 lg:pl-8 items-center">
@@ -382,7 +406,6 @@
 
             <!-- PUSAT PESAN / CHAT MENU -->
             <div id="view-chat" class="hidden-el h-[calc(100vh-14rem)] flex flex-col md:flex-row gap-6 text-left">
-                <!-- Kontak Sebelah Kiri (Hanya Admin) -->
                 <div id="chat-contacts" class="w-full md:w-1/3 bg-white rounded-[32px] p-6 card-shadow border border-slate-100 flex flex-col hidden-el">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="font-black italic uppercase tracking-tight text-indigo-950">Buku Kontak</h3>
@@ -392,7 +415,6 @@
                         <!-- Disuntik via JS -->
                     </div>
                 </div>
-                <!-- Ruang Chatting Sebelah Kanan -->
                 <div class="flex-1 bg-white rounded-[32px] card-shadow border border-slate-100 flex flex-col overflow-hidden">
                     <div class="p-6 border-b border-slate-100 bg-slate-50/80 flex items-center gap-4 shrink-0">
                         <div class="h-12 w-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xl shadow-inner border-2 border-white"><i class="fas fa-headset"></i></div>
@@ -406,21 +428,17 @@
                         <!-- Pesan disuntik via JS -->
                     </div>
                     
-                    <!-- Area Input Chat -->
                     <div class="flex flex-col bg-white border-t border-slate-100 p-4 shrink-0">
-                        <!-- Pratinjau Berkas (Attachment Preview) -->
                         <div id="attachment-preview" class="hidden-el flex items-center gap-2 mb-2 p-2 bg-indigo-50 rounded-lg border border-indigo-100 text-xs font-bold text-indigo-800 w-fit">
                             <i class="fas fa-file-alt"></i> <span id="attachment-name" class="truncate max-w-[200px]">filename.png</span>
                             <button onclick="window.clearAttachment()" class="ml-2 text-red-500 hover:text-red-700 bg-red-100 hover:bg-red-200 h-5 w-5 rounded-full flex items-center justify-center"><i class="fas fa-times text-[10px]"></i></button>
                         </div>
                         
                         <div class="flex gap-2 items-center">
-                            <!-- Tombol Penjepit Kertas (Attachment Input) -->
                             <label class="cursor-pointer text-slate-400 hover:text-indigo-600 bg-slate-50 hover:bg-indigo-50 h-12 w-12 rounded-xl flex items-center justify-center transition-all border-2 border-slate-100 shrink-0" title="Lampirkan File (PDF, PNG, JPG)">
                                 <i class="fas fa-paperclip text-lg"></i>
                                 <input type="file" id="chat-file-input" class="hidden" accept=".pdf, image/png, image/jpeg, image/jpg" onchange="window.handleFileSelect(event)">
                             </label>
-                            
                             <input type="text" id="chat-input" placeholder="Tuliskan pesan Anda..." class="flex-1 bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 font-medium outline-none focus:border-indigo-400 transition-all" onkeypress="if(event.key === 'Enter') sendChatMessage()">
                             <button onclick="sendChatMessage()" class="bg-indigo-600 hover:bg-indigo-800 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-md shrink-0">Kirim</button>
                         </div>
@@ -433,14 +451,6 @@
                 
                 <!-- DASHBOARD KHUSUS MITRA / REKANAN -->
                 <div id="rekanan-dashboard-section" class="hidden-el space-y-6 text-left mb-10">
-                    <div id="rek-unverified-warning" class="bg-red-50 border border-red-100 p-5 rounded-2xl mb-6 hidden-el flex items-start gap-4">
-                        <i class="fas fa-exclamation-triangle text-red-500 text-2xl mt-1"></i>
-                        <div>
-                            <p class="text-sm text-red-700 font-bold leading-tight mb-1">Status Belum Tersertifikasi (Unverified)</p>
-                            <p class="text-xs text-red-600 leading-tight">Akun Anda belum mendapat Sertifikasi Bintang Kuning dari Admin Pusat. Anda bisa menerima komisi dari penjualan (Sales), namun Anda tidak akan bisa ditugaskan untuk menerima pekerjaan Jasa Pemasangan Penghemat AC Kalimaja Airtron.</p>
-                        </div>
-                    </div>
-
                     <div class="flex items-center gap-3 mb-6">
                         <div class="h-10 w-10 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-lg">
                             <i class="fas fa-handshake"></i>
@@ -450,24 +460,22 @@
                             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Ringkasan Kinerja & Komisi Penjualan / Teknisi</p>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm flex flex-col justify-between">
-                            <span class="text-[10px] font-bold px-3 py-1 bg-slate-100 text-slate-600 rounded-lg uppercase tracking-widest w-fit">Klien Terhubung</span>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm">
+                            <span class="text-[10px] font-bold px-3 py-1 bg-slate-100 text-slate-600 rounded-lg uppercase tracking-widest">Total Klien</span>
                             <p class="text-3xl font-black text-indigo-900 mt-4" id="rek-total-klien">0</p>
                         </div>
-                        <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm flex flex-col justify-between">
-                            <span class="text-[10px] font-bold px-3 py-1 bg-slate-100 text-slate-600 rounded-lg uppercase tracking-widest w-fit">AC Terpasang</span>
+                        <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm">
+                            <span class="text-[10px] font-bold px-3 py-1 bg-slate-100 text-slate-600 rounded-lg uppercase tracking-widest">Unit (Teknisi)</span>
                             <p class="text-3xl font-black text-indigo-900 mt-4" id="rek-total-unit">0</p>
                         </div>
-                        <div class="bg-emerald-950 p-6 rounded-[2rem] shadow-xl text-white flex flex-col justify-between">
-                            <span class="text-[10px] font-bold px-3 py-1 bg-white/10 text-emerald-200 rounded-lg uppercase tracking-widest w-fit">Jasa Pemasangan</span>
-                            <p class="text-2xl font-black text-emerald-400 mt-4 mono" id="rek-total-jasa">Rp 0</p>
-                            <p class="text-[9px] text-emerald-500/70 mt-1 italic uppercase tracking-widest">Sekali Bayar</p>
+                        <div class="bg-indigo-950 p-6 rounded-[2rem] shadow-xl text-white">
+                            <span class="text-[10px] font-bold px-3 py-1 bg-white/10 text-indigo-200 rounded-lg uppercase tracking-widest">Komisi Sales</span>
+                            <p class="text-2xl font-black text-amber-400 mt-4 mono truncate" id="rek-total-komisi-sales">Rp 0</p>
                         </div>
-                        <div class="bg-indigo-950 p-6 rounded-[2rem] shadow-xl text-white flex flex-col justify-between">
-                            <span class="text-[10px] font-bold px-3 py-1 bg-white/10 text-indigo-200 rounded-lg uppercase tracking-widest w-fit">Akumulasi Komisi</span>
-                            <p class="text-2xl font-black text-amber-400 mt-4 mono" id="rek-total-komisi">Rp 0</p>
-                            <p class="text-[9px] text-indigo-400/70 mt-1 italic uppercase tracking-widest">Bagi Hasil Rutin</p>
+                        <div class="bg-emerald-950 p-6 rounded-[2rem] shadow-xl text-white">
+                            <span class="text-[10px] font-bold px-3 py-1 bg-white/10 text-emerald-200 rounded-lg uppercase tracking-widest">Fee Teknisi</span>
+                            <p class="text-2xl font-black text-emerald-400 mt-4 mono truncate" id="rek-total-komisi-tek">Rp 0</p>
                         </div>
                     </div>
                     
@@ -479,7 +487,64 @@
                     </div>
                 </div>
 
-                <!-- LIST PORTOFOLIO INVESTOR (HANYA INVESTOR) -->
+                <!-- DASHBOARD KHUSUS INVESTOR - TIER SELECTION -->
+                <div id="investor-tier-section" class="hidden-el space-y-6 text-left mb-10">
+                    <div class="bg-white rounded-[32px] p-8 card-shadow border border-slate-100">
+                        <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
+                            <div class="flex items-center gap-3">
+                                <div class="h-10 w-10 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-lg shrink-0">
+                                    <i class="fas fa-award"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-black italic uppercase tracking-tight text-slate-900 text-xl leading-none">Verifikasi & Tier Investor</h3>
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Pilih komitmen pendanaan Anda</p>
+                                </div>
+                            </div>
+                            <div id="investor-stars" class="text-amber-400 text-2xl flex gap-1"></div>
+                        </div>
+
+                        <div id="tier-selection-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <!-- Tier A -->
+                            <div onclick="window.selectInvestorTier('A')" class="cursor-pointer bg-white border-2 border-slate-100 hover:border-amber-400 hover:shadow-lg rounded-2xl p-6 transition-all text-center group">
+                                <div class="text-amber-400 text-xl mb-2 group-hover:scale-110 transition-transform"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                                <h4 class="font-black text-2xl text-slate-800 mb-1">TIER A</h4>
+                                <p class="text-lg font-black text-indigo-600 mono mb-3">Rp 28.500.000</p>
+                                <button class="text-[10px] font-bold bg-slate-50 text-slate-600 px-4 py-2 rounded-lg uppercase tracking-widest w-full group-hover:bg-amber-400 group-hover:text-white transition-colors">Pilih Tier Ini</button>
+                            </div>
+                            <!-- Tier B -->
+                            <div onclick="window.selectInvestorTier('B')" class="cursor-pointer bg-white border-2 border-slate-100 hover:border-amber-400 hover:shadow-lg rounded-2xl p-6 transition-all text-center group">
+                                <div class="text-amber-400 text-xl mb-2 group-hover:scale-110 transition-transform"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                                <h4 class="font-black text-2xl text-slate-800 mb-1">TIER B</h4>
+                                <p class="text-lg font-black text-indigo-600 mono mb-3">Rp 22.250.000</p>
+                                <button class="text-[10px] font-bold bg-slate-50 text-slate-600 px-4 py-2 rounded-lg uppercase tracking-widest w-full group-hover:bg-amber-400 group-hover:text-white transition-colors">Pilih Tier Ini</button>
+                            </div>
+                            <!-- Tier C -->
+                            <div onclick="window.selectInvestorTier('C')" class="cursor-pointer bg-white border-2 border-slate-100 hover:border-amber-400 hover:shadow-lg rounded-2xl p-6 transition-all text-center group">
+                                <div class="text-amber-400 text-xl mb-2 group-hover:scale-110 transition-transform"><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                                <h4 class="font-black text-2xl text-slate-800 mb-1">TIER C</h4>
+                                <p class="text-lg font-black text-indigo-600 mono mb-3">Rp 15.750.000</p>
+                                <button class="text-[10px] font-bold bg-slate-50 text-slate-600 px-4 py-2 rounded-lg uppercase tracking-widest w-full group-hover:bg-amber-400 group-hover:text-white transition-colors">Pilih Tier Ini</button>
+                            </div>
+                            <!-- Tier D -->
+                            <div onclick="window.selectInvestorTier('D')" class="cursor-pointer bg-white border-2 border-slate-100 hover:border-amber-400 hover:shadow-lg rounded-2xl p-6 transition-all text-center group">
+                                <div class="text-amber-400 text-xl mb-2 group-hover:scale-110 transition-transform"><i class="fas fa-star"></i></div>
+                                <h4 class="font-black text-2xl text-slate-800 mb-1">TIER D</h4>
+                                <p class="text-lg font-black text-indigo-600 mono mb-3">Rp 14.250.000</p>
+                                <button class="text-[10px] font-bold bg-slate-50 text-slate-600 px-4 py-2 rounded-lg uppercase tracking-widest w-full group-hover:bg-amber-400 group-hover:text-white transition-colors">Pilih Tier Ini</button>
+                            </div>
+                        </div>
+                        
+                        <div id="tier-active-info" class="hidden-el p-6 bg-emerald-50 rounded-2xl border border-emerald-100 flex items-center justify-between mt-4">
+                            <div>
+                                <p class="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1">Status Akun</p>
+                                <p class="text-lg font-black text-emerald-900 uppercase">Terverifikasi - <span id="active-tier-name"></span></p>
+                            </div>
+                            <i class="fas fa-check-circle text-4xl text-emerald-400"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LIST PORTOFOLIO INVESTOR -->
                 <div id="investor-portfolio-section" class="hidden-el mb-10 text-left">
                     <div class="flex items-center gap-3 mb-6">
                         <div class="h-10 w-10 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center text-lg">
@@ -538,8 +603,12 @@
                             <h3 id="view-inv-email" class="text-lg font-black italic uppercase mb-4 tracking-tighter truncate">-</h3>
                             <div class="space-y-4">
                                 <div class="flex justify-between items-center border-b border-white/5 pb-2">
-                                    <span class="text-[10px] text-slate-400 uppercase">Investasi (CAPEX)</span>
+                                    <span class="text-[10px] text-slate-400 uppercase" title="Dibayarkan Investor ke Perusahaan">Kewajiban CAPEX (Awal)</span>
                                     <span id="view-capex" class="font-bold text-amber-400 mono">Rp 0</span>
+                                </div>
+                                <div class="flex justify-between items-center border-b border-white/5 pb-2 admin-only-view hidden-el">
+                                    <span class="text-[10px] text-slate-400 uppercase" title="Dibayarkan Perusahaan ke Investor">Pembayaran Ke Investor</span>
+                                    <span id="view-investor-payout" class="font-bold text-emerald-400 mono">Rp 0</span>
                                 </div>
                                 <div class="flex justify-between items-center" id="bep-container">
                                     <span class="text-[10px] text-slate-400 uppercase">Estimasi BEP</span>
@@ -656,7 +725,8 @@
                                     <th class="py-5 px-6 text-left">Customer</th>
                                     <th class="py-5 px-6 text-left">Investor</th>
                                     <th class="py-5 px-6 text-right">Total Unit</th>
-                                    <th class="py-5 px-6 text-right">Nilai CAPEX</th>
+                                    <th class="py-5 px-6 text-right">Kewajiban CAPEX Awal</th>
+                                    <th class="py-5 px-6 text-right">Pembayaran Investor (Bln Ini)</th>
                                     <th class="py-5 px-6 text-center">Aksi</th>
                                 </tr>
                             </thead>
@@ -745,7 +815,6 @@
                                     <th class="py-5 px-6 text-left">No. HP / WA</th>
                                     <th class="py-5 px-6 text-left">Data Rekening</th>
                                     <th class="py-5 px-6 text-left">Status Proyek</th>
-                                    <th class="py-5 px-6 text-center text-amber-600">Sertifikasi Teknisi</th>
                                 </tr>
                             </thead>
                             <tbody id="table-rekanan-body" class="divide-y divide-slate-100">
@@ -782,7 +851,7 @@
         </div>
     </div>
 
-    <!-- MODAL: REGISTRASI PROYEK (ADMIN) - DENGAN DROPDOWN REKANAN -->
+    <!-- MODAL: REGISTRASI PROYEK (ADMIN) -->
     <div id="project-modal" class="modal-overlay no-print text-left">
         <div class="modal-container">
             <div class="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50">
@@ -821,7 +890,7 @@
                         </select>
                     </div>
                     <div class="space-y-1 text-left">
-                        <label class="text-[10px] font-black text-indigo-500 uppercase px-2">Teknisi Pemasangan (Tersertifikasi)</label>
+                        <label class="text-[10px] font-black text-indigo-500 uppercase px-2">Teknisi Pemasangan</label>
                         <select id="form-rek-tek" class="w-full bg-indigo-50 border-2 border-indigo-100 rounded-2xl px-4 py-4 font-bold outline-none cursor-pointer focus:border-indigo-500 text-sm">
                             <option value="">-- Tidak Ada --</option>
                         </select>
@@ -891,25 +960,93 @@
         </div>
     </div>
 
+    <!-- TEMPLATE CETAK INVOICE -->
+    <div id="invoice-print-template" class="p-8 max-w-4xl mx-auto bg-white text-slate-900">
+        <div class="border-b-4 border-indigo-950 pb-6 mb-8 flex justify-between items-end">
+            <div>
+                <h1 class="text-4xl font-black italic uppercase tracking-tighter text-indigo-950 leading-none">KALIMAJA AIRTRON</h1>
+                <p class="text-sm font-bold text-slate-500 uppercase tracking-[0.2em] mt-2">PT Kalimaja Surya Alam</p>
+                <p class="text-xs text-slate-500 mt-1">Tangerang, Banten, Indonesia</p>
+            </div>
+            <div class="text-right">
+                <h2 class="text-3xl font-black text-slate-800 uppercase tracking-widest mb-2">INVOICE TAGIHAN</h2>
+                <p class="text-sm font-bold text-slate-600" id="inv-date">Tanggal: -</p>
+                <p class="text-sm font-bold text-slate-600">No: <span id="inv-number" class="mono text-indigo-700">-</span></p>
+            </div>
+        </div>
+
+        <div class="flex justify-between items-start mb-10">
+            <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100 min-w-[300px]">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Ditagihkan Kepada:</p>
+                <p class="text-xl font-black text-slate-800 uppercase mb-1" id="inv-cust-name">-</p>
+                <p class="text-sm font-bold text-slate-600 uppercase" id="inv-cust-loc"><i class="fas fa-map-marker-alt mr-1"></i> -</p>
+            </div>
+            <div class="text-right p-6">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Periode Konsumsi & Bagi Hasil:</p>
+                <p class="text-2xl font-black text-indigo-600 uppercase italic border-b-2 border-indigo-200 inline-block pb-1" id="inv-period">-</p>
+            </div>
+        </div>
+
+        <table class="w-full text-left border-collapse mb-10">
+            <thead class="bg-indigo-950 text-white">
+                <tr>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-widest rounded-tl-xl">Keterangan / Parameter</th>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-widest text-right rounded-tr-xl">Nilai (IDR)</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200 border border-slate-200">
+                <tr>
+                    <td class="py-5 px-6 text-sm font-bold text-slate-500 italic">Estimasi Tagihan Listrik Normal (Tanpa Airtron)</td>
+                    <td class="py-5 px-6 text-right text-sm font-bold text-slate-400 line-through decoration-red-400 mono" id="inv-val-normal">-</td>
+                </tr>
+                <tr>
+                    <td class="py-5 px-6 text-sm font-bold text-slate-700">Tagihan Aktual Listrik PLN (Terakhir)</td>
+                    <td class="py-5 px-6 text-right text-sm font-black text-slate-800 mono" id="inv-val-actual">-</td>
+                </tr>
+                <tr class="bg-emerald-50/50">
+                    <td class="py-5 px-6 text-sm font-black text-emerald-700 uppercase">Gross Saving (Realisasi Penghematan)</td>
+                    <td class="py-5 px-6 text-right text-base font-black text-emerald-600 mono" id="inv-val-saving">-</td>
+                </tr>
+                <tr class="bg-indigo-50 border-t-2 border-indigo-200">
+                    <td id="inv-label-total" class="py-6 px-6 text-base font-black text-indigo-950 uppercase tracking-widest">Total Tagihan Bagi Hasil</td>
+                    <td class="py-6 px-6 text-right text-2xl font-black text-indigo-700 mono" id="inv-val-total">-</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="border-t-2 border-dashed border-slate-200 pt-8 flex justify-between items-start mt-10">
+            <div class="bg-amber-50 p-6 rounded-2xl border border-amber-100 max-w-sm">
+                <p class="text-[10px] font-black text-amber-700 uppercase tracking-widest mb-3"><i class="fas fa-info-circle mr-1"></i> Instruksi Pembayaran:</p>
+                <p class="text-sm font-bold text-slate-800 uppercase mb-1" id="inv-bank-name">-</p>
+                <p class="text-xl font-black text-indigo-950 mono tracking-widest mb-1" id="inv-bank-rek">-</p>
+                <p class="text-xs font-bold text-slate-600 uppercase" id="inv-bank-owner">A.n -</p>
+            </div>
+            <div class="text-center pt-4">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-16">Hormat Kami,</p>
+                <p class="text-sm font-black text-slate-800 uppercase border-b border-slate-800 pb-1 inline-block">PT KALIMAJA SURYA ALAM</p>
+                <p class="text-xs text-slate-500 font-bold mt-1">Divisi Kemitraan & Keuangan</p>
+            </div>
+        </div>
+    </div>
+
     <!-- SCRIPT FIREBASE CLOUD DATABASE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Konfigurasi Database - Canvas Environment & Fallback untuk Github
-        // Catatan: Firebase API Key untuk Web aman diakses publik (keamanan diatur via Firestore Rules).
-        // Kita memecah string API Key agar GitHub Secret Scanner tidak memberikan peringatan "Exposed Secret".
+        // Ganti seluruh nilai di dalam firebaseConfig ini dengan milik Anda sendiri
         let firebaseConfig = {
-            apiKey: "AIzaSy" + "Bnvway6x7QTxv4" + "kup7lW5TEKNwkocRdL4", 
-            authDomain: "kalimaja-airtron-system.firebaseapp.com",
-            projectId: "kalimaja-airtron-system",
-            storageBucket: "kalimaja-airtron-system.appspot.com",
-            messagingSenderId: "785700779057",
-            appId: "1:785700779057:web:b4e19c1908ffe680459110"
+             apiKey: "AIzaSyACXL_atETWO7qrfZQNjQpeyj2p5Kh4VpU",
+  		authDomain: "portal-kalimaja.firebaseapp.com",
+  		databaseURL: "https://portal-kalimaja-default-rtdb.asia-southeast1.firebasedatabase.app",
+ 		projectId: "portal-kalimaja",
+  		storageBucket: "portal-kalimaja.firebasestorage.app",
+ 	 	messagingSenderId: "816596055410",
+ 	 	appId: "1:816596055410:web:43fcdb00052278780099eb",
+ 	 	measurementId: "G-D5RLW5P8ZY"
         };
 
-        // Jika dijalankan di dalam portal Canvas, gunakan konfigurasi sistem dinamis
         if (typeof __firebase_config !== 'undefined') {
             try {
                 firebaseConfig = JSON.parse(__firebase_config);
@@ -925,13 +1062,14 @@
 
         const PRICES = { 0.5:2500000, 0.75:2600000, 1:2750000, 1.5:2750000, 2:3150000, 2.5:3150000, 3:3150000, 3.5:4450000, 4:4450000, 4.5:4450000, 5:5700000, 6:5700000, 7:5700000, 8:6500000, 10:8500000, 12:10500000, 15:12500000, 18:14500000, 20:16500000 };
         const WATTS = { 0.5:420, 0.75:630, 1:840, 1.5:1260, 2:1680, 2.5:2100, 3:2520, 3.5:2940, 4:3360, 4.5:3780, 5:4200, 6:5040, 7:5880, 8:6720, 10:8400, 12:10080, 15:12600, 18:15120, 20:16800 };
-        const SECRET = "ADMIN123";
         const TARIF_PLN = 1615;
 
         window.dbUsers = [];
         window.dbProjects = [];
         window.dbLogs = [];
         window.dbChats = [];
+        
+        window.fbUser = null; 
         
         let isReady = { users: false, projects: false, logs: false, chats: false };
         let unsubscribeList = [];
@@ -947,7 +1085,6 @@
         const formatNum = (v) => new Intl.NumberFormat('id-ID').format(v);
         const setUI = (id, val) => { const el = document.getElementById(id); if(el) el.innerText = val; };
         
-        // PENGATURAN PATH DATABASE (Wajib untuk integrasi Canvas)
         const getPubCol = (c) => {
             if(typeof __app_id !== 'undefined') return collection(db, 'artifacts', appId, 'public', 'data', c);
             return collection(db, c);
@@ -957,15 +1094,13 @@
             return doc(db, c, id);
         };
 
-        // --- ERROR HANDLING & REALTIME SETUP ---
         let errorCount = 0;
         
-        // Diubah menjadi fungsi standar agar terhindar dari ReferenceError (Hoisting)
         function handleSnapError(err) {
             console.error("Firestore Error:", err);
             errorCount++;
             if (errorCount === 1) {
-                alert("Gagal terhubung ke Cloud. Pastikan domain github.io Anda sudah ditambahkan ke menu Authentication > Settings > Authorized domains di Firebase, dan API Key sudah benar.");
+                window.showAlert("Gagal terhubung ke Cloud. Pastikan domain github.io Anda sudah ditambahkan ke menu Authentication > Settings > Authorized domains di Firebase, dan API Key sudah benar.");
                 const loader = document.getElementById('cloud-loader');
                 if(loader) loader.style.display = 'none';
             }
@@ -981,7 +1116,6 @@
             ];
         }
 
-        // --- AUTHENTICATION INIT ---
         async function initAuth() {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -991,27 +1125,24 @@
                 }
             } catch (error) {
                 console.error("Auth error", error);
-                // Jika auth gagal (biasanya karena domain belum di whitelist di github), 
-                // tetap paksa jalankan realtime jika Rules database sudah public
                 setupRealtime();
             }
         }
 
         onAuthStateChanged(auth, (user) => {
+            window.fbUser = user;
             if(user) {
                 setupRealtime();
             }
         });
 
-        // Jalankan Inisialisasi
         initAuth();
 
-        // Fallback Timeout 7 Detik
         setTimeout(() => {
             const loader = document.getElementById('cloud-loader');
             if (loader && loader.style.display !== 'none' && (!isReady.users || !isReady.projects || !isReady.logs || !isReady.chats)) {
                 loader.style.display = 'none';
-                alert("Koneksi Cloud Timeout. Pastikan domain aplikasi ini sudah di-whitelist di Firebase Authentication Anda, atau pastikan koneksi stabil.");
+                window.showAlert("Koneksi Cloud Timeout. Pastikan domain aplikasi ini sudah di-whitelist di Firebase Authentication Anda, atau pastikan koneksi stabil.");
                 isReady.users = isReady.projects = isReady.logs = isReady.chats = true;
                 checkReady();
             }
@@ -1023,7 +1154,7 @@
                 setTimeout(() => document.getElementById('cloud-loader').style.display = 'none', 500);
 
                 if (!window.activeUser) {
-                    const sessionEmail = sessionStorage.getItem('kalimaja_session_email');
+                    const sessionEmail = localStorage.getItem('kalimaja_session_email');
                     if (sessionEmail) {
                         const found = window.dbUsers.find(u => u.email === sessionEmail);
                         if (found) {
@@ -1092,15 +1223,15 @@
             const bank = document.getElementById('reg-bank').value;
             const rek = document.getElementById('reg-rek').value;
 
-            if(!name || !email || !pass || !phone || !bank || !rek) return alert("Harap lengkapi semua kolom pendaftaran.");
-            if(pass.length < 6) return alert("Sandi minimal 6 karakter.");
+            if(!name || !email || !pass || !phone || !bank || !rek) return window.showAlert("Harap lengkapi semua kolom pendaftaran.");
+            if(pass.length < 6) return window.showAlert("Sandi minimal 6 karakter.");
             
             if (role !== 'admin') {
-                if(!nik) return alert("Nomor NIK wajib diisi untuk keamanan data kemitraan.");
+                if(!nik) return window.showAlert("Nomor NIK wajib diisi untuk keamanan data kemitraan.");
                 const nikError = validateNIK(nik);
-                if(nikError) return alert(nikError);
+                if(nikError) return window.showAlert(nikError);
                 if(window.dbUsers.find(u => u.nik === nik && u.role !== 'admin')) {
-                    return alert("PENDAFTARAN DITOLAK: NIK KTP ini sudah digunakan oleh akun lain!");
+                    return window.showAlert("PENDAFTARAN DITOLAK: NIK KTP ini sudah digunakan oleh akun lain!");
                 }
             }
             
@@ -1110,21 +1241,21 @@
                     { email: 'kalimajasuryaalam@gmail.com', pass: 'Yakin537@' }
                 ];
                 const isAuthorized = allowedAdmins.some(a => a.email === email && a.pass === pass);
-                if(!isAuthorized) return alert("AKSES DITOLAK: Email atau Sandi Anda tidak terdaftar sebagai Manajemen Inti. Pendaftaran Admin dibatalkan.");
+                if(!isAuthorized) return window.showAlert("AKSES DITOLAK: Email atau Sandi Anda tidak terdaftar sebagai Manajemen Inti. Pendaftaran Admin dibatalkan.");
             }
             
-            if(window.dbUsers.find(u => u.email === email)) return alert("Email sudah terdaftar!");
+            if(window.dbUsers.find(u => u.email === email)) return window.showAlert("Email sudah terdaftar!");
+            if(!window.fbUser) return window.showAlert("Koneksi cloud gagal. Silakan coba lagi.");
 
             const newUser = { 
                 name, email, pass, role, 
                 nik: role === 'admin' ? '-' : nik, 
-                phone, bank, rek, avatar: null,
-                isVerified: false // Flag untuk Sertifikasi Teknisi
+                phone, bank, rek, avatar: null 
             };
             
             await setDoc(getPubDoc('users', email), newUser);
             
-            alert("Pendaftaran Berhasil! Silakan masuk dengan email Anda.");
+            window.showAlert("Pendaftaran Berhasil! Silakan masuk dengan email Anda.");
             document.getElementById('login-email').value = email;
             document.getElementById('login-password').value = pass;
             window.showLogin();
@@ -1133,20 +1264,20 @@
         window.doLogin = function() {
             const email = document.getElementById('login-email').value.toLowerCase();
             const pass = document.getElementById('login-password').value;
-            if(!email || !pass) return alert("Isi email dan kata sandi.");
+            if(!email || !pass) return window.showAlert("Isi email dan kata sandi.");
 
             const user = window.dbUsers.find(u => u.email === email && u.pass === pass);
             if(user) {
                 window.activeUser = user;
-                sessionStorage.setItem('kalimaja_session_email', email);
+                localStorage.setItem('kalimaja_session_email', email);
                 window.loadDashboard();
             } else {
-                alert("Login Gagal: Email tidak ditemukan atau sandi salah.");
+                window.showAlert("Login Gagal: Email tidak ditemukan atau sandi salah.");
             }
         };
 
         window.doLogout = function() {
-            sessionStorage.removeItem('kalimaja_session_email');
+            localStorage.removeItem('kalimaja_session_email');
             window.activeUser = null;
             location.reload();
         };
@@ -1154,7 +1285,7 @@
         window.uploadProfilePic = async function(event) {
             const file = event.target.files[0];
             if (!file) return;
-            if (!file.type.startsWith('image/')) return alert('Harap pilih file berformat gambar.');
+            if (!file.type.startsWith('image/')) return window.showAlert('Harap pilih file berformat gambar.');
 
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -1179,7 +1310,7 @@
 
                     const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
                     
-                    if(window.activeUser) {
+                    if(window.fbUser && window.activeUser) {
                         const updatedUser = { ...window.activeUser, avatar: dataUrl };
                         await setDoc(getPubDoc('users', window.activeUser.email), updatedUser);
                     }
@@ -1187,15 +1318,6 @@
                 img.src = e.target.result;
             };
             reader.readAsDataURL(file);
-        };
-        
-        window.toggleVerifyRekanan = async function(email, currentStatus) {
-            if(!window.activeUser || window.activeUser.role !== 'admin') return;
-            const targetUser = window.dbUsers.find(u => u.email === email);
-            if(targetUser) {
-                targetUser.isVerified = !currentStatus;
-                await setDoc(getPubDoc('users', email), targetUser);
-            }
         };
 
         window.updateUnreadBadge = function() {
@@ -1214,7 +1336,7 @@
         };
 
         window.markAsRead = async function(contactId) {
-            if(!window.activeUser || !contactId || !fbUser) return;
+            if(!window.activeUser || !contactId || !window.fbUser) return;
             const myId = window.activeUser.role === 'admin' ? 'admin' : window.activeUser.email;
             const unreadMsgs = window.dbChats.filter(m => m.receiver === myId && m.sender === contactId && !m.read);
             
@@ -1246,7 +1368,7 @@
             const file = event.target.files[0];
             if(!file) return;
             if(file.size > 2 * 1024 * 1024) {
-                alert("Mohon maaf, demi kecepatan sistem, ukuran berkas maksimal dibatasi 2MB per unggahan.");
+                window.showAlert("Mohon maaf, demi kecepatan sistem, ukuran berkas maksimal dibatasi 2MB per unggahan.");
                 event.target.value = '';
                 return;
             }
@@ -1279,16 +1401,9 @@
                 const unreadCount = window.dbChats.filter(m => m.sender === u.email && m.receiver === 'admin' && !m.read).length;
                 const badgeHtml = unreadCount > 0 ? `<span class="bg-red-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full ml-auto shadow-sm">${unreadCount}</span>` : '';
 
-                const starBadge = u.isVerified ? `<div class="absolute -bottom-1 -right-1 bg-amber-500 text-white rounded-full h-4 w-4 flex items-center justify-center text-[8px] border border-white shadow-sm z-10" title="Tersertifikasi"><i class="fas fa-star"></i></div>` : '';
-                
-                const avatarHtml = `
-                    <div class="relative shrink-0">
-                        ${u.avatar 
-                            ? `<img src="${u.avatar}" class="w-10 h-10 rounded-full object-cover border border-slate-200">` 
-                            : `<div class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-sm border border-indigo-100"><i class="fas fa-user"></i></div>`}
-                        ${starBadge}
-                    </div>
-                `;
+                const avatarHtml = u.avatar 
+                    ? `<img src="${u.avatar}" class="w-10 h-10 rounded-full object-cover border border-slate-200 shrink-0">` 
+                    : `<div class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-sm border border-indigo-100 shrink-0"><i class="fas fa-user"></i></div>`;
 
                 list.insertAdjacentHTML('beforeend', `
                     <div onclick="selectChatContact('${u.email}', '${u.name}', '${u.role}')" class="flex items-center gap-3 p-4 rounded-xl cursor-pointer transition-all mb-2 ${isActive ? 'bg-indigo-50 border border-indigo-200 shadow-sm' : 'bg-slate-50 border border-transparent hover:bg-slate-100'}">
@@ -1379,7 +1494,7 @@
             const input = document.getElementById('chat-input');
             const text = input.value.trim();
             if(!text && !window.currentAttachment) return; 
-            if(!window.activeChatContact || !fbUser) return;
+            if(!window.activeChatContact || !window.fbUser) return;
 
             const msgId = 'MSG-' + Date.now();
             const newMsg = {
@@ -1404,18 +1519,16 @@
             document.getElementById('auth-screen').classList.add('hidden-el');
             document.getElementById('app-content').classList.remove('hidden-el');
             
-            setUI('user-display-name', window.activeUser.name);
             setUI('user-role-badge', window.activeUser.role.toUpperCase());
             setUI('profile-name', window.activeUser.name);
             
-            const roleEl = document.getElementById('profile-role');
-            if(roleEl) {
-                if(window.activeUser.role === 'rekanan' && window.activeUser.isVerified) {
-                    roleEl.innerHTML = `AKSES: REKANAN <i class="fas fa-star text-amber-500 ml-1 text-sm" title="Teknisi Tersertifikasi"></i>`;
-                } else {
-                    roleEl.innerText = `Akses: ${window.activeUser.role.toUpperCase()}`;
-                }
+            let roleDisplay = "Akses: " + window.activeUser.role;
+            if(window.activeUser.role === 'investor' && window.activeUser.tier) {
+                const starCount = window.activeUser.tier === 'A' ? 4 : window.activeUser.tier === 'B' ? 3 : window.activeUser.tier === 'C' ? 2 : 1;
+                let stars = ''; for(let i=0; i<starCount; i++) stars += '★';
+                roleDisplay += ` | TIER ${window.activeUser.tier} ${stars}`;
             }
+            setUI('profile-role', roleDisplay);
             
             setUI('profile-nik', window.activeUser.nik || "-");
             setUI('profile-phone', window.activeUser.phone || "-");
@@ -1437,19 +1550,17 @@
             const companyShareContainer = document.getElementById('company-share-container');
             const bepContainer = document.getElementById('bep-container');
             const rekananSection = document.getElementById('rekanan-dashboard-section');
-            const adminShareBtn = document.getElementById('admin-share-btn');
-            const rekWarning = document.getElementById('rek-unverified-warning');
 
             if(window.activeUser.role === 'admin') {
                 document.getElementById('admin-actions').classList.remove('hidden-el');
+                document.getElementById('danger-zone').classList.remove('hidden-el');
                 if (companyShareContainer) companyShareContainer.classList.remove('hidden-el');
                 if (bepContainer) bepContainer.classList.remove('hidden-el');
                 if (rekananSection) rekananSection.classList.add('hidden-el');
-                if (adminShareBtn) adminShareBtn.classList.remove('hidden-el');
                 window.populateAdminDropdowns();
             } else {
-                if (adminShareBtn) adminShareBtn.classList.add('hidden-el');
                 if (companyShareContainer) companyShareContainer.classList.add('hidden-el');
+                document.getElementById('danger-zone').classList.add('hidden-el');
                 if (window.activeUser.role === 'customer') {
                     if (bepContainer) bepContainer.classList.add('hidden-el');
                     if (rekananSection) rekananSection.classList.add('hidden-el');
@@ -1458,10 +1569,6 @@
                     if (rekananSection) rekananSection.classList.add('hidden-el');
                 } else if (window.activeUser.role === 'rekanan') {
                     if (rekananSection) rekananSection.classList.remove('hidden-el');
-                    if(rekWarning) {
-                        if(window.activeUser.isVerified) rekWarning.classList.add('hidden-el');
-                        else rekWarning.classList.remove('hidden-el');
-                    }
                 }
             }
 
@@ -1486,6 +1593,16 @@
                 const inv = window.dbUsers.find(u => u.email === p.invEmail) || {};
                 const totalUnits = p.units ? p.units.reduce((acc, curr) => acc + curr.q, 0) : 0;
                 
+                let pLogs = window.dbLogs.filter(l => l.projectId === p.id);
+                let latestPayout = 0;
+                if(pLogs.length > 0) {
+                    pLogs.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+                    const latest = pLogs[0];
+                    const s = Math.max(0, (p.baseline - latest.kwhReal) * TARIF_PLN);
+                    const split = window.getSplitRatio(p.createdAt, latest.period);
+                    latestPayout = (s * split.invGross) * 0.7; 
+                }
+
                 tbody.insertAdjacentHTML('beforeend', `
                     <tr class="text-xs border-b border-slate-50 hover:bg-slate-50 transition-colors">
                         <td class="py-5 px-6 font-bold text-slate-500">${index + 1}</td>
@@ -1500,6 +1617,7 @@
                         </td>
                         <td class="py-5 px-6 text-right font-bold text-indigo-600">${totalUnits} Unit</td>
                         <td class="py-5 px-6 text-right font-mono text-slate-800 font-bold">${formatIDR(p.capex)}</td>
+                        <td class="py-5 px-6 text-right font-mono text-emerald-600 font-bold">${formatIDR(latestPayout)}</td>
                         <td class="py-5 px-6 text-center whitespace-nowrap">
                             <button onclick="goToProjectFromAdmin('${p.id}')" class="px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors inline-flex items-center gap-1 mr-1" title="Lihat Detail">
                                 <i class="fas fa-eye"></i> Detail
@@ -1548,35 +1666,28 @@
                     projectHtml = `<span class="text-[10px] text-slate-400 italic">${roleType === 'rekanan' ? 'Menunggu Penugasan / Data Sinkronisasi' : 'Belum ada proyek'}</span>`;
                 }
 
-                const starBadge = u.isVerified && roleType === 'rekanan' ? `<div class="absolute -bottom-1 -right-1 bg-amber-500 text-white rounded-full h-4 w-4 flex items-center justify-center text-[8px] border border-white shadow-sm z-10" title="Tersertifikasi"><i class="fas fa-star"></i></div>` : '';
+                const avatarHtml = u.avatar 
+                    ? `<img src="${u.avatar}" class="w-8 h-8 rounded-full object-cover border border-slate-200 shrink-0">` 
+                    : `<div class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs border border-indigo-100 shrink-0"><i class="fas fa-user"></i></div>`;
 
-                const avatarHtml = `
-                    <div class="relative shrink-0">
-                        ${u.avatar 
-                            ? `<img src="${u.avatar}" class="w-8 h-8 rounded-full object-cover border border-slate-200">` 
-                            : `<div class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs border border-indigo-100"><i class="fas fa-user"></i></div>`}
-                        ${starBadge}
-                    </div>
-                `;
-
-                let verifyColHtml = '';
-                if (roleType === 'rekanan') {
-                    const isVer = u.isVerified || false;
-                    const btnClass = isVer ? 'bg-amber-500 text-white border-amber-600' : 'bg-slate-100 text-slate-300 hover:text-amber-500 border-slate-200';
-                    verifyColHtml = `
-                    <td class="py-5 px-6 text-center">
-                        <button onclick="toggleVerifyRekanan('${u.email}', ${isVer})" class="${btnClass} h-8 w-8 rounded-full shadow-sm transition-all flex items-center justify-center text-xs mx-auto border" title="${isVer ? 'Cabut Sertifikasi' : 'Beri Sertifikasi'}">
-                            <i class="fas fa-star"></i>
-                        </button>
-                    </td>`;
+                let tierBadge = '';
+                if(roleType === 'investor' && u.tier) {
+                    const starCount = u.tier === 'A' ? 4 : u.tier === 'B' ? 3 : u.tier === 'C' ? 2 : 1;
+                    let stars = ''; for(let i=0; i<starCount; i++) stars += '<i class="fas fa-star"></i>';
+                    tierBadge = `<span class="text-[9px] text-amber-500 tracking-widest uppercase mt-1 block">${stars} TIER ${u.tier}</span>`;
                 }
 
                 tbody.insertAdjacentHTML('beforeend', `
                     <tr class="text-xs border-b border-slate-50 hover:bg-slate-50 transition-colors">
                         <td class="py-5 px-6 font-bold text-slate-500">${index + 1}</td>
-                        <td class="py-5 px-6 font-black text-indigo-900 flex items-center gap-3">
-                            ${avatarHtml}
-                            ${u.name}
+                        <td class="py-5 px-6 font-black text-indigo-900">
+                            <div class="flex items-center gap-3">
+                                ${avatarHtml}
+                                <div>
+                                    ${u.name}
+                                    ${tierBadge}
+                                </div>
+                            </div>
                         </td>
                         <td class="py-5 px-6 text-slate-600 italic">${u.email}</td>
                         <td class="py-5 px-6 font-mono text-slate-600">${u.nik || '-'}</td>
@@ -1588,7 +1699,6 @@
                         <td class="py-5 px-6 max-w-[200px]">
                             ${projectHtml}
                         </td>
-                        ${verifyColHtml}
                     </tr>
                 `);
             });
@@ -1598,7 +1708,6 @@
             let customers = window.dbUsers.filter(u => u.role === 'customer');
             let investors = window.dbUsers.filter(u => u.role === 'investor');
             let rekanans = window.dbUsers.filter(u => u.role === 'rekanan');
-            let verifiedTeknisi = rekanans.filter(u => u.isVerified);
             
             const custSelect = document.getElementById('form-cust-email');
             const invSelect = document.getElementById('form-inv-email');
@@ -1613,17 +1722,15 @@
             if(invSelect) {
                 invSelect.innerHTML = '<option value="">-- Pilih Investor Terdaftar --</option>' + 
                     investors.map(i => `<option value="${i.email}">${i.name} (${i.email})</option>`).join('');
+                invSelect.onchange = window.updateFormTotal;
             }
             
             const rekOptions = '<option value="">-- Tidak Ada / Opsional --</option>' + 
                 rekanans.map(r => `<option value="${r.email}">${r.name} (${r.email})</option>`).join('');
 
-            const tekOptions = '<option value="">-- Tidak Ada / Opsional --</option>' + 
-                verifiedTeknisi.map(r => `<option value="${r.email}">🌟 ${r.name} (${r.email})</option>`).join('');
-
             if(rekCustSelect) rekCustSelect.innerHTML = rekOptions;
             if(rekInvSelect) rekInvSelect.innerHTML = rekOptions;
-            if(rekTekSelect) rekTekSelect.innerHTML = tekOptions;
+            if(rekTekSelect) rekTekSelect.innerHTML = rekOptions;
         };
 
         window.refreshProjectData = function() {
@@ -1701,23 +1808,12 @@
                     setUI('empty-msg-desc', "Sistem sedang menunggu Admin PT. Kalimaja untuk menghubungkan email Anda dengan data proyek yang berjalan.");
                 }
             }
+            window.renderInvestorTier();
         };
 
         window.changeActiveProject = function(projId) {
             window.activeProject = window.dbProjects.find(p => p.id === projId);
             if(window.activeProject) window.renderProjectData();
-        };
-
-        window.selectInvestorProject = function(projId) {
-            window.changeActiveProject(projId);
-            
-            setTimeout(() => {
-                const target = document.getElementById('dash-view');
-                if(target) {
-                    target.classList.remove('hidden-el');
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            }, 100);
         };
 
         window.openEditBankModal = function() {
@@ -1728,17 +1824,17 @@
         };
 
         window.saveBankData = async function() {
-            if(!window.activeUser || !fbUser) return;
+            if(!window.activeUser || !window.fbUser) return;
             const newBank = document.getElementById('edit-bank-name').value;
             const newRek = document.getElementById('edit-bank-rek').value;
 
-            if(!newBank || !newRek) return alert("Nama Bank dan Nomor Rekening tidak boleh kosong.");
+            if(!newBank || !newRek) return window.showAlert("Nama Bank dan Nomor Rekening tidak boleh kosong.");
 
             const updatedUser = { ...window.activeUser, bank: newBank, rek: newRek };
             await setDoc(getPubDoc('users', window.activeUser.email), updatedUser);
             
             window.activeUser = updatedUser;
-            sessionStorage.setItem('kalimaja_session_email', window.activeUser.email);
+            localStorage.setItem('kalimaja_session_email', window.activeUser.email);
             setUI('profile-bank', newBank);
             setUI('profile-rek', newRek);
             uiModal('bank-modal', false);
@@ -1784,6 +1880,7 @@
                 
                 setUI('view-saving-idr', formatIDR(savingIdr));
                 setUI('view-share-cust', formatIDR(savingIdr * latestSplit.cust)); 
+                setUI('view-investor-payout', formatIDR(invNetProfit));
                 
                 if (window.activeUser.role === 'customer') {
                     setUI('view-share-inv', formatIDR(tagihanInvestorGross)); 
@@ -1794,13 +1891,33 @@
                 }
                 
                 const elShareCom = document.getElementById('view-share-company');
-                let komisiBulananRekanan = 0;
-                if(window.activeProject.rekCustEmail === window.activeUser.email) komisiBulananRekanan += companyProfit * 0.25;
-                if(window.activeProject.rekInvEmail === window.activeUser.email) komisiBulananRekanan += companyProfit * 0.15;
+                let komisiBulananSales = 0;
+                if(window.activeProject.rekCustEmail === window.activeUser.email) komisiBulananSales += companyProfit * 0.25;
+                if(window.activeProject.rekInvEmail === window.activeUser.email) komisiBulananSales += companyProfit * 0.15;
+
+                let pendapatanTeknisi = 0;
+                if (window.activeProject.rekTekEmail === window.activeUser.email) {
+                    const totalUnits = window.activeProject.units.reduce((a,b)=>a+b.q,0);
+                    const invUser = window.dbUsers.find(u => u.email === window.activeProject.invEmail);
+                    const pTier = (invUser && invUser.tier) ? invUser.tier : 'D';
+                    let feePerUnit = 150000;
+                    if (pTier === 'A') feePerUnit = 450000;
+                    else if (pTier === 'B') feePerUnit = 350000;
+                    else if (pTier === 'C') feePerUnit = 250000;
+                    pendapatanTeknisi = feePerUnit * totalUnits;
+                }
                 
                 if (window.activeUser.role === 'rekanan') {
-                    setUI('label-share-company', `Komisi Anda (Bulan Ini)`);
-                    if(elShareCom) elShareCom.innerHTML = formatIDR(komisiBulananRekanan);
+                    if (komisiBulananSales > 0 && pendapatanTeknisi > 0) {
+                        setUI('label-share-company', `Sales (${formatIDR(komisiBulananSales)}) + Teknisi (${formatIDR(pendapatanTeknisi)})`);
+                        if(elShareCom) elShareCom.innerHTML = formatIDR(komisiBulananSales + pendapatanTeknisi);
+                    } else if (pendapatanTeknisi > 0) {
+                        setUI('label-share-company', `Fee Jasa Teknisi (Proyek Ini)`);
+                        if(elShareCom) elShareCom.innerHTML = formatIDR(pendapatanTeknisi);
+                    } else {
+                        setUI('label-share-company', `Komisi Sales (Bulan Ini)`);
+                        if(elShareCom) elShareCom.innerHTML = formatIDR(komisiBulananSales);
+                    }
                 } else {
                     setUI('label-share-company', `Laba Perusahaan (30% dari Tagihan)`);
                     
@@ -1912,21 +2029,71 @@
                 setUI('view-share-inv', "Rp 0");
                 setUI('view-share-company', "Rp 0");
                 setUI('view-bep', "0.0 Bulan");
+                setUI('view-investor-payout', "Rp 0");
                 
                 if (window.activeUser.role === 'customer') {
                     setUI('label-share-inv', `Tagihan Investor`);
                     setUI('label-share-company', `Laba Perusahaan`);
                 } else if (window.activeUser.role === 'rekanan') {
                     setUI('label-share-inv', `Net Profit Investor`);
-                    setUI('label-share-company', `Komisi Anda (Bulan Ini)`);
+                    setUI('label-share-company', `Komisi / Fee Teknisi`);
                 } else {
                     setUI('label-share-inv', `Net Profit Investor`);
                     setUI('label-share-company', `Laba Perusahaan`);
                 }
             }
             
+            document.querySelectorAll('.admin-only-view').forEach(el => {
+                if(window.activeUser.role === 'admin') el.classList.remove('hidden-el');
+                else el.classList.add('hidden-el');
+            });
+
+            window.renderInvestorTier();
             window.renderInvestorPortfolio(); 
             window.renderRekananPortfolio();
+        };
+
+        window.selectInvestorTier = function(tierCode) {
+            if(!window.fbUser || !window.activeUser) return;
+            window.showConfirm(`Yakin memilih TIER ${tierCode} sebagai komitmen investasi awal Anda?`, async () => {
+                const updatedUser = { ...window.activeUser, tier: tierCode, verified: true };
+                await setDoc(getPubDoc('users', window.activeUser.email), updatedUser);
+                window.activeUser = updatedUser;
+                localStorage.setItem('kalimaja_session_email', window.activeUser.email);
+                window.renderInvestorTier();
+                window.loadDashboard();
+                window.showAlert(`Selamat! Akun Anda telah terverifikasi di TIER ${tierCode}.`);
+            });
+        };
+
+        window.renderInvestorTier = function() {
+            const tierSect = document.getElementById('investor-tier-section');
+            if(!tierSect) return;
+
+            if(window.activeUser.role !== 'investor') {
+                tierSect.classList.add('hidden-el');
+                return;
+            }
+            tierSect.classList.remove('hidden-el');
+
+            const grid = document.getElementById('tier-selection-grid');
+            const activeInfo = document.getElementById('tier-active-info');
+            const starsContainer = document.getElementById('investor-stars');
+
+            if(window.activeUser.tier) {
+                grid.classList.add('hidden-el');
+                activeInfo.classList.remove('hidden-el');
+                document.getElementById('active-tier-name').innerText = `TIER ${window.activeUser.tier}`;
+                
+                let stars = '';
+                const starCount = window.activeUser.tier === 'A' ? 4 : window.activeUser.tier === 'B' ? 3 : window.activeUser.tier === 'C' ? 2 : 1;
+                for(let i=0; i<starCount; i++) stars += '<i class="fas fa-star"></i>';
+                starsContainer.innerHTML = stars;
+            } else {
+                grid.classList.remove('hidden-el');
+                activeInfo.classList.add('hidden-el');
+                starsContainer.innerHTML = '';
+            }
         };
 
         window.renderInvestorPortfolio = function() {
@@ -1998,8 +2165,8 @@
                 
                 let totalKlien = userProjects.length;
                 let totalUnitTerpasang = 0;
-                let totalAkumulasiKomisi = 0;
-                let totalJasaTeknisiAccumulated = 0;
+                let totalAkumulasiSales = 0;
+                let totalAkumulasiTeknisi = 0;
                 let gridHtml = '';
                 
                 userProjects.forEach(p => {
@@ -2008,15 +2175,21 @@
                     const totalUnits = p.units ? p.units.reduce((a,b)=>a+b.q,0) : 0;
                     const isActive = window.activeProject && window.activeProject.id === p.id;
                     
-                    let projectKomisi = 0;
-                    let projectJasa = 0;
+                    let komisiSales = 0;
+                    let komisiTeknisi = 0;
                     let roleBadges = [];
                     
                     if (p.rekTekEmail === window.activeUser.email) {
-                        projectJasa = p.jasaTeknisi || 0;
-                        totalJasaTeknisiAccumulated += projectJasa;
+                        const invUser = window.dbUsers.find(u => u.email === p.invEmail);
+                        const pTier = (invUser && invUser.tier) ? invUser.tier : 'D';
+                        let feePerUnit = 150000;
+                        if (pTier === 'A') feePerUnit = 500000;
+                        else if (pTier === 'B') feePerUnit = 350000;
+                        else if (pTier === 'C') feePerUnit = 250000;
+                        
+                        komisiTeknisi += (feePerUnit * totalUnits);
                         totalUnitTerpasang += totalUnits;
-                        roleBadges.push('Teknisi');
+                        roleBadges.push(`Teknisi (Tier ${pTier})`);
                     }
                     
                     let pLogs = window.dbLogs.filter(l => l.projectId === p.id);
@@ -2026,19 +2199,33 @@
                         const tagihanGross = s * split.invGross;
                         const companyProfit = tagihanGross * 0.3;
                         
-                        if(p.rekCustEmail === window.activeUser.email) projectKomisi += companyProfit * 0.25;
-                        if(p.rekInvEmail === window.activeUser.email) projectKomisi += companyProfit * 0.15;
+                        if(p.rekCustEmail === window.activeUser.email) komisiSales += companyProfit * 0.25;
+                        if(p.rekInvEmail === window.activeUser.email) komisiSales += companyProfit * 0.15;
                     });
                     
                     if (p.rekCustEmail === window.activeUser.email) roleBadges.push('Sales Cust');
                     if (p.rekInvEmail === window.activeUser.email) roleBadges.push('Sales Inv');
                     
-                    totalAkumulasiKomisi += projectKomisi;
+                    totalAkumulasiSales += komisiSales;
+                    totalAkumulasiTeknisi += komisiTeknisi;
 
-                    let estIncomeHtml = '';
-                    if(projectKomisi > 0) estIncomeHtml += `<span class="block text-sm font-bold text-amber-600 mono" title="Komisi Bagi Hasil">Komisi: ${formatIDR(projectKomisi)}</span>`;
-                    if(projectJasa > 0) estIncomeHtml += `<span class="block text-sm font-bold text-emerald-600 mono" title="Jasa Pemasangan">Jasa: ${formatIDR(projectJasa)}</span>`;
-                    if(estIncomeHtml === '') estIncomeHtml = `<span class="block text-sm font-bold text-slate-400 mono">Rp 0</span>`;
+                    let displayFees = '';
+                    if (komisiSales > 0 || p.rekCustEmail === window.activeUser.email || p.rekInvEmail === window.activeUser.email) {
+                        displayFees += `
+                            <div class="mb-2">
+                                <span class="block text-[9px] font-black text-slate-400 uppercase mb-1">Komisi Sales</span>
+                                <span class="block text-sm font-bold text-amber-600 mono">${formatIDR(komisiSales)}</span>
+                            </div>
+                        `;
+                    }
+                    if (komisiTeknisi > 0 || p.rekTekEmail === window.activeUser.email) {
+                        displayFees += `
+                            <div>
+                                <span class="block text-[9px] font-black text-slate-400 uppercase mb-1">Fee Jasa Teknisi</span>
+                                <span class="block text-sm font-bold text-emerald-600 mono">${formatIDR(komisiTeknisi)}</span>
+                            </div>
+                        `;
+                    }
 
                     gridHtml += `
                         <div class="bg-white p-6 rounded-[2rem] border ${isActive ? 'border-amber-500 shadow-lg ring-4 ring-amber-500/10 scale-[1.02]' : 'border-slate-200 shadow-sm hover:border-amber-300 hover:shadow-md'} transition-all text-left flex flex-col justify-between">
@@ -2050,12 +2237,11 @@
                                 <h4 class="text-xl font-black italic uppercase text-slate-900 leading-tight mb-1 line-clamp-2">${p.location}</h4>
                                 <p class="text-xs font-bold text-indigo-600 uppercase tracking-widest mb-1 truncate"><i class="fas fa-building mr-1"></i> ${custName}</p>
                             </div>
-                            <div class="pt-4 border-t border-slate-100 flex justify-between items-center mt-4 mb-4">
+                            <div class="pt-4 border-t border-slate-100 flex justify-between items-start mt-4 mb-4">
                                 <div>
-                                    <span class="block text-[9px] font-black text-slate-400 uppercase mb-1">Pendapatan Proyek</span>
-                                    ${estIncomeHtml}
+                                    ${displayFees}
                                 </div>
-                                <div class="text-right">
+                                <div class="text-right shrink-0 ml-2">
                                     <span class="block text-[9px] font-black text-slate-400 uppercase mb-1">Populasi</span>
                                     <span class="block text-sm font-bold text-slate-900">${totalUnits} Unit</span>
                                 </div>
@@ -2069,8 +2255,8 @@
                 
                 setUI('rek-total-klien', totalKlien);
                 setUI('rek-total-unit', totalUnitTerpasang);
-                setUI('rek-total-komisi', formatIDR(totalAkumulasiKomisi));
-                setUI('rek-total-jasa', formatIDR(totalJasaTeknisiAccumulated));
+                setUI('rek-total-komisi-sales', formatIDR(totalAkumulasiSales));
+                setUI('rek-total-komisi-tek', formatIDR(totalAkumulasiTeknisi));
                 document.getElementById('rekanan-portfolio-grid').innerHTML = gridHtml;
             }
         };
@@ -2097,8 +2283,35 @@
                 const q = parseInt(r.querySelector('.qty-in').value) || 0;
                 total += PRICES[pk] * q;
             });
-            setUI('form-capex-display', formatIDR(total));
-            return total;
+            
+            const invSelect = document.getElementById('form-inv-email');
+            let tierDiscount = 0;
+            let tierText = '';
+            
+            if (invSelect && invSelect.value) {
+                const invUser = window.dbUsers.find(u => u.email === invSelect.value.toLowerCase());
+                if (invUser && invUser.tier) {
+                    if (invUser.tier === 'A') tierDiscount = 28500000;
+                    else if (invUser.tier === 'B') tierDiscount = 22250000;
+                    else if (invUser.tier === 'C') tierDiscount = 15750000;
+                    else if (invUser.tier === 'D') tierDiscount = 14250000;
+                    tierText = `<br><span class="text-emerald-500 font-bold">- Dipotong Deposito (Tier ${invUser.tier}): ${formatIDR(tierDiscount)}</span>`;
+                }
+            }
+            
+            let finalCapex = total - tierDiscount;
+            if (finalCapex < 0) finalCapex = 0;
+            
+            const displayEl = document.getElementById('form-capex-display');
+            if (displayEl) {
+                if (tierDiscount > 0) {
+                    displayEl.innerHTML = `${formatIDR(finalCapex)} <span class="text-[10px] text-slate-400 block mt-2 font-bold leading-tight">Total Nilai AC: ${formatIDR(total)}${tierText}</span>`;
+                } else {
+                    displayEl.innerHTML = formatIDR(total);
+                }
+            }
+            
+            return finalCapex;
         };
 
         window.openNewProjectModal = function() {
@@ -2127,7 +2340,7 @@
 
         window.openEditProjectModal = function(projId) {
             const proj = window.dbProjects.find(p => p.id === projId);
-            if(!proj) return alert("Proyek tidak ditemukan.");
+            if(!proj) return window.showAlert("Proyek tidak ditemukan.");
 
             window.editingProjectId = projId;
             setUI('project-modal-title', 'Edit Kontrak Proyek');
@@ -2159,7 +2372,7 @@
         };
 
         window.saveProject = async function() {
-            if(!fbUser) return alert("Terputus dari server cloud.");
+            if(!window.fbUser) return window.showAlert("Terputus dari server cloud.");
             const custEmail = document.getElementById('form-cust-email').value.toLowerCase();
             const invEmail = document.getElementById('form-inv-email').value.toLowerCase();
             const loc = document.getElementById('form-loc').value;
@@ -2170,7 +2383,14 @@
             const rekInvEmail = document.getElementById('form-rek-inv').value.toLowerCase();
             const rekTekEmail = document.getElementById('form-rek-tek').value.toLowerCase();
 
-            if(!custEmail || !invEmail || !loc) return alert("Pilih Email Customer, Investor, & Isi Lokasi Gedung!");
+            if(!custEmail || !invEmail || !loc) return window.showAlert("Pilih Email Customer, Investor, & Isi Lokasi Gedung!");
+
+            const selectedInv = window.dbUsers.find(u => u.email === invEmail);
+            const pTier = (selectedInv && selectedInv.tier) ? selectedInv.tier : 'D';
+            let feePerUnit = 150000;
+            if (pTier === 'A') feePerUnit = 450000;
+            else if (pTier === 'B') feePerUnit = 350000;
+            else if (pTier === 'C') feePerUnit = 250000;
 
             let units = []; let totalWatt = 0; let totalJasaTeknisi = 0;
             document.querySelectorAll('#unit-rows-area > div').forEach(r => {
@@ -2179,15 +2399,11 @@
                 if(q > 0) { 
                     units.push({pk, q}); 
                     totalWatt += WATTS[pk] * q; 
-                    
-                    let pkNum = parseFloat(pk);
-                    if (pkNum <= 2.5) totalJasaTeknisi += 150000 * q;
-                    else if (pkNum <= 10) totalJasaTeknisi += 250000 * q;
-                    else totalJasaTeknisi += 350000 * q;
+                    totalJasaTeknisi += feePerUnit * q;
                 }
             });
 
-            if(units.length === 0) return alert("Tambahkan minimal 1 Unit AC.");
+            if(units.length === 0) return window.showAlert("Tambahkan minimal 1 Unit AC.");
 
             const projId = window.editingProjectId || ('PRJ-' + Date.now());
             const newProj = {
@@ -2209,13 +2425,13 @@
 
             await setDoc(getPubDoc('projects', projId), newProj);
             
-            alert(window.editingProjectId ? "Perubahan Proyek Tersimpan ke Cloud!" : "Kontrak Proyek Cloud Berhasil Diaktifkan!");
+            window.showAlert(window.editingProjectId ? "Perubahan Proyek Tersimpan ke Cloud!" : "Kontrak Proyek Cloud Berhasil Diaktifkan!");
             uiModal('project-modal', false);
             window.editingProjectId = null;
         };
 
         window.openKwhModal = function() {
-            if(!window.activeProject) return alert("Tidak ada proyek yang aktif untuk diupdate.");
+            if(!window.activeProject) return window.showAlert("Tidak ada proyek yang aktif untuk diupdate.");
             window.editingLogId = null;
             setUI('kwh-modal-title', 'Input Realisasi per Unit');
             
@@ -2242,8 +2458,8 @@
 
         window.editKwh = function(logId) {
             const logToEdit = window.dbLogs.find(l => (l.id || l.timestamp) === logId);
-            if(!logToEdit) return alert("Data riwayat tidak ditemukan.");
-            if(logToEdit.status === 'paid') return alert("Tagihan yang sudah LUNAS tidak dapat diedit lagi demi keamanan data.");
+            if(!logToEdit) return window.showAlert("Data riwayat tidak ditemukan.");
+            if(logToEdit.status === 'paid') return window.showAlert("Tagihan yang sudah LUNAS tidak dapat diedit lagi demi keamanan data.");
 
             window.editingLogId = logId;
             setUI('kwh-modal-title', 'Edit Realisasi per Unit');
@@ -2284,8 +2500,9 @@
         };
 
         window.saveKwh = async function() {
+            if(!window.fbUser) return window.showAlert("Terputus dari cloud.");
             const period = document.getElementById('in-kwh-period').value;
-            if(!period) return alert("Pilih Periode Bulan Tagihan!");
+            if(!period) return window.showAlert("Pilih Periode Bulan Tagihan!");
             
             let totalVal = 0;
             let breakdownData = [];
@@ -2303,8 +2520,8 @@
                 });
             });
 
-            if(!allFilled) return alert("Harap isi nilai kWh untuk seluruh unit. Isi dengan 0 jika unit tidak menyala.");
-            if(totalVal <= 0) return alert("Total kWh akumulasi tidak boleh 0.");
+            if(!allFilled) return window.showAlert("Harap isi nilai kWh untuk seluruh unit. Isi dengan 0 jika unit tidak menyala.");
+            if(totalVal <= 0) return window.showAlert("Total kWh akumulasi tidak boleh 0.");
 
             const logId = window.editingLogId || ('LOG-' + Date.now());
             const logData = {
@@ -2325,10 +2542,10 @@
 
         window.printInvoice = function(logId) {
             const log = window.dbLogs.find(l => (l.id || l.timestamp) === logId);
-            if(!log) return alert("Data riwayat tidak ditemukan.");
+            if(!log) return window.showAlert("Data riwayat tidak ditemukan.");
 
             const proj = window.dbProjects.find(p => p.id === log.projectId);
-            if(!proj) return alert("Data proyek tidak ditemukan.");
+            if(!proj) return window.showAlert("Data proyek tidak ditemukan.");
 
             const cust = window.dbUsers.find(u => u.email === proj.custEmail) || {};
 
@@ -2365,41 +2582,45 @@
             }, 1000);
         };
 
-        window.markAsPaid = async function(logId) {
-            if(!confirm("Yakin menandai tagihan/bagi hasil ini sebagai LUNAS?")) return;
-            const logToEdit = window.dbLogs.find(l => (l.id || l.timestamp) === logId);
-            if(logToEdit && fbUser) {
-                logToEdit.status = 'paid';
-                await setDoc(getPubDoc('logs', logId), logToEdit);
-            }
-        };
-
-        window.deleteKwh = async function(logId) {
-            if(!confirm("PERINGATAN! Anda yakin ingin menghapus data riwayat konsumsi untuk periode ini secara permanen dari Cloud Database?")) return;
-            if(fbUser) await deleteDoc(getPubDoc('logs', logId));
-        };
-
-        window.deleteActiveProject = async function() {
-            if(!window.activeProject) return alert("Pilih proyek yang akan dihapus.");
-            const konfirmasi = confirm(`PERINGATAN!\n\nAnda yakin ingin membatalkan dan menghapus proyek di lokasi "${window.activeProject.location}" dari CLOUD?\n\nSemua riwayat pemakaian dan tagihan untuk proyek ini juga akan dihapus secara permanen.`);
-            
-            if(konfirmasi && fbUser) {
-                const projId = window.activeProject.id;
-                const logsToDelete = window.dbLogs.filter(l => l.projectId === projId);
-                
-                for (let log of logsToDelete) {
-                    await deleteDoc(getPubDoc('logs', log.id || log.timestamp));
+        window.markAsPaid = function(logId) {
+            window.showConfirm("Yakin menandai tagihan/bagi hasil ini sebagai LUNAS?", async () => {
+                const logToEdit = window.dbLogs.find(l => (l.id || l.timestamp) === logId);
+                if(logToEdit && window.fbUser) {
+                    logToEdit.status = 'paid';
+                    await setDoc(getPubDoc('logs', logId), logToEdit);
                 }
-                await deleteDoc(getPubDoc('projects', projId));
-                
-                alert("Proyek berhasil dihapus dari Cloud.");
-                window.activeProject = null;
-            }
+            });
         };
 
-        window.clearAllData = async function() {
-            if(confirm("PERINGATAN KRITIS: Seluruh data (User, Proyek, Log, Chat) akan dihapus secara PERMANEN dari Cloud Database. Anda yakin?")) {
-                if(!fbUser) return;
+        window.deleteKwh = function(logId) {
+            window.showConfirm("PERINGATAN! Anda yakin ingin menghapus data riwayat konsumsi untuk periode ini secara permanen dari Cloud Database?", async () => {
+                if(window.fbUser) await deleteDoc(getPubDoc('logs', logId));
+            });
+        };
+
+        window.deleteActiveProject = function() {
+            if(!window.activeProject) return window.showAlert("Pilih proyek yang akan dihapus.");
+            
+            window.showConfirm(`PERINGATAN!\n\nAnda yakin ingin membatalkan dan menghapus proyek di lokasi "${window.activeProject.location}" dari CLOUD?\n\nSemua riwayat pemakaian dan tagihan untuk proyek ini juga akan dihapus secara permanen.`, async () => {
+                if(window.fbUser) {
+                    const projId = window.activeProject.id;
+                    const logsToDelete = window.dbLogs.filter(l => l.projectId === projId);
+                    
+                    for (let log of logsToDelete) {
+                        await deleteDoc(getPubDoc('logs', log.id || log.timestamp));
+                    }
+                    await deleteDoc(getPubDoc('projects', projId));
+                    
+                    window.showAlert("Proyek berhasil dihapus dari Cloud.");
+                    window.activeProject = null;
+                    window.refreshProjectData();
+                }
+            });
+        };
+
+        window.clearAllData = function() {
+            window.showConfirm("PERINGATAN KRITIS: Seluruh data (User, Proyek, Log, Chat) akan dihapus secara PERMANEN dari Cloud Database. Anda yakin?", async () => {
+                if(!window.fbUser) return;
                 document.getElementById('cloud-loader').style.display = 'flex';
                 document.getElementById('cloud-loader').style.opacity = '1';
                 
@@ -2408,9 +2629,9 @@
                 for(let l of window.dbLogs) await deleteDoc(getPubDoc('logs', l.id || l.timestamp));
                 for(let c of window.dbChats) await deleteDoc(getPubDoc('chats', c.id.toString()));
                 
-                sessionStorage.removeItem('kalimaja_session_email');
+                localStorage.removeItem('kalimaja_session_email');
                 location.reload();
-            }
+            });
         };
     </script>
 </body>
