@@ -141,6 +141,9 @@
             document.getElementById('view-investors').classList.add('hidden-el');
             document.getElementById('view-rekanan').classList.add('hidden-el');
             document.getElementById('view-chat').classList.add('hidden-el');
+            
+            const lockedView = document.getElementById('locked-access-view');
+            if (lockedView) lockedView.classList.add('hidden-el');
 
             if(viewName === 'dashboard') {
                 document.getElementById('view-dashboard').classList.remove('hidden-el');
@@ -371,6 +374,27 @@
                     <p class="text-sm font-medium text-slate-400 italic mt-2 text-left">Portal Informasi & Transaksi Finansial</p>
                 </div>
             </header>
+
+            <!-- TAMPILAN JIKA AKSES TERKUNCI (KARENA TAGIHAN INVESTOR) -->
+            <div id="locked-access-view" class="hidden-el bg-white border border-red-200 rounded-[40px] p-10 lg:p-20 text-center card-shadow mt-8">
+                <i class="fas fa-lock text-6xl text-red-400 mb-6 block mx-auto"></i>
+                <h2 class="text-3xl font-black italic uppercase text-red-900 mb-2">Akses Terkunci</h2>
+                <p class="text-red-600 font-bold mb-8 max-w-lg mx-auto">Anda memiliki tagihan deposit atau kekurangan CAPEX yang belum diselesaikan. Harap selesaikan pembayaran untuk membuka akses operasional Anda.</p>
+                <div class="bg-red-50 p-6 rounded-2xl max-w-md mx-auto border border-red-100 shadow-sm text-left">
+                    <p class="text-[10px] font-black text-red-400 uppercase tracking-widest mb-4 border-b border-red-100 pb-2">Rincian Tagihan Tertunda</p>
+                    <div id="locked-bill-details" class="space-y-4"></div>
+                    <div class="mt-6 pt-4 border-t border-red-200 flex justify-between items-center">
+                        <p class="text-[10px] font-black text-red-500 uppercase tracking-widest">Total Tagihan</p>
+                        <p id="locked-total-bill" class="text-2xl font-black text-red-700 mono">Rp 0</p>
+                    </div>
+                </div>
+                <div class="mt-8 pt-8 border-t border-slate-100 max-w-md mx-auto text-left">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 text-center">Silakan Transfer Ke Rekening Resmi:</p>
+                    <p class="text-xl font-black text-slate-800 mono text-center">BCA 6044837263</p>
+                    <p class="text-xs font-bold text-slate-500 uppercase mt-1 text-center">A.n PT KALIMAJA SURYA ALAM</p>
+                    <p class="text-[10px] font-bold text-amber-600 bg-amber-50 rounded-lg p-3 mt-4 border border-amber-100 text-center">Segera hubungi tim Admin melalui chat jika Anda telah melakukan transfer agar akses akun Anda dapat segera dibuka.</p>
+                </div>
+            </div>
 
             <!-- PROFIL PENGGUNA -->
             <div class="bg-white rounded-[32px] p-8 card-shadow border border-slate-100 mb-8 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 text-left">
@@ -1088,7 +1112,7 @@
 
         const formatIDR = (v) => new Intl.NumberFormat('id-ID', {style:'currency', currency:'IDR', maximumFractionDigits:0}).format(v);
         const formatNum = (v) => new Intl.NumberFormat('id-ID').format(v);
-        const setUI = (id, val) => { const el = document.getElementById(id); if(el) el.innerText = val; };
+        const setUI = (id, val) => { const el = document.getElementById(id); if(el) el.innerHTML = val; };
         
         const getPubCol = (c) => {
             if(typeof __app_id !== 'undefined') return collection(db, 'artifacts', appId, 'public', 'data', c);
@@ -1208,7 +1232,7 @@
         };
 
         function validateNIK(nik) {
-            if (!/^\d{16}$/.test(nik)) return "Format NIK tidak valid. Harus terdiri dari tepat 16 digit angka.";
+            if (!/^\d{16}$/.test(nik)) return "Format NIK tidak valid. Harus terdiri من tepat 16 digit angka.";
             const day = parseInt(nik.substring(6, 8));
             const month = parseInt(nik.substring(8, 10));
             if (month < 1 || month > 12) return "Format NIK terdeteksi asal-asalan (Kode Bulan tidak valid).";
@@ -1699,19 +1723,45 @@
                     else if (u.tier === 'D') nominalTagihan = 14250000;
 
                     let totalShortfall = 0;
+                    let unpaidShortfall = 0;
+                    let shortfallButtons = '';
+                    
                     userProjs.forEach(p => {
-                        if (p.capexShortfall) totalShortfall += p.capexShortfall;
+                        if (p.capexShortfall) {
+                            totalShortfall += p.capexShortfall;
+                            if(!p.shortfallPaid) {
+                                unpaidShortfall += p.capexShortfall;
+                                shortfallButtons += `<button onclick="window.markShortfallPaid('${p.id}')" class="text-[8px] mt-1 font-bold text-white bg-amber-500 hover:bg-amber-600 px-2 py-1 rounded block w-full text-center transition-colors shadow-sm">Lunas: Kekurangan ${p.location}</button>`;
+                            }
+                        }
                     });
 
                     if (nominalTagihan > 0 || totalShortfall > 0) {
                         let badges = '';
-                        if(nominalTagihan > 0) badges += `<span class="text-[8px] font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded mt-1 inline-block uppercase tracking-widest border border-red-100">Deposit: ${formatIDR(nominalTagihan)}</span><br>`;
-                        if(totalShortfall > 0) badges += `<span class="text-[8px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded mt-1 inline-block uppercase tracking-widest border border-amber-100">Kekurangan CAPEX: ${formatIDR(totalShortfall)}</span>`;
+                        let depositStatus = u.tierPaid ? '<span class="text-[8px] text-emerald-600 bg-emerald-50 px-1 rounded ml-1 border border-emerald-100">LUNAS</span>' : '';
+                        
+                        if(nominalTagihan > 0) {
+                            badges += `<div class="mb-2"><span class="text-[8px] font-bold ${u.tierPaid ? 'text-emerald-600 bg-emerald-50 border-emerald-100' : 'text-red-500 bg-red-50 border-red-100'} px-2 py-0.5 rounded mt-1 inline-block uppercase tracking-widest border">Deposit: ${formatIDR(nominalTagihan)} ${depositStatus}</span>`;
+                            if(!u.tierPaid) {
+                                badges += `<button onclick="window.markTierPaid('${u.email}')" class="text-[8px] mt-1 mb-2 font-bold text-white bg-red-500 hover:bg-red-600 px-2 py-1 rounded block w-full text-center transition-colors shadow-sm">Tandai Deposit Lunas</button>`;
+                            }
+                            badges += `</div>`;
+                        }
+                        
+                        if(totalShortfall > 0) {
+                            let shortStatus = (unpaidShortfall === 0) ? '<span class="text-[8px] text-emerald-600 bg-emerald-50 px-1 rounded ml-1 border border-emerald-100">LUNAS</span>' : '';
+                            badges += `<div><span class="text-[8px] font-bold ${unpaidShortfall === 0 ? 'text-emerald-600 bg-emerald-50 border-emerald-100' : 'text-amber-600 bg-amber-50 border-amber-100'} px-2 py-0.5 rounded mt-1 inline-block uppercase tracking-widest border">Kekurangan CAPEX: ${formatIDR(totalShortfall)} ${shortStatus}</span>`;
+                            badges += shortfallButtons + `</div>`;
+                        }
+
+                        let totalUnpaid = (!u.tierPaid ? nominalTagihan : 0) + unpaidShortfall;
+                        let totalColor = totalUnpaid > 0 ? 'text-red-600' : 'text-emerald-600';
 
                         tagihanColumn = `
-                            <td class="py-5 px-6 text-right">
-                                <span class="block font-mono font-black text-red-600">${formatIDR(nominalTagihan + totalShortfall)}</span>
-                                ${badges}
+                            <td class="py-5 px-6 text-right align-top">
+                                <span class="block font-mono font-black text-sm ${totalColor}">${formatIDR(totalUnpaid > 0 ? totalUnpaid : (nominalTagihan + totalShortfall))}</span>
+                                ${totalUnpaid === 0 && (nominalTagihan+totalShortfall) > 0 ? '<span class="text-[8px] font-bold text-emerald-500 block uppercase mb-2">Semua Lunas</span>' : '<span class="text-[8px] font-bold text-red-500 block uppercase mb-2">Total Tertunggak</span>'}
+                                <div class="mt-2 text-left">${badges}</div>
                             </td>
                         `;
                     } else {
@@ -1747,6 +1797,28 @@
             });
         };
 
+        window.markTierPaid = function(email) {
+            window.showConfirm("Yakin menandai Deposit Tier investor ini sebagai LUNAS? Akses dashboard investor akan terbuka.", async () => {
+                const user = window.dbUsers.find(u => u.email === email);
+                if(user && window.fbUser) {
+                    user.tierPaid = true;
+                    await setDoc(getPubDoc('users', email), user);
+                    window.showAlert("Deposit Tier berhasil ditandai lunas.");
+                }
+            });
+        };
+
+        window.markShortfallPaid = function(projectId) {
+            window.showConfirm("Yakin menandai Kekurangan CAPEX proyek ini sebagai LUNAS?", async () => {
+                const proj = window.dbProjects.find(p => p.id === projectId);
+                if(proj && window.fbUser) {
+                    proj.shortfallPaid = true;
+                    await setDoc(getPubDoc('projects', projectId), proj);
+                    window.showAlert("Kekurangan CAPEX berhasil ditandai lunas.");
+                }
+            });
+        };
+
         window.populateAdminDropdowns = function() {
             let customers = window.dbUsers.filter(u => u.role === 'customer');
             let investors = window.dbUsers.filter(u => u.role === 'investor');
@@ -1779,6 +1851,68 @@
         window.refreshProjectData = function() {
             let userProjects = [];
             
+            const lockedView = document.getElementById('locked-access-view');
+            if(lockedView) lockedView.classList.add('hidden-el');
+
+            if (window.activeUser.role === 'admin') {
+                userProjects = window.dbProjects;
+            } else if (window.activeUser.role === 'investor') {
+                userProjects = window.dbProjects.filter(p => p.invEmail === window.activeUser.email);
+            } else if (window.activeUser.role === 'rekanan') {
+                userProjects = window.dbProjects.filter(p => p.rekCustEmail === window.activeUser.email || p.rekInvEmail === window.activeUser.email || p.rekTekEmail === window.activeUser.email);
+            } else {
+                userProjects = window.dbProjects.filter(p => p.custEmail === window.activeUser.email);
+            }
+
+            if(window.activeUser.role === 'investor') {
+                let locked = false;
+                let billDetails = '';
+                let totalBill = 0;
+
+                // Validasi Deposit Tier (jika old user tierPaid = undefined, kita anggap false/belum lunas jika ada tier)
+                let isTierPaid = window.activeUser.tierPaid === true;
+
+                if(window.activeUser.tier && !isTierPaid) {
+                    locked = true;
+                    let nominalTagihan = 0;
+                    if (window.activeUser.tier === 'A') nominalTagihan = 28500000;
+                    else if (window.activeUser.tier === 'B') nominalTagihan = 22250000;
+                    else if (window.activeUser.tier === 'C') nominalTagihan = 15750000;
+                    else if (window.activeUser.tier === 'D') nominalTagihan = 14250000;
+                    
+                    totalBill += nominalTagihan;
+                    billDetails += `<div class="flex justify-between items-center"><span class="text-xs font-bold text-red-800 uppercase">Deposit Awal (Tier ${window.activeUser.tier})</span><span class="text-sm font-black text-red-600 mono">${formatIDR(nominalTagihan)}</span></div>`;
+                }
+
+                userProjects.forEach(p => {
+                    let isShortfallPaid = p.shortfallPaid === true;
+                    if(p.capexShortfall > 0 && !isShortfallPaid) {
+                        locked = true;
+                        totalBill += p.capexShortfall;
+                        billDetails += `<div class="flex justify-between items-center"><span class="text-xs font-bold text-red-800 uppercase">Kekurangan CAPEX <br><span class="text-[9px] text-red-500">${p.location}</span></span><span class="text-sm font-black text-red-600 mono">${formatIDR(p.capexShortfall)}</span></div>`;
+                    }
+                });
+
+                if(locked) {
+                    document.getElementById('view-dashboard').classList.add('hidden-el');
+                    document.getElementById('project-controls').classList.add('hidden-el');
+                    document.getElementById('empty-msg').classList.add('hidden-el');
+                    
+                    if(lockedView) {
+                        lockedView.classList.remove('hidden-el');
+                        setUI('locked-bill-details', billDetails);
+                        setUI('locked-total-bill', formatIDR(totalBill));
+                    }
+                    
+                    const invPortSect = document.getElementById('investor-portfolio-section');
+                    if(invPortSect) invPortSect.classList.add('hidden-el');
+                    const tierSect = document.getElementById('investor-tier-section');
+                    if(tierSect) tierSect.classList.add('hidden-el');
+                    
+                    return; 
+                }
+            }
+
             if (window.activeUser.role === 'rekanan') {
                 const controls = document.getElementById('project-controls');
                 if(controls) controls.classList.add('hidden-el');
@@ -1786,14 +1920,6 @@
                 document.getElementById('dash-view').classList.add('hidden-el');
                 window.renderRekananPortfolio();
                 return; 
-            }
-
-            if (window.activeUser.role === 'admin') {
-                userProjects = window.dbProjects;
-            } else if (window.activeUser.role === 'investor') {
-                userProjects = window.dbProjects.filter(p => p.invEmail === window.activeUser.email);
-            } else {
-                userProjects = window.dbProjects.filter(p => p.custEmail === window.activeUser.email);
             }
 
             const controls = document.getElementById('project-controls');
@@ -1910,7 +2036,9 @@
             const shortfallEl = document.querySelector('.shortfall-container');
             if (window.activeProject.capexShortfall && window.activeProject.capexShortfall > 0) {
                 if(shortfallEl) shortfallEl.classList.remove('hidden-el');
+                let statusBadge = window.activeProject.shortfallPaid ? '<span class="text-[8px] bg-emerald-100 text-emerald-700 px-1 ml-2 rounded">LUNAS</span>' : '<span class="text-[8px] bg-red-100 text-red-700 px-1 ml-2 rounded">BELUM LUNAS</span>';
                 setUI('view-capex-shortfall', formatIDR(window.activeProject.capexShortfall));
+                document.getElementById('view-capex-shortfall').insertAdjacentHTML('beforeend', statusBadge);
             } else {
                 if(shortfallEl) shortfallEl.classList.add('hidden-el');
             }
@@ -2113,14 +2241,13 @@
 
         window.selectInvestorTier = function(tierCode) {
             if(!window.fbUser || !window.activeUser) return;
-            window.showConfirm(`Yakin memilih TIER ${tierCode} sebagai komitmen investasi awal Anda?`, async () => {
-                const updatedUser = { ...window.activeUser, tier: tierCode, verified: true };
+            window.showConfirm(`Yakin memilih TIER ${tierCode} sebagai komitmen investasi awal Anda? Tagihan deposit akan diterbitkan setelah ini.`, async () => {
+                const updatedUser = { ...window.activeUser, tier: tierCode, verified: true, tierPaid: false };
                 await setDoc(getPubDoc('users', window.activeUser.email), updatedUser);
                 window.activeUser = updatedUser;
                 localStorage.setItem('kalimaja_session_email', window.activeUser.email);
-                window.renderInvestorTier();
-                window.loadDashboard();
-                window.showAlert(`Selamat! Akun Anda telah terverifikasi di TIER ${tierCode}.`);
+                window.showAlert(`Tier ${tierCode} berhasil dipilih. Silakan selesaikan tagihan deposit Anda.`);
+                window.refreshProjectData();
             });
         };
 
@@ -2176,10 +2303,11 @@
                     
                     let shortfallHtml = '';
                     if (p.capexShortfall && p.capexShortfall > 0) {
+                        let status = p.shortfallPaid ? '<span class="text-emerald-500 ml-2 border border-emerald-200 bg-emerald-50 px-1 rounded">(LUNAS)</span>' : '<span class="text-red-500 ml-2 border border-red-200 bg-red-50 px-1 rounded">(BELUM LUNAS)</span>';
                         shortfallHtml = `
-                            <div class="mt-4 pt-4 border-t border-red-100/50">
-                                <span class="block text-[9px] font-black text-red-500 uppercase mb-1"><i class="fas fa-exclamation-triangle"></i> Kekurangan CAPEX</span>
-                                <span class="block text-sm font-bold text-red-600 mono">${formatIDR(p.capexShortfall)}</span>
+                            <div class="mt-4 pt-4 border-t ${p.shortfallPaid ? 'border-emerald-100/50' : 'border-red-100/50'}">
+                                <span class="block text-[9px] font-black ${p.shortfallPaid ? 'text-emerald-500' : 'text-red-500'} uppercase mb-1"><i class="fas ${p.shortfallPaid ? 'fa-check-circle' : 'fa-exclamation-triangle'}"></i> Kekurangan CAPEX ${status}</span>
+                                <span class="block text-sm font-bold ${p.shortfallPaid ? 'text-emerald-600' : 'text-red-600'} mono">${formatIDR(p.capexShortfall)}</span>
                             </div>
                         `;
                     }
@@ -2489,6 +2617,7 @@
                 location: loc,
                 capex: totalNilaiAC,
                 capexShortfall: capexShortfall,
+                shortfallPaid: capexShortfall === 0,
                 baseline: (totalWatt/1000) * h * d,
                 hours: h,
                 days: d,
