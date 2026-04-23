@@ -724,7 +724,7 @@
                                         <th class="py-5 px-6 text-left">Periode</th>
                                         <th class="py-5 px-6 text-right">Meter Listrik Real</th>
                                         <th class="py-5 px-6 text-right">Saving Murni</th>
-                                        <th class="py-5 px-6 text-right text-indigo-600">Tagihan Investor (Rasio)</th>
+                                        <th id="th-tagihan-inv" class="py-5 px-6 text-right text-indigo-600">Tagihan Investor (Rasio)</th>
                                         <th class="py-5 px-6 text-center">Akhir Kontrak</th>
                                         <th class="py-5 px-6 text-center">Status</th>
                                     </tr>
@@ -2020,6 +2020,11 @@
         window.renderProjectData = function() {
             document.getElementById('empty-msg').classList.add('hidden-el');
             document.getElementById('dash-view').classList.remove('hidden-el');
+            
+            const thTagihan = document.getElementById('th-tagihan-inv');
+            if (thTagihan) {
+                thTagihan.innerText = window.activeUser.role === 'investor' ? 'Tagihan ke Customer (Rasio)' : 'Tagihan Investor (Rasio)';
+            }
             
             const custObj = window.dbUsers.find(u => u.email === window.activeProject.custEmail) || {};
             const custNameDisplay = custObj.name || "Customer Tidak Diketahui";
