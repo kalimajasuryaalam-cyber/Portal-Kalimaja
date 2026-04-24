@@ -725,7 +725,7 @@
                                         <th class="py-5 px-6 text-right">Meter Listrik Real</th>
                                         <th class="py-5 px-6 text-right">Saving Murni</th>
                                         <th id="th-tagihan-inv" class="py-5 px-6 text-right text-indigo-600">Tagihan Investor (Rasio)</th>
-                                        <th class="py-5 px-6 text-center">Status Transfer Inv.</th>
+                                        <th id="th-status-transfer-inv" class="py-5 px-6 text-center">Status Transfer Inv.</th>
                                         <th class="py-5 px-6 text-center">Akhir Kontrak</th>
                                         <th class="py-5 px-6 text-center">Status (Cust)</th>
                                     </tr>
@@ -2026,6 +2026,15 @@
             if (thTagihan) {
                 thTagihan.innerText = window.activeUser.role === 'investor' ? 'Tagihan ke Customer (Rasio)' : 'Tagihan Investor (Rasio)';
             }
+
+            const thStatusTransfer = document.getElementById('th-status-transfer-inv');
+            if (thStatusTransfer) {
+                if (window.activeUser.role === 'customer') {
+                    thStatusTransfer.classList.add('hidden-el');
+                } else {
+                    thStatusTransfer.classList.remove('hidden-el');
+                }
+            }
             
             const custObj = window.dbUsers.find(u => u.email === window.activeProject.custEmail) || {};
             const custNameDisplay = custObj.name || "Customer Tidak Diketahui";
@@ -2204,6 +2213,19 @@
 
                     const rasioLabel = `Inv ${Math.round(logSplit.invGross * 100)}% : Cust ${Math.round(logSplit.cust * 100)}%`;
 
+                    let invTransferTd = '';
+                    if (window.activeUser.role !== 'customer') {
+                        invTransferTd = `
+                            <td class="py-5 px-6 text-center">
+                                <span class="status-pill ${invStatusClass}">${invStatusLabel}</span>
+                                <div class="mt-2 pt-2 border-t border-slate-100">
+                                    <span class="block text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Nominal Transfer:</span>
+                                    <span class="block text-xs font-black text-emerald-600 mono">${formatIDR(invNetProfitTable)}</span>
+                                </div>
+                            </td>
+                        `;
+                    }
+
                     table.insertAdjacentHTML('beforeend', `
                         <tr class="text-xs font-bold italic border-b border-slate-50 hover:bg-slate-50 transition-colors">
                             <td class="py-5 px-6">${l.period}</td>
@@ -2213,13 +2235,7 @@
                                 ${formatIDR(tagihanInvestorGrossTable)} <br>
                                 <span class="text-[9px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded mt-1 inline-block">${rasioLabel}</span>
                             </td>
-                            <td class="py-5 px-6 text-center">
-                                <span class="status-pill ${invStatusClass}">${invStatusLabel}</span>
-                                <div class="mt-2 pt-2 border-t border-slate-100">
-                                    <span class="block text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Nominal Transfer:</span>
-                                    <span class="block text-xs font-black text-emerald-600 mono">${formatIDR(invNetProfitTable)}</span>
-                                </div>
-                            </td>
+                            ${invTransferTd}
                             <td class="py-5 px-6 text-center text-amber-600">${endDateStr}</td>
                             <td class="py-5 px-6 text-center leading-tight align-top">
                                 <span class="status-pill ${statusClass}">${statusLabel}</span>
