@@ -1416,17 +1416,21 @@
                 nik, phone, bank, rek, avatar: null 
             };
             
-            // Backup inject ke memori lokal secara instan anti-delay
-            const existingIndex = window.dbUsers.findIndex(u => cleanEmailStr(u.email) === email);
-            if(existingIndex >= 0) window.dbUsers[existingIndex] = newUser;
-            else window.dbUsers.push(newUser);
-
-            await setDoc(getPubDoc('users', email), newUser);
-            
-            window.showAlert(`Berhasil! Akun Teknisi baru berhasil dibuat.\n\nEmail: ${email}\nSandi: ${pass}\n\nBerikan data login ini kepada Teknisi agar bisa mengakses sistem.`);
-            uiModal('teknisi-modal', false);
-            window.renderUserTable('teknisi');
-            window.populateAdminDropdowns();
+            try {
+                // Wajib menunggu konfirmasi dari server Cloud (Bukan memori lokal)
+                await setDoc(getPubDoc('users', email), newUser);
+                
+                window.showAlert(`Berhasil! Akun Teknisi baru telah dikunci ke Cloud Database.\n\nEmail: ${email}\nSandi: ${pass}\n\nBerikan data login ini kepada Teknisi agar bisa mengakses sistem.`);
+                uiModal('teknisi-modal', false);
+                
+                // Refresh tampilan setelah data benar-benar sukses masuk ke server
+                setTimeout(() => {
+                    window.renderUserTable('teknisi');
+                    window.populateAdminDropdowns();
+                }, 1000);
+            } catch (error) {
+                window.showAlert(`GAGAL menyimpan ke Cloud! Pesan Error: ${error.message}`);
+            }
         };
 
         window.doLogin = function() {
@@ -1440,7 +1444,13 @@
                 localStorage.setItem('kalimaja_session_email', user.email);
                 window.loadDashboard();
             } else {
-                window.showAlert("Login Gagal: Akun Teknisi/User tidak ditemukan. Pastikan tidak ada spasi tak terlihat saat Copy-Paste.");
+                // Pengecekan Error Spesifik (Apakah salah Sandi, atau Email memang tidak ada)
+                const emailExist = window.dbUsers.find(u => cleanEmailStr(u.email) === email);
+                if (emailExist) {
+                    window.showAlert(`Login Gagal: Kata sandi salah untuk akun ${email}`);
+                } else {
+                    window.showAlert(`Login Gagal: Akun dengan email "${email}" tidak ditemukan di Cloud Database. Pastikan Admin sudah berhasil mendaftarkan email ini.`);
+                }
             }
         };
 
