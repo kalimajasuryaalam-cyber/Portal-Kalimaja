@@ -897,6 +897,7 @@
                                     <th class="py-5 px-6 text-left">No. HP / WA</th>
                                     <th class="py-5 px-6 text-left">Data Rekening</th>
                                     <th class="py-5 px-6 text-left">Status Proyek</th>
+                                    <th class="py-5 px-6 text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="table-sales-body" class="divide-y divide-slate-100">
@@ -2012,6 +2013,33 @@
                     }
                 }
 
+                let feeStatusHtml = '';
+                if (roleType === 'sales' || roleType === 'teknisi') {
+                    if (u.lastFeePaidAt) {
+                        const paidDate = new Date(u.lastFeePaidAt).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year: 'numeric'});
+                        feeStatusHtml = `<span class="block mt-2 text-[8px] bg-emerald-100 text-emerald-700 px-2 py-1 rounded font-bold uppercase tracking-widest border border-emerald-200 w-fit">Terakhir Bayar: ${paidDate}</span>`;
+                    } else {
+                        feeStatusHtml = `<span class="block mt-2 text-[8px] bg-amber-100 text-amber-700 px-2 py-1 rounded font-bold uppercase tracking-widest border border-amber-200 w-fit">Belum Ada Pembayaran</span>`;
+                    }
+                }
+
+                let aksiColumn = '';
+                if (roleType === 'sales' || roleType === 'teknisi') {
+                    aksiColumn = `
+                        <td class="py-5 px-6 text-center whitespace-nowrap align-top">
+                            <button onclick="window.payUserFee('${u.email}')" class="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors inline-flex items-center gap-1 mb-1 w-full justify-center" title="Proses Bayar Fee">
+                                <i class="fas fa-money-check-alt"></i> Bayar Fee
+                            </button>
+                            ${roleType === 'teknisi' ? `
+                            <br>
+                            <button onclick="window.deleteUserAccount('${u.email}')" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors inline-flex items-center gap-1 w-full justify-center" title="Hapus Teknisi">
+                                <i class="fas fa-trash-alt"></i> Hapus
+                            </button>
+                            ` : ''}
+                        </td>
+                    `;
+                }
+
                 tbody.insertAdjacentHTML('beforeend', `
                     <tr class="text-xs border-b border-slate-50 hover:bg-slate-50 transition-colors">
                         <td class="py-5 px-6 font-bold text-slate-500">${index + 1}</td>
@@ -2033,20 +2061,27 @@
                         <td class="py-5 px-6">
                             <span class="text-slate-500 uppercase">${u.bank || '-'}</span> <br> 
                             <span class="font-mono text-indigo-600 font-bold">${u.rek || '-'}</span>
+                            ${feeStatusHtml}
                         </td>
                         ${tagihanColumn}
                         <td class="py-5 px-6 max-w-[200px]">
                             ${projectHtml}
                         </td>
-                        ${roleType === 'teknisi' ? `
-                        <td class="py-5 px-6 text-center whitespace-nowrap">
-                            <button onclick="window.deleteUserAccount('${u.email}')" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors inline-flex items-center gap-1" title="Hapus Teknisi">
-                                <i class="fas fa-trash-alt"></i> Hapus
-                            </button>
-                        </td>
-                        ` : ''}
+                        ${aksiColumn}
                     </tr>
                 `);
+            });
+        };
+
+        window.payUserFee = function(email) {
+            window.showConfirm("Yakin menandai seluruh komisi/fee untuk mitra ini sebagai LUNAS DIBAYAR?", async () => {
+                const user = window.dbUsers.find(u => u.email === email);
+                if(user && window.fbUser) {
+                    const now = new Date();
+                    user.lastFeePaidAt = now.toISOString();
+                    await setDoc(getPubDoc('users', email), user);
+                    window.showAlert(`Pembayaran fee berhasil diproses dan dicatat di sistem pada tanggal ${now.toLocaleDateString('id-ID')}.`);
+                }
             });
         };
 
