@@ -791,7 +791,7 @@
                                 <tr>
                                     <th class="py-5 px-6 text-left">No</th>
                                     <th class="py-5 px-6 text-left">Nama / Instansi</th>
-                                    <th class="py-5 px-6 text-left">Email Login</th>
+                                    <th class="py-5 px-6 text-left">Akun Login</th>
                                     <th class="py-5 px-6 text-left">NIK KTP</th>
                                     <th class="py-5 px-6 text-left">No. HP / WA</th>
                                     <th class="py-5 px-6 text-left">Data Rekening</th>
@@ -820,7 +820,7 @@
                                 <tr>
                                     <th class="py-5 px-6 text-left">No</th>
                                     <th class="py-5 px-6 text-left">Nama Investor</th>
-                                    <th class="py-5 px-6 text-left">Email Login</th>
+                                    <th class="py-5 px-6 text-left">Akun Login</th>
                                     <th class="py-5 px-6 text-left">NIK KTP</th>
                                     <th class="py-5 px-6 text-left">No. HP / WA</th>
                                     <th class="py-5 px-6 text-left">Data Rekening</th>
@@ -850,7 +850,7 @@
                                 <tr>
                                     <th class="py-5 px-6 text-left">No</th>
                                     <th class="py-5 px-6 text-left">Nama Sales</th>
-                                    <th class="py-5 px-6 text-left">Email Login</th>
+                                    <th class="py-5 px-6 text-left">Akun Login</th>
                                     <th class="py-5 px-6 text-left">NIK KTP</th>
                                     <th class="py-5 px-6 text-left">No. HP / WA</th>
                                     <th class="py-5 px-6 text-left">Data Rekening</th>
@@ -879,7 +879,7 @@
                                 <tr>
                                     <th class="py-5 px-6 text-left">No</th>
                                     <th class="py-5 px-6 text-left">Nama Teknisi</th>
-                                    <th class="py-5 px-6 text-left">Email Login</th>
+                                    <th class="py-5 px-6 text-left">Akun Login</th>
                                     <th class="py-5 px-6 text-left">NIK KTP</th>
                                     <th class="py-5 px-6 text-left">No. HP / WA</th>
                                     <th class="py-5 px-6 text-left">Data Rekening</th>
@@ -1413,7 +1413,7 @@
             
             await setDoc(getPubDoc('users', email), newUser);
             
-            window.showAlert("Berhasil! Akun Teknisi baru berhasil dibuat dan langsung bisa digunakan untuk login.");
+            window.showAlert(`Berhasil! Akun Teknisi baru berhasil dibuat.\n\nEmail: ${email}\nSandi: ${pass}\n\nBerikan data login ini kepada Teknisi agar bisa mengakses sistem.`);
             uiModal('teknisi-modal', false);
             window.renderUserTable('teknisi');
             window.populateAdminDropdowns();
@@ -1911,7 +1911,10 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="py-5 px-6 text-slate-600 italic">${u.email}</td>
+                        <td class="py-5 px-6">
+                            <span class="text-slate-600 italic block mb-1">${u.email}</span>
+                            <span class="text-[9px] font-black text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100 uppercase tracking-widest"><i class="fas fa-key"></i> Sandi: ${u.pass}</span>
+                        </td>
                         <td class="py-5 px-6 font-mono text-slate-600">${u.nik || '-'}</td>
                         <td class="py-5 px-6 font-mono text-slate-600">${u.phone || '-'}</td>
                         <td class="py-5 px-6">
