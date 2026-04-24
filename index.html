@@ -2049,9 +2049,35 @@
                             <button onclick="openEditProjectModal('${p.id}')" class="px-3 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors inline-flex items-center gap-1" title="Edit Proyek">
                                 <i class="fas fa-edit"></i> Edit
                             </button>
+                            ${window.activeUser.role === 'admin' ? `
+                            <button onclick="window.deleteSpecificProject('${p.id}', '${p.location.replace(/'/g, "\\'")}')" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors inline-flex items-center gap-1 ml-1" title="Hapus Proyek">
+                                <i class="fas fa-trash-alt"></i> Hapus
+                            </button>
+                            ` : ''}
                         </td>
                     </tr>
                 `);
+            });
+        };
+
+        window.deleteSpecificProject = function(projId, locName) {
+            window.showConfirm(`PERINGATAN!\n\nAnda yakin ingin membatalkan dan menghapus proyek di lokasi "${locName}" dari CLOUD?\n\nSemua riwayat pemakaian dan tagihan untuk proyek ini juga akan dihapus secara permanen.`, async () => {
+                if(window.fbUser) {
+                    const logsToDelete = window.dbLogs.filter(l => l.projectId === projId);
+                    
+                    for (let log of logsToDelete) {
+                        await deleteDoc(getPubDoc('logs', log.id || log.timestamp));
+                    }
+                    await deleteDoc(getPubDoc('projects', projId));
+                    
+                    window.showAlert("Proyek berhasil dihapus dari Cloud.");
+                    if (window.activeProject && window.activeProject.id === projId) {
+                        window.activeProject = null;
+                        window.refreshProjectData();
+                    } else {
+                        window.renderProjectTable();
+                    }
+                }
             });
         };
 
