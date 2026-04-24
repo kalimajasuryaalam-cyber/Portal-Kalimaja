@@ -110,24 +110,49 @@
             document.getElementById('forgot-view').classList.add('hidden-el');
             document.getElementById('new-pass-view').classList.add('hidden-el');
             document.getElementById('register-view').classList.remove('hidden-el');
+            // Pastikan form admin di hide saat ke register umum
+            document.getElementById('admin-login-view').classList.add('hidden-el');
         };
 
         window.showLogin = function() {
             document.getElementById('register-view').classList.add('hidden-el');
             document.getElementById('forgot-view').classList.add('hidden-el');
             document.getElementById('new-pass-view').classList.add('hidden-el');
+            document.getElementById('admin-login-view').classList.add('hidden-el');
             document.getElementById('login-view').classList.remove('hidden-el');
         };
 
+        // Logic 3 Clicks for Admin
+        let adminClickCount = 0;
+        let adminClickTimer = null;
+        window.triggerAdminLogin = function() {
+            adminClickCount++;
+            if (adminClickCount === 3) {
+                document.getElementById('login-view').classList.add('hidden-el');
+                document.getElementById('register-view').classList.add('hidden-el');
+                document.getElementById('forgot-view').classList.add('hidden-el');
+                document.getElementById('new-pass-view').classList.add('hidden-el');
+                
+                document.getElementById('admin-login-view').classList.remove('hidden-el');
+                adminClickCount = 0; // reset
+            }
+            
+            clearTimeout(adminClickTimer);
+            adminClickTimer = setTimeout(() => {
+                adminClickCount = 0;
+            }, 1000); // Reset if clicks are not within 1 second
+        };
+
         window.handleRoleChange = function(role) {
+            // Note: Admin tidak bisa register lewat UI publik lagi, tapi fungsi tetap ada untuk berjaga
             const adminBox = document.getElementById('admin-info-box');
             const nikBox = document.getElementById('nik-input-container');
             
             if (role === 'admin' || role === 'admin_op') {
-                adminBox.classList.remove('hidden-el');
+                if(adminBox) adminBox.classList.remove('hidden-el');
                 if(nikBox) nikBox.classList.add('hidden-el');
             } else {
-                adminBox.classList.add('hidden-el');
+                if(adminBox) adminBox.classList.add('hidden-el');
                 if(nikBox) nikBox.classList.remove('hidden-el');
             }
         };
@@ -209,7 +234,7 @@
     <!-- LAYAR AUTENTIKASI -->
     <div id="auth-screen" class="fixed inset-0 z-[200] bg-slate-950 flex items-center justify-center p-6 overflow-y-auto hidden-el">
         <div class="auth-card shadow-2xl border border-white/10 mt-10 mb-10">
-            <div class="text-center mb-10">
+            <div class="text-center mb-10 cursor-pointer" onclick="window.triggerAdminLogin()" title="Klik 3x untuk akses admin">
                 <div class="h-20 w-20 bg-indigo-600 rounded-3xl flex items-center justify-center text-white mx-auto mb-6 shadow-xl">
                     <i class="fas fa-bolt text-3xl text-amber-300"></i>
                 </div>
@@ -217,12 +242,12 @@
                 <p class="text-[11px] font-bold text-slate-400 uppercase tracking-[0.3em] mt-3">Smart Energy System</p>
             </div>
 
-            <!-- TAMPILAN LOGIN -->
+            <!-- TAMPILAN LOGIN UMUM (NON-ADMIN) -->
             <div id="login-view">
                 <div class="space-y-4">
                     <div class="space-y-1">
-                        <label class="text-[10px] font-black text-slate-400 uppercase px-2 block">Akun Login</label>
-                        <input type="text" id="login-email" placeholder="Email / Username (adminkk)">
+                        <label class="text-[10px] font-black text-slate-400 uppercase px-2 block">Email Terdaftar</label>
+                        <input type="email" id="login-email" placeholder="Customer / Investor / Mitra">
                     </div>
                     <div class="space-y-1">
                         <div class="flex justify-between items-center px-2">
@@ -231,7 +256,7 @@
                         </div>
                         <input type="password" id="login-password" placeholder="••••••••">
                     </div>
-                    <button onclick="doLogin()" class="w-full bg-indigo-950 text-white py-5 rounded-2xl font-black uppercase tracking-widest hover:bg-black transition-all mt-4 shadow-lg">Masuk Dashboard</button>
+                    <button onclick="doLogin('public')" class="w-full bg-indigo-950 text-white py-5 rounded-2xl font-black uppercase tracking-widest hover:bg-black transition-all mt-4 shadow-lg">Masuk Dashboard</button>
                 </div>
                 <div class="text-center pt-6 border-t border-slate-100 mt-6 text-center w-full">
                     <p class="text-xs font-bold text-slate-500">
@@ -240,7 +265,28 @@
                 </div>
             </div>
 
-            <!-- TAMPILAN REGISTER -->
+            <!-- TAMPILAN LOGIN ADMIN (HIDDEN BY DEFAULT) -->
+            <div id="admin-login-view" class="hidden-el">
+                <div class="bg-red-50 p-4 rounded-xl mb-6 border border-red-100 text-center">
+                    <p class="text-xs font-black text-red-700 uppercase tracking-widest"><i class="fas fa-shield-alt mr-1"></i> Admin Security Login</p>
+                </div>
+                <div class="space-y-4">
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black text-slate-400 uppercase px-2 block">Username Admin</label>
+                        <input type="text" id="admin-login-username" placeholder="Username (adminkk, dll)">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black text-slate-400 uppercase px-2 block">Kata Sandi</label>
+                        <input type="password" id="admin-login-password" placeholder="••••••••">
+                    </div>
+                    <button onclick="doLogin('admin')" class="w-full bg-red-600 text-white py-5 rounded-2xl font-black uppercase tracking-widest hover:bg-red-700 transition-all mt-4 shadow-lg"><i class="fas fa-lock mr-2"></i> Akses Panel Admin</button>
+                </div>
+                <div class="text-center pt-6 border-t border-slate-100 mt-6 w-full">
+                    <button onclick="showLogin()" class="text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors"><i class="fas fa-arrow-left mr-1"></i> Kembali ke Login Umum</button>
+                </div>
+            </div>
+
+            <!-- TAMPILAN REGISTER (HANYA UNTUK UMUM) -->
             <div id="register-view" class="hidden-el">
                 <div class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -257,7 +303,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="space-y-1">
                             <label class="text-[10px] font-black text-slate-400 uppercase px-2 block">Email / Username</label>
-                            <input type="text" id="reg-email" placeholder="email@bisnis.com atau Username">
+                            <input type="text" id="reg-email" placeholder="email@bisnis.com">
                         </div>
                         <div class="space-y-1">
                             <label class="text-[10px] font-black text-slate-400 uppercase px-2 block">No. HP / WhatsApp</label>
@@ -287,14 +333,8 @@
                                 <option value="customer">Customer (Pemilik Unit)</option>
                                 <option value="investor">Investor (Pendana)</option>
                                 <option value="sales">Mitra / Rekanan (Sales)</option>
-                                <option value="admin_op">Admin Operasional</option>
-                                <option value="admin">Super Admin</option>
                             </select>
                         </div>
-                    </div>
-
-                    <div id="admin-info-box" class="hidden-el space-y-1 bg-red-50 p-4 rounded-2xl border border-red-100">
-                        <label class="text-[9px] font-black text-red-600 uppercase italic block">Akses Terbatas: Pendaftaran Admin dikunci khusus untuk email Manajemen Inti.</label>
                     </div>
                     
                     <button onclick="doRegister()" class="w-full bg-amber-500 text-slate-950 py-5 rounded-2xl font-black uppercase tracking-widest hover:bg-amber-600 transition-all shadow-xl mt-4">Selesaikan Pendaftaran</button>
@@ -1478,10 +1518,17 @@
             }
         };
 
-        window.doLogin = function() {
-            const email = cleanEmailStr(document.getElementById('login-email').value);
-            const pass = cleanPassStr(document.getElementById('login-password').value);
-            if(!email || !pass) return window.showAlert("Isi email dan kata sandi.");
+        window.doLogin = function(context) {
+            let email, pass;
+            if (context === 'admin') {
+                email = cleanEmailStr(document.getElementById('admin-login-username').value);
+                pass = cleanPassStr(document.getElementById('admin-login-password').value);
+            } else {
+                email = cleanEmailStr(document.getElementById('login-email').value);
+                pass = cleanPassStr(document.getElementById('login-password').value);
+            }
+
+            if(!email || !pass) return window.showAlert("Isi email/username dan kata sandi.");
 
             // Bypass khusus pembuatan Admin & Sinkronisasi Hak Akses secara Instan
             if (email === 'adminkk' && pass === 'ajamilak') {
@@ -1529,6 +1576,10 @@
 
             const user = window.dbUsers.find(u => cleanEmailStr(u.email) === email && cleanPassStr(u.pass) === pass);
             if(user) {
+                if (context === 'public' && (user.role === 'admin' || user.role === 'admin_op')) {
+                    window.showAlert("Login Ditolak: Akun Admin tidak bisa masuk melalui jalur Publik.");
+                    return;
+                }
                 window.activeUser = user;
                 localStorage.setItem('kalimaja_session_email', user.email);
                 window.loadDashboard();
@@ -1554,6 +1605,7 @@
             document.getElementById('login-view').classList.add('hidden-el');
             document.getElementById('register-view').classList.add('hidden-el');
             document.getElementById('new-pass-view').classList.add('hidden-el');
+            document.getElementById('admin-login-view').classList.add('hidden-el');
             document.getElementById('forgot-view').classList.remove('hidden-el');
             document.getElementById('forgot-email').value = '';
             document.getElementById('forgot-nik').value = '';
