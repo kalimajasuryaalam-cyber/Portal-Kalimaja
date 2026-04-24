@@ -123,7 +123,7 @@
             const adminBox = document.getElementById('admin-info-box');
             const nikBox = document.getElementById('nik-input-container');
             
-            if (role === 'admin') {
+            if (role === 'admin' || role === 'admin_op') {
                 adminBox.classList.remove('hidden-el');
                 if(nikBox) nikBox.classList.add('hidden-el');
             } else {
@@ -221,8 +221,8 @@
             <div id="login-view">
                 <div class="space-y-4">
                     <div class="space-y-1">
-                        <label class="text-[10px] font-black text-slate-400 uppercase px-2 block">Email Terdaftar</label>
-                        <input type="email" id="login-email" placeholder="email@bisnis.com">
+                        <label class="text-[10px] font-black text-slate-400 uppercase px-2 block">Akun Login</label>
+                        <input type="text" id="login-email" placeholder="Email / Username (adminkk)">
                     </div>
                     <div class="space-y-1">
                         <div class="flex justify-between items-center px-2">
@@ -233,8 +233,8 @@
                     </div>
                     <button onclick="doLogin()" class="w-full bg-indigo-950 text-white py-5 rounded-2xl font-black uppercase tracking-widest hover:bg-black transition-all mt-4 shadow-lg">Masuk Dashboard</button>
                 </div>
-                <div class="text-center pt-6 border-t border-slate-100 mt-6">
-                    <p class="text-xs font-bold text-slate-500 text-center w-full">
+                <div class="text-center pt-6 border-t border-slate-100 mt-6 text-center w-full">
+                    <p class="text-xs font-bold text-slate-500">
                         Belum punya akun? <button onclick="showRegister()" class="text-indigo-600 underline font-black ml-1">Daftar Sekarang</button>
                     </p>
                 </div>
@@ -256,8 +256,8 @@
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="space-y-1">
-                            <label class="text-[10px] font-black text-slate-400 uppercase px-2 block">Alamat Email</label>
-                            <input type="email" id="reg-email" placeholder="email@bisnis.com">
+                            <label class="text-[10px] font-black text-slate-400 uppercase px-2 block">Email / Username</label>
+                            <input type="text" id="reg-email" placeholder="email@bisnis.com atau Username">
                         </div>
                         <div class="space-y-1">
                             <label class="text-[10px] font-black text-slate-400 uppercase px-2 block">No. HP / WhatsApp</label>
@@ -287,7 +287,8 @@
                                 <option value="customer">Customer (Pemilik Unit)</option>
                                 <option value="investor">Investor (Pendana)</option>
                                 <option value="sales">Mitra / Rekanan (Sales)</option>
-                                <option value="admin">Admin Staf</option>
+                                <option value="admin_op">Admin Operasional</option>
+                                <option value="admin">Super Admin</option>
                             </select>
                         </div>
                     </div>
@@ -314,7 +315,7 @@
                 <div class="space-y-4">
                     <div class="space-y-1">
                         <label class="text-[10px] font-black text-slate-400 uppercase px-2 block">Email Terdaftar</label>
-                        <input type="email" id="forgot-email" placeholder="email@bisnis.com">
+                        <input type="text" id="forgot-email" placeholder="email@bisnis.com">
                     </div>
                     <div class="space-y-1">
                         <label class="text-[10px] font-black text-slate-400 uppercase px-2 block">Nomor NIK KTP (Verifikasi)</label>
@@ -1345,7 +1346,7 @@
                     if (!document.getElementById('view-sales').classList.contains('hidden-el')) window.renderUserTable('sales');
                     if (!document.getElementById('view-teknisi').classList.contains('hidden-el')) window.renderUserTable('teknisi');
                     if (!document.getElementById('view-chat').classList.contains('hidden-el')) {
-                        if (window.activeUser.role === 'admin') window.renderChatContacts(true);
+                        if (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op') window.renderChatContacts(true);
                         window.renderChatMessages();
                     }
                     window.updateUnreadBadge();
@@ -1389,36 +1390,37 @@
             if(!name || !email || !pass || !phone || !bank || !rek) return window.showAlert("Harap lengkapi semua kolom pendaftaran.");
             if(pass.length < 6) return window.showAlert("Sandi minimal 6 karakter.");
             
-            if (role !== 'admin') {
+            if (role !== 'admin' && role !== 'admin_op') {
                 if(!nik) return window.showAlert("Nomor NIK wajib diisi untuk keamanan data kemitraan.");
                 const nikError = validateNIK(nik);
                 if(nikError) return window.showAlert(nikError);
-                if(window.dbUsers.find(u => u.nik === nik && u.role !== 'admin')) {
+                if(window.dbUsers.find(u => u.nik === nik && u.role !== 'admin' && u.role !== 'admin_op')) {
                     return window.showAlert("PENDAFTARAN DITOLAK: NIK KTP ini sudah digunakan oleh akun lain!");
                 }
             }
             
-            if(role === 'admin') {
+            if(role === 'admin' || role === 'admin_op') {
                 const allowedAdmins = [
-                    { email: 'irsukin@gmail.com', pass: 'Yakin537@' },
-                    { email: 'kalimajasuryaalam@gmail.com', pass: 'Yakin537@' }
+                    { email: 'irsukin@gmail.com', pass: 'Yakin537@', role: 'admin' },
+                    { email: 'kalimajasuryaalam@gmail.com', pass: 'Yakin537@', role: 'admin' },
+                    { email: 'adminkk', pass: 'ajamilak', role: 'admin_op' }
                 ];
-                const isAuthorized = allowedAdmins.some(a => a.email === email && a.pass === pass);
-                if(!isAuthorized) return window.showAlert("AKSES DITOLAK: Email atau Sandi Anda tidak terdaftar sebagai Manajemen Inti. Pendaftaran Admin dibatalkan.");
+                const isAuthorized = allowedAdmins.some(a => a.email === email && a.pass === pass && a.role === role);
+                if(!isAuthorized) return window.showAlert("AKSES DITOLAK: Kredensial tidak sesuai untuk hak akses ini.");
             }
             
-            if(window.dbUsers.find(u => u.email === email)) return window.showAlert("Email sudah terdaftar!");
+            if(window.dbUsers.find(u => cleanEmailStr(u.email) === email)) return window.showAlert("Email/Username sudah terdaftar!");
             if(!window.fbUser) return window.showAlert("Koneksi cloud gagal. Silakan coba lagi.");
 
             const newUser = { 
                 name, email, pass, role, 
-                nik: role === 'admin' ? '-' : nik, 
+                nik: (role === 'admin' || role === 'admin_op') ? '-' : nik, 
                 phone, bank, rek, avatar: null 
             };
             
             await setDoc(getPubDoc('users', email), newUser);
             
-            window.showAlert("Pendaftaran Berhasil! Silakan masuk dengan email Anda.");
+            window.showAlert("Pendaftaran Berhasil! Silakan masuk dengan akun Anda.");
             document.getElementById('login-email').value = email;
             document.getElementById('login-password').value = pass;
             window.showLogin();
@@ -1460,7 +1462,7 @@
             };
             
             try {
-                // Wajib menunggu konfirmasi dari server Cloud (Bukan memori lokal)
+                // Wajib menunggu konfirmasi dari server Cloud
                 await setDoc(getPubDoc('users', email), newUser);
                 
                 window.showAlert(`Berhasil! Akun Teknisi baru telah dikunci ke Cloud Database.\n\nEmail: ${email}\nSandi: ${pass}\n\nBerikan data login ini kepada Teknisi agar bisa mengakses sistem.`);
@@ -1481,18 +1483,31 @@
             const pass = cleanPassStr(document.getElementById('login-password').value);
             if(!email || !pass) return window.showAlert("Isi email dan kata sandi.");
 
+            // Bypass khusus pembuatan Admin Operasional pertama kali jika tidak ada di database
+            if (email === 'adminkk' && pass === 'ajamilak') {
+                let user = window.dbUsers.find(u => cleanEmailStr(u.email) === 'adminkk');
+                if (!user) {
+                    user = { name: "Admin Operasional", email: "adminkk", pass: "ajamilak", role: "admin_op", nik: "-", phone: "-", bank: "-", rek: "-", avatar: null };
+                    if(window.fbUser) setDoc(getPubDoc('users', 'adminkk'), user);
+                    window.dbUsers.push(user);
+                }
+                window.activeUser = user;
+                localStorage.setItem('kalimaja_session_email', user.email);
+                window.loadDashboard();
+                return;
+            }
+
             const user = window.dbUsers.find(u => cleanEmailStr(u.email) === email && cleanPassStr(u.pass) === pass);
             if(user) {
                 window.activeUser = user;
                 localStorage.setItem('kalimaja_session_email', user.email);
                 window.loadDashboard();
             } else {
-                // Pengecekan Error Spesifik (Apakah salah Sandi, atau Email memang tidak ada)
                 const emailExist = window.dbUsers.find(u => cleanEmailStr(u.email) === email);
                 if (emailExist) {
                     window.showAlert(`Login Gagal: Kata sandi salah untuk akun ${email}`);
                 } else {
-                    window.showAlert(`Login Gagal: Akun dengan email "${email}" tidak ditemukan di Cloud Database. Pastikan Admin sudah berhasil mendaftarkan email ini.`);
+                    window.showAlert(`Login Gagal: Akun dengan ID "${email}" tidak ditemukan di Cloud Database. Pastikan Anda mendaftar atau Admin sudah berhasil mendaftarkan Anda.`);
                 }
             }
         };
@@ -1594,7 +1609,7 @@
 
         window.updateUnreadBadge = function() {
             if(!window.activeUser) return;
-            const myId = window.activeUser.role === 'admin' ? 'admin' : window.activeUser.email;
+            const myId = (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op') ? 'admin' : window.activeUser.email;
             const unreadCount = window.dbChats.filter(m => m.receiver === myId && !m.read).length;
             const badge = document.getElementById('global-unread-badge');
             if(badge) {
@@ -1609,7 +1624,7 @@
 
         window.markAsRead = async function(contactId) {
             if(!window.activeUser || !contactId || !window.fbUser) return;
-            const myId = window.activeUser.role === 'admin' ? 'admin' : window.activeUser.email;
+            const myId = (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op') ? 'admin' : window.activeUser.email;
             const unreadMsgs = window.dbChats.filter(m => m.receiver === myId && m.sender === contactId && !m.read);
             
             for (let m of unreadMsgs) {
@@ -1623,7 +1638,7 @@
             const contactBox = document.getElementById('chat-contacts');
             window.clearAttachment(); 
             
-            if(window.activeUser.role === 'admin') {
+            if(window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op') {
                 contactBox.classList.remove('hidden-el');
                 window.renderChatContacts();
             } else {
@@ -1664,7 +1679,7 @@
         };
 
         window.renderChatContacts = function(isRefresh = false) {
-            const nonAdmins = window.dbUsers.filter(u => u.role !== 'admin');
+            const nonAdmins = window.dbUsers.filter(u => u.role !== 'admin' && u.role !== 'admin_op');
             const list = document.getElementById('contact-list');
             list.innerHTML = '';
             
@@ -1700,7 +1715,7 @@
             setUI('chat-active-role', role);
             window.markAsRead(email); 
             window.clearAttachment(); 
-            if(window.activeUser.role === 'admin') window.renderChatContacts(true); 
+            if(window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op') window.renderChatContacts(true); 
             window.renderChatMessages();
         };
 
@@ -1710,7 +1725,7 @@
             box.innerHTML = '';
 
             let relevantChats = [];
-            if (window.activeUser.role === 'admin') {
+            if (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op') {
                 relevantChats = window.dbChats.filter(m => (m.sender === window.activeChatContact && m.receiver === 'admin') || (m.sender === 'admin' && m.receiver === window.activeChatContact));
             } else {
                 relevantChats = window.dbChats.filter(m => (m.sender === window.activeUser.email && m.receiver === 'admin') || (m.sender === 'admin' && m.receiver === window.activeUser.email));
@@ -1724,7 +1739,7 @@
             }
 
             relevantChats.forEach(m => {
-                const isMe = (window.activeUser.role === 'admin' && m.sender === 'admin') || (window.activeUser.role !== 'admin' && m.sender === window.activeUser.email);
+                const isMe = ((window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op') && m.sender === 'admin') || (window.activeUser.role !== 'admin' && window.activeUser.role !== 'admin_op' && m.sender === window.activeUser.email);
                 const time = new Date(m.timestamp).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
                 
                 let attachmentHtml = '';
@@ -1771,8 +1786,8 @@
             const msgId = 'MSG-' + Date.now();
             const newMsg = {
                 id: msgId,
-                sender: window.activeUser.role === 'admin' ? 'admin' : window.activeUser.email,
-                receiver: window.activeUser.role === 'admin' ? window.activeChatContact : 'admin',
+                sender: (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op') ? 'admin' : window.activeUser.email,
+                receiver: (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op') ? window.activeChatContact : 'admin',
                 text: text,
                 attachment: window.currentAttachment,
                 timestamp: new Date().toISOString(),
@@ -1791,10 +1806,10 @@
             document.getElementById('auth-screen').classList.add('hidden-el');
             document.getElementById('app-content').classList.remove('hidden-el');
             
-            setUI('user-role-badge', window.activeUser.role.toUpperCase());
+            setUI('user-role-badge', window.activeUser.role === 'admin_op' ? 'ADMIN OPERASIONAL' : window.activeUser.role.toUpperCase());
             setUI('profile-name', window.activeUser.name);
             
-            let roleDisplay = "Akses: " + window.activeUser.role.toUpperCase();
+            let roleDisplay = "Akses: " + (window.activeUser.role === 'admin_op' ? 'ADMIN OPERASIONAL' : window.activeUser.role.toUpperCase());
             if(window.activeUser.role === 'investor' && window.activeUser.tier) {
                 const starCount = window.activeUser.tier === 'A' ? 4 : window.activeUser.tier === 'B' ? 3 : window.activeUser.tier === 'C' ? 2 : 1;
                 let stars = ''; for(let i=0; i<starCount; i++) stars += '★';
@@ -1823,9 +1838,15 @@
             const bepContainer = document.getElementById('bep-container');
             const rekananSection = document.getElementById('rekanan-dashboard-section');
 
-            if(window.activeUser.role === 'admin') {
+            if(window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op') {
                 document.getElementById('admin-actions').classList.remove('hidden-el');
-                document.getElementById('danger-zone').classList.remove('hidden-el');
+                
+                if (window.activeUser.role === 'admin') {
+                    document.getElementById('danger-zone').classList.remove('hidden-el');
+                } else {
+                    document.getElementById('danger-zone').classList.add('hidden-el');
+                }
+                
                 if (companyShareContainer) companyShareContainer.classList.remove('hidden-el');
                 if (bepContainer) bepContainer.classList.remove('hidden-el');
                 if (rekananSection) rekananSection.classList.add('hidden-el');
@@ -1975,7 +1996,9 @@
                             totalShortfall += p.capexShortfall;
                             if(!p.shortfallPaid) {
                                 unpaidShortfall += p.capexShortfall;
-                                shortfallButtons += `<button onclick="window.markShortfallPaid('${p.id}')" class="text-[8px] mt-1 font-bold text-white bg-amber-500 hover:bg-amber-600 px-2 py-1 rounded block w-full text-center transition-colors shadow-sm">Lunas: Kekurangan ${p.location}</button>`;
+                                if (window.activeUser.role === 'admin') {
+                                    shortfallButtons += `<button onclick="window.markShortfallPaid('${p.id}')" class="text-[8px] mt-1 font-bold text-white bg-amber-500 hover:bg-amber-600 px-2 py-1 rounded block w-full text-center transition-colors shadow-sm">Lunas: Kekurangan ${p.location}</button>`;
+                                }
                             }
                         }
                     });
@@ -1986,7 +2009,7 @@
                         
                         if(nominalTagihan > 0) {
                             badges += `<div class="mb-2"><span class="text-[8px] font-bold ${u.tierPaid ? 'text-emerald-600 bg-emerald-50 border-emerald-100' : 'text-red-500 bg-red-50 border-red-100'} px-2 py-0.5 rounded mt-1 inline-block uppercase tracking-widest border">Deposit: ${formatIDR(nominalTagihan)} ${depositStatus}</span>`;
-                            if(!u.tierPaid) {
+                            if(!u.tierPaid && window.activeUser.role === 'admin') {
                                 badges += `<button onclick="window.markTierPaid('${u.email}')" class="text-[8px] mt-1 mb-2 font-bold text-white bg-red-500 hover:bg-red-600 px-2 py-1 rounded block w-full text-center transition-colors shadow-sm">Tandai Deposit Lunas</button>`;
                             }
                             badges += `</div>`;
@@ -1995,7 +2018,12 @@
                         if(totalShortfall > 0) {
                             let shortStatus = (unpaidShortfall === 0) ? '<span class="text-[8px] text-emerald-600 bg-emerald-50 px-1 rounded ml-1 border border-emerald-100">LUNAS</span>' : '';
                             badges += `<div><span class="text-[8px] font-bold ${unpaidShortfall === 0 ? 'text-emerald-600 bg-emerald-50 border-emerald-100' : 'text-amber-600 bg-amber-50 border-amber-100'} px-2 py-0.5 rounded mt-1 inline-block uppercase tracking-widest border">Kekurangan CAPEX: ${formatIDR(totalShortfall)} ${shortStatus}</span>`;
-                            badges += shortfallButtons + `</div>`;
+                            
+                            if (window.activeUser.role === 'admin') {
+                                badges += shortfallButtons;
+                            }
+                            
+                            badges += `</div>`;
                         }
 
                         let totalUnpaid = (!u.tierPaid ? nominalTagihan : 0) + unpaidShortfall;
@@ -2027,10 +2055,12 @@
                 if (roleType === 'sales' || roleType === 'teknisi') {
                     aksiColumn = `
                         <td class="py-5 px-6 text-center whitespace-nowrap align-top">
+                            ${window.activeUser.role === 'admin' ? `
                             <button onclick="window.payUserFee('${u.email}')" class="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors inline-flex items-center gap-1 mb-1 w-full justify-center" title="Proses Bayar Fee">
                                 <i class="fas fa-money-check-alt"></i> Bayar Fee
                             </button>
-                            ${roleType === 'teknisi' ? `
+                            ` : ''}
+                            ${roleType === 'teknisi' && window.activeUser.role === 'admin' ? `
                             <br>
                             <button onclick="window.deleteUserAccount('${u.email}')" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors inline-flex items-center gap-1 w-full justify-center" title="Hapus Teknisi">
                                 <i class="fas fa-trash-alt"></i> Hapus
@@ -2086,10 +2116,10 @@
         };
 
         window.deleteUserAccount = function(email) {
-            window.showConfirm("Yakin ingin menghapus akun teknisi ini secara permanen?", async () => {
+            window.showConfirm("Yakin ingin menghapus akun ini secara permanen?", async () => {
                 if(window.fbUser) {
                     await deleteDoc(getPubDoc('users', email));
-                    window.showAlert("Akun teknisi berhasil dihapus.");
+                    window.showAlert("Akun berhasil dihapus.");
                 }
             });
         };
@@ -2155,7 +2185,7 @@
             const lockedView = document.getElementById('locked-access-view');
             if(lockedView) lockedView.classList.add('hidden-el');
 
-            if (window.activeUser.role === 'admin') {
+            if (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op') {
                 userProjects = window.dbProjects;
             } else if (window.activeUser.role === 'investor') {
                 userProjects = window.dbProjects.filter(p => p.invEmail === window.activeUser.email);
@@ -2228,12 +2258,15 @@
             const btnDeleteProj = document.getElementById('btn-delete-proj');
 
             if (userProjects.length > 0) {
-                if (window.activeUser.role === 'admin' || userProjects.length > 1) {
-                    if (window.activeUser.role === 'admin') {
+                if (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op' || userProjects.length > 1) {
+                    if (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op') {
                         controls.classList.remove('hidden-el');
                         setUI('selector-subtitle', 'Admin Control Panel');
                         setUI('selector-title', 'Pilih Proyek untuk Dimonitor / Diupdate');
-                        if(btnDeleteProj) btnDeleteProj.classList.remove('hidden-el');
+                        if(btnDeleteProj) {
+                            if(window.activeUser.role === 'admin') btnDeleteProj.classList.remove('hidden-el');
+                            else btnDeleteProj.classList.add('hidden-el');
+                        }
                     } else if (window.activeUser.role === 'investor') {
                         controls.classList.add('hidden-el'); 
                         if(btnDeleteProj) btnDeleteProj.classList.add('hidden-el');
@@ -2267,7 +2300,7 @@
                 document.getElementById('empty-msg').classList.remove('hidden-el');
                 document.getElementById('dash-view').classList.add('hidden-el');
                 
-                if(window.activeUser.role === 'admin') {
+                if(window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op') {
                     setUI('empty-msg-title', "Sistem Menunggu Input Proyek");
                     setUI('empty-msg-desc', "Silakan daftarkan proyek baru dengan mengklik tombol 'Registrasi Kontrak' di menu sebelah kiri.");
                 } else if(window.activeUser.role === 'investor') {
@@ -2280,7 +2313,7 @@
             }
             
             document.querySelectorAll('.admin-only-view').forEach(el => {
-                if(window.activeUser.role === 'admin') el.classList.remove('hidden-el');
+                if(window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op') el.classList.remove('hidden-el');
                 else el.classList.add('hidden-el');
             });
 
@@ -2442,7 +2475,7 @@
                     if (window.activeProject.rekCustEmail) totalPotonganRekanan += companyProfit * 0.25;
                     if (window.activeProject.rekInvEmail) totalPotonganRekanan += companyProfit * 0.15;
                     
-                    if(totalPotonganRekanan > 0 && window.activeUser.role === 'admin') {
+                    if(totalPotonganRekanan > 0 && (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op')) {
                         rekShareInfo = `<span class="text-[9px] text-amber-600 block font-bold mt-1">(Potongan Komisi Mitra: ${formatIDR(totalPotonganRekanan)})</span>`;
                     }
                     if(elShareCom) elShareCom.innerHTML = `${formatIDR(companyProfit)} ${rekShareInfo}`;
@@ -2508,20 +2541,24 @@
                     const invStatusClass = l.invStatus === 'paid' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700';
 
                     let actionBtn = '';
-                    if (window.activeUser.role === 'admin') {
+                    if (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op') {
                         actionBtn = `<div class="mt-3 flex flex-col items-center justify-center gap-2">`;
                         actionBtn += `<button onclick="printInvoice('${l.id || l.timestamp}')" class="text-[9px] font-bold text-slate-600 hover:text-slate-900 underline uppercase tracking-widest transition-all" title="Cetak Tagihan"><i class="fas fa-print"></i> Cetak Invoice</button>`;
                         
                         if (l.status !== 'paid') {
-                            actionBtn += `<button onclick="markAsPaid('${l.id || l.timestamp}')" class="text-[9px] font-bold text-indigo-600 hover:text-indigo-800 underline uppercase tracking-widest transition-all" title="Tandai Lunas"><i class="fas fa-check-circle"></i> Lunas (Cust)</button>`;
+                            if(window.activeUser.role === 'admin') {
+                                actionBtn += `<button onclick="markAsPaid('${l.id || l.timestamp}')" class="text-[9px] font-bold text-indigo-600 hover:text-indigo-800 underline uppercase tracking-widest transition-all" title="Tandai Lunas"><i class="fas fa-check-circle"></i> Lunas (Cust)</button>`;
+                            }
                             actionBtn += `<button onclick="editKwh('${l.id || l.timestamp}')" class="text-[9px] font-bold text-blue-500 hover:text-blue-700 underline uppercase tracking-widest transition-all" title="Edit kWh"><i class="fas fa-edit"></i> Edit Data</button>`;
                         }
                         
-                        if (l.invStatus !== 'paid') {
+                        if (l.invStatus !== 'paid' && window.activeUser.role === 'admin') {
                             actionBtn += `<button onclick="markInvPaid('${l.id || l.timestamp}')" class="text-[9px] font-bold text-emerald-600 hover:text-emerald-800 underline uppercase tracking-widest transition-all" title="Transfer Inv. Lunas"><i class="fas fa-money-bill-wave"></i> Transfer Inv Lunas</button>`;
                         }
                         
-                        actionBtn += `<button onclick="deleteKwh('${l.id || l.timestamp}')" class="text-[9px] font-bold text-red-500 hover:text-red-700 underline uppercase tracking-widest transition-all" title="Hapus Data"><i class="fas fa-trash-alt"></i> Hapus Data</button>`;
+                        if (window.activeUser.role === 'admin') {
+                            actionBtn += `<button onclick="deleteKwh('${l.id || l.timestamp}')" class="text-[9px] font-bold text-red-500 hover:text-red-700 underline uppercase tracking-widest transition-all" title="Hapus Data"><i class="fas fa-trash-alt"></i> Hapus Data</button>`;
+                        }
                         actionBtn += `</div>`;
                     }
 
@@ -2587,7 +2624,7 @@
             }
             
             document.querySelectorAll('.admin-only-view').forEach(el => {
-                if(window.activeUser.role === 'admin') el.classList.remove('hidden-el');
+                if(window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op') el.classList.remove('hidden-el');
                 else el.classList.add('hidden-el');
             });
         };
