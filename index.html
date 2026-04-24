@@ -955,11 +955,7 @@
                                     <th class="py-3 px-3 text-left">No</th>
                                     <th class="py-3 px-3 text-left">Nama Investor</th>
                                     <th class="py-3 px-3 text-left">Akun Login</th>
-                                    <th class="py-3 px-3 text-left">NIK KTP</th>
-                                    <th class="py-3 px-3 text-left">No. HP / WA</th>
-                                    <th class="py-3 px-3 text-left">Data Rekening</th>
-                                    <th class="py-3 px-3 text-right">Keuangan & Sisa Dana</th>
-                                    <th class="py-3 px-3 text-left">Proyek Didanai</th>
+                                    <th class="py-3 px-3 text-left">Kontak & Rekening</th>
                                     <th class="py-3 px-3 text-center">Aksi</th>
                                 </tr>
                             </thead>
@@ -1079,25 +1075,15 @@
         </div>
     </div>
 
-    <!-- MODAL: EDIT BANK -->
-    <div id="bank-modal" class="modal-overlay no-print text-left">
-        <div class="modal-container max-w-md">
+    <!-- MODAL: DETAIL INVESTOR -->
+    <div id="investor-detail-modal" class="modal-overlay no-print text-left">
+        <div class="modal-container max-w-4xl">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                <h3 class="font-black italic uppercase tracking-tight text-indigo-950">Ubah Data Rekening</h3>
-                <button onclick="uiModal('bank-modal', false)" class="text-slate-400 hover:text-slate-900"><i class="fas fa-times"></i></button>
+                <h3 class="font-black italic uppercase tracking-tight text-indigo-950">Form Detail Keuangan Investor</h3>
+                <button onclick="uiModal('investor-detail-modal', false)" class="text-slate-400 hover:text-slate-900"><i class="fas fa-times"></i></button>
             </div>
-            <div class="p-6 space-y-4">
-                <div class="space-y-1">
-                    <label class="text-[10px] font-black text-slate-400 uppercase px-2">Nama Bank Baru</label>
-                    <input type="text" id="edit-bank-name" placeholder="Contoh: BCA / Mandiri / BNI" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 font-bold outline-none">
-                </div>
-                <div class="space-y-1">
-                    <label class="text-[10px] font-black text-slate-400 uppercase px-2">Nomor Rekening Baru</label>
-                    <input type="number" id="edit-bank-rek" placeholder="Nomor Rekening" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 font-bold outline-none">
-                </div>
-            </div>
-            <div class="p-6 bg-slate-50 border-t border-slate-100">
-                <button onclick="window.saveBankData()" class="w-full bg-indigo-950 text-white py-4 rounded-xl font-black uppercase tracking-widest hover:scale-[1.02] transition-all shadow-md">Simpan Perubahan</button>
+            <div class="p-6 overflow-y-auto bg-slate-50/50 max-h-[75vh]" id="investor-detail-content">
+                <!-- Disuntikkan via JS -->
             </div>
         </div>
     </div>
@@ -2142,77 +2128,44 @@
                     tierBadge = `<span class="text-[9px] text-amber-500 tracking-widest uppercase mt-1 block">${stars} TIER ${u.tier}</span>`;
                 }
 
-                let tagihanColumn = '';
                 if (roleType === 'investor') {
-                    let nominalTagihan = 0;
-                    if (u.tier === 'A') nominalTagihan = 28500000;
-                    else if (u.tier === 'B') nominalTagihan = 22250000;
-                    else if (u.tier === 'C') nominalTagihan = 15750000;
-                    else if (u.tier === 'D') nominalTagihan = 14250000;
-
-                    let totalShortfall = 0;
-                    let unpaidShortfall = 0;
-                    let shortfallButtons = '';
-                    let totalCapex = 0;
-                    
-                    userProjs.forEach(p => {
-                        totalCapex += (p.capex || 0);
-                        if (p.capexShortfall) {
-                            totalShortfall += p.capexShortfall;
-                            if(!p.shortfallPaid) {
-                                unpaidShortfall += p.capexShortfall;
-                                if (window.activeUser.role === 'admin') {
-                                    shortfallButtons += `<button onclick="window.markShortfallPaid('${p.id}')" class="text-[8px] mt-1 font-bold text-white bg-amber-500 hover:bg-amber-600 px-2 py-1 rounded block w-full text-center transition-colors shadow-sm">Lunas: Kekurangan ${p.location}</button>`;
-                                }
-                            }
-                        }
-                    });
-
-                    let sisaDeposit = nominalTagihan - totalCapex;
-                    if (sisaDeposit < 0) sisaDeposit = 0;
-
-                    if (nominalTagihan > 0 || totalShortfall > 0) {
-                        let badges = '';
-                        let depositStatus = u.tierPaid ? '<span class="text-[8px] text-emerald-600 bg-emerald-50 px-1 rounded ml-1 border border-emerald-100">LUNAS</span>' : '';
-                        
-                        if(nominalTagihan > 0) {
-                            badges += `<div class="mb-2"><span class="text-[8px] font-bold ${u.tierPaid ? 'text-emerald-600 bg-emerald-50 border-emerald-100' : 'text-red-500 bg-red-50 border-red-100'} px-2 py-0.5 rounded mt-1 inline-block uppercase tracking-widest border">Deposit: ${formatIDR(nominalTagihan)} ${depositStatus}</span>`;
-                            if(!u.tierPaid && window.activeUser.role === 'admin') {
-                                badges += `<button onclick="window.markTierPaid('${u.email}')" class="text-[8px] mt-1 mb-2 font-bold text-white bg-red-500 hover:bg-red-600 px-2 py-1 rounded block w-full text-center transition-colors shadow-sm">Tandai Deposit Lunas</button>`;
-                            }
-                            badges += `</div>`;
-                        }
-
-                        if (u.tierPaid && nominalTagihan > 0) {
-                            badges += `<div class="mb-2"><span class="text-[8px] font-bold text-blue-600 bg-blue-50 border-blue-100 px-2 py-0.5 rounded mt-1 inline-block uppercase tracking-widest border">Sisa Dana: ${formatIDR(sisaDeposit)}</span></div>`;
-                        }
-                        
-                        if(totalShortfall > 0) {
-                            let shortStatus = (unpaidShortfall === 0) ? '<span class="text-[8px] text-emerald-600 bg-emerald-50 px-1 rounded ml-1 border border-emerald-100">LUNAS</span>' : '';
-                            badges += `<div><span class="text-[8px] font-bold ${unpaidShortfall === 0 ? 'text-emerald-600 bg-emerald-50 border-emerald-100' : 'text-amber-600 bg-amber-50 border-amber-100'} px-2 py-0.5 rounded mt-1 inline-block uppercase tracking-widest border">Kekurangan CAPEX: ${formatIDR(totalShortfall)} ${shortStatus}</span>`;
-                            
-                            if (window.activeUser.role === 'admin') {
-                                badges += shortfallButtons;
-                            }
-                            
-                            badges += `</div>`;
-                        }
-
-                        let totalUnpaid = (!u.tierPaid ? nominalTagihan : 0) + unpaidShortfall;
-                        let totalColor = totalUnpaid > 0 ? 'text-red-600' : 'text-emerald-600';
-
-                        tagihanColumn = `
-                            <td class="py-3 px-3 text-right align-top">
-                                <span class="block font-mono font-black text-sm ${totalColor}">${formatIDR(totalUnpaid > 0 ? totalUnpaid : (nominalTagihan + totalShortfall))}</span>
-                                ${totalUnpaid === 0 && (nominalTagihan+totalShortfall) > 0 ? '<span class="text-[8px] font-bold text-emerald-500 block uppercase mb-2">Semua Lunas</span>' : '<span class="text-[8px] font-bold text-red-500 block uppercase mb-2">Total Tertunggak</span>'}
-                                <div class="mt-2 text-left">${badges}</div>
+                    tbody.insertAdjacentHTML('beforeend', `
+                        <tr class="text-xs border-b border-slate-50 hover:bg-slate-50 transition-colors">
+                            <td class="py-3 px-3 font-bold text-slate-500">${index + 1}</td>
+                            <td class="py-3 px-3 font-black text-indigo-900">
+                                <div class="flex items-center gap-3">
+                                    ${avatarHtml}
+                                    <div>
+                                        ${u.name}
+                                        ${tierBadge}
+                                    </div>
+                                </div>
                             </td>
-                        `;
-                    } else {
-                        tagihanColumn = `<td class="py-3 px-3 text-right text-slate-400 font-bold text-[10px] italic">Belum Pilih Tier</td>`;
-                    }
+                            <td class="py-3 px-3">
+                                <span class="text-slate-600 italic block mb-1">${u.email}</span>
+                                <span class="text-[9px] font-black text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100 uppercase tracking-widest"><i class="fas fa-key"></i> Sandi: ${u.pass}</span>
+                            </td>
+                            <td class="py-3 px-3">
+                                <span class="font-mono text-slate-600 block"><i class="fas fa-phone"></i> ${u.phone || '-'}</span>
+                                <span class="text-slate-500 uppercase text-[10px] mt-1 block"><i class="fas fa-university"></i> ${u.bank || '-'} : ${u.rek || '-'}</span>
+                            </td>
+                            <td class="py-3 px-3 text-center whitespace-nowrap align-top">
+                                <button onclick="window.openInvestorDetail('${u.email}')" class="px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors inline-flex items-center gap-1 mb-1 w-full justify-center shadow-sm" title="Lihat Form Portofolio">
+                                    <i class="fas fa-folder-open"></i> Buka Form
+                                </button>
+                                ${window.activeUser.role === 'admin' ? `
+                                <br>
+                                <button onclick="window.deleteUserAccount('${u.email}')" class="px-3 py-2 mt-1 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors inline-flex items-center gap-1 w-full justify-center" title="Hapus Akun">
+                                    <i class="fas fa-trash-alt"></i> Hapus
+                                </button>
+                                ` : ''}
+                            </td>
+                        </tr>
+                    `);
+                    return; // Lewati proses kolom lainnya khusus untuk investor agar rapi
                 }
 
+                let tagihanColumn = '';
                 let feeStatusHtml = '';
                 if (roleType === 'sales' || roleType === 'teknisi') {
                     if (u.lastFeePaidAt) {
@@ -2289,6 +2242,122 @@
                     window.showAlert(`Pembayaran fee berhasil diproses dan dicatat di sistem pada tanggal ${now.toLocaleDateString('id-ID')}.`);
                 }
             });
+        };
+
+        window.openInvestorDetail = function(email) {
+            const u = window.dbUsers.find(user => user.email === email);
+            if(!u) return;
+
+            const userProjs = window.dbProjects.filter(p => p.invEmail === u.email);
+            
+            let nominalTagihan = 0;
+            if (u.tier === 'A') nominalTagihan = 28500000;
+            else if (u.tier === 'B') nominalTagihan = 22250000;
+            else if (u.tier === 'C') nominalTagihan = 15750000;
+            else if (u.tier === 'D') nominalTagihan = 14250000;
+
+            let totalShortfall = 0;
+            let unpaidShortfall = 0;
+            let totalCapex = 0;
+            let projListHtml = '';
+
+            if(userProjs.length > 0) {
+                userProjs.forEach(p => {
+                    totalCapex += (p.capex || 0);
+                    
+                    let sfStatus = '';
+                    if (p.capexShortfall && p.capexShortfall > 0) {
+                        totalShortfall += p.capexShortfall;
+                        if(!p.shortfallPaid) {
+                            unpaidShortfall += p.capexShortfall;
+                            sfStatus = `<span class="text-[9px] font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded border border-red-100 mt-2 block w-fit">Kekurangan: ${formatIDR(p.capexShortfall)} (BELUM LUNAS)</span>`;
+                            if (window.activeUser.role === 'admin') {
+                                sfStatus += `<button onclick="window.markShortfallPaid('${p.id}'); uiModal('investor-detail-modal', false);" class="text-[9px] mt-2 font-bold text-white bg-amber-500 hover:bg-amber-600 px-3 py-1.5 rounded transition-colors shadow-sm w-full block text-center"><i class="fas fa-check-circle"></i> Tandai Kekurangan Lunas</button>`;
+                            }
+                        } else {
+                            sfStatus = `<span class="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100 mt-2 block w-fit">Kekurangan CAPEX LUNAS</span>`;
+                        }
+                    }
+
+                    projListHtml += `
+                        <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm mb-3">
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="font-black text-indigo-900 uppercase leading-tight">${p.location}</span>
+                                <button onclick="goToProjectFromAdmin('${p.id}'); uiModal('investor-detail-modal', false);" class="text-[9px] text-indigo-600 font-bold bg-indigo-50 px-2 py-1 rounded hover:bg-indigo-100 shrink-0 ml-2"><i class="fas fa-external-link-alt"></i> Detail Proyek</button>
+                            </div>
+                            <p class="text-[10px] text-slate-500 mb-1">Total Unit: <b>${p.units ? p.units.reduce((a,b)=>a+b.q,0) : 0} Unit</b> | Nilai CAPEX: <b>${formatIDR(p.capex)}</b></p>
+                            ${sfStatus}
+                        </div>
+                    `;
+                });
+            } else {
+                projListHtml = `<p class="text-sm text-slate-400 italic bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-center">Belum ada proyek yang terhubung ke investor ini.</p>`;
+            }
+
+            let sisaDeposit = nominalTagihan - totalCapex;
+            if (sisaDeposit < 0) sisaDeposit = 0;
+
+            let depositInfoHtml = '';
+            if(u.tier) {
+                let depositStatus = u.tierPaid ? '<span class="text-[10px] text-emerald-600 bg-emerald-50 px-2 py-1 rounded border border-emerald-100 font-black uppercase"><i class="fas fa-check-circle"></i> Lunas</span>' : '<span class="text-[10px] text-red-500 bg-red-50 px-2 py-1 rounded border border-red-100 font-black uppercase"><i class="fas fa-times-circle"></i> Belum Lunas</span>';
+                
+                depositInfoHtml += `
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mb-4">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-xs font-black text-slate-500 uppercase tracking-widest">Deposit Awal (Tier ${u.tier})</span>
+                            ${depositStatus}
+                        </div>
+                        <p class="text-3xl font-black text-slate-800 mono mb-4">${formatIDR(nominalTagihan)}</p>
+                `;
+
+                if(!u.tierPaid && window.activeUser.role === 'admin') {
+                    depositInfoHtml += `<button onclick="window.markTierPaid('${u.email}'); uiModal('investor-detail-modal', false);" class="w-full text-xs font-bold text-white bg-red-500 hover:bg-red-600 py-3.5 rounded-xl transition-colors shadow-sm uppercase tracking-widest mb-2"><i class="fas fa-check-circle mr-1"></i> Konfirmasi Deposit Lunas</button>`;
+                }
+
+                if (u.tierPaid) {
+                    depositInfoHtml += `
+                        <div class="mt-4 pt-4 border-t border-slate-100">
+                            <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest block mb-1">Sisa Dana (Belum Terpakai)</span>
+                            <span class="text-2xl font-black text-blue-900 mono">${formatIDR(sisaDeposit)}</span>
+                        </div>
+                    `;
+                }
+                depositInfoHtml += `</div>`;
+            } else {
+                depositInfoHtml = `
+                    <div class="bg-amber-50 p-6 rounded-2xl border border-amber-200 shadow-sm mb-4 text-center">
+                        <i class="fas fa-exclamation-triangle text-amber-500 text-4xl mb-3 block"></i>
+                        <p class="text-sm font-bold text-amber-800">Investor belum memilih Tier Pendanaan.</p>
+                    </div>
+                `;
+            }
+
+            const content = document.getElementById('investor-detail-content');
+            content.innerHTML = `
+                <div class="flex items-center gap-4 mb-6 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    ${u.avatar ? `<img src="${u.avatar}" class="w-16 h-16 rounded-full object-cover border-2 border-slate-100 shadow-sm">` : `<div class="w-16 h-16 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-2xl border-2 border-white shadow-sm"><i class="fas fa-user-tie"></i></div>`}
+                    <div>
+                        <h4 class="text-2xl font-black text-slate-900 uppercase leading-none mb-1">${u.name}</h4>
+                        <p class="text-xs font-bold text-slate-500 mb-2">${u.email}</p>
+                        <p class="text-[10px] text-slate-400 font-mono"><i class="fas fa-phone"></i> ${u.phone || '-'} <span class="mx-2">|</span> <i class="fas fa-university"></i> ${u.bank || '-'} ${u.rek || '-'}</p>
+                    </div>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h5 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3"><i class="fas fa-wallet mr-1"></i> Informasi Keuangan</h5>
+                        ${depositInfoHtml}
+                    </div>
+                    <div>
+                        <h5 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3"><i class="fas fa-briefcase mr-1"></i> Daftar Proyek Didanai</h5>
+                        <div class="space-y-3">
+                            ${projListHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            uiModal('investor-detail-modal', true);
         };
 
         window.deleteUserAccount = function(email) {
