@@ -687,12 +687,26 @@
                             </div>
                         </div>
                         
-                        <div id="tier-active-info" class="hidden-el p-6 bg-emerald-50 rounded-2xl border border-emerald-100 flex items-center justify-between mt-4">
-                            <div>
-                                <p class="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1">Status Akun</p>
-                                <p class="text-lg font-black text-emerald-900 uppercase">Terverifikasi - <span id="active-tier-name"></span></p>
+                        <div id="tier-active-wrapper" class="hidden-el mt-4 space-y-4">
+                            <div id="tier-active-info" class="p-6 bg-emerald-50 rounded-2xl border border-emerald-100 flex items-center justify-between">
+                                <div>
+                                    <p class="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1">Status Akun</p>
+                                    <p class="text-lg font-black text-emerald-900 uppercase">Terverifikasi - <span id="active-tier-name"></span></p>
+                                </div>
+                                <i class="fas fa-check-circle text-4xl text-emerald-400"></i>
                             </div>
-                            <i class="fas fa-check-circle text-4xl text-emerald-400"></i>
+                            
+                            <!-- INFO SISA DEPOSIT -->
+                            <div id="sisa-deposit-info" class="hidden-el p-6 bg-blue-50 rounded-2xl border border-blue-100 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm">
+                                <div>
+                                    <p class="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1">Sisa Deposit (Belum Terpakai)</p>
+                                    <p class="text-2xl font-black text-blue-900 mono" id="view-sisa-deposit">Rp 0</p>
+                                </div>
+                                <div class="bg-white p-4 rounded-xl border border-blue-100 text-xs font-bold text-blue-800 flex items-center gap-3 max-w-md">
+                                    <i class="fas fa-info-circle text-blue-500 text-2xl"></i>
+                                    <span class="leading-snug">Sisa deposit dapat <b>dikembalikan</b> atau <b>dimasukkan ke proyek selanjutnya</b>.</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2318,18 +2332,10 @@
             if(invSelect) {
                 invSelect.innerHTML = '<option value="">-- Pilih Investor Terdaftar --</option>' + 
                     investors.map(i => {
-                        let isBlocked = false;
-                        let blockReason = "";
                         if (!i.tier) {
-                            isBlocked = true;
-                            blockReason = "Belum Pilih Tier";
+                            return `<option value="${i.email}" disabled class="text-slate-400 bg-red-50">🚫 ${i.name} (${i.email}) - Belum Pilih Tier</option>`;
                         } else if (!i.tierPaid) {
-                            isBlocked = true;
-                            blockReason = "Belum Lunas Deposit";
-                        }
-                        
-                        if (isBlocked) {
-                            return `<option value="${i.email}" disabled class="text-slate-400 bg-red-50">🚫 ${i.name} (${i.email}) - ${blockReason}</option>`;
+                            return `<option value="${i.email}" disabled class="text-slate-400 bg-red-50">🚫 ${i.name} (${i.email}) - Belum Lunas Deposit</option>`;
                         }
                         return `<option value="${i.email}">${i.name} (${i.email})</option>`;
                     }).join('');
@@ -2821,22 +2827,44 @@
             tierSect.classList.remove('hidden-el');
 
             const grid = document.getElementById('tier-selection-grid');
-            const activeInfo = document.getElementById('tier-active-info');
+            const activeWrapper = document.getElementById('tier-active-wrapper');
             const starsContainer = document.getElementById('investor-stars');
 
             if(window.activeUser.tier) {
                 grid.classList.add('hidden-el');
-                activeInfo.classList.remove('hidden-el');
-                document.getElementById('active-tier-name').innerText = `TIER ${window.activeUser.tier}`;
+                if(activeWrapper) activeWrapper.classList.remove('hidden-el');
+                
+                const activeTierName = document.getElementById('active-tier-name');
+                if(activeTierName) activeTierName.innerText = `TIER ${window.activeUser.tier}`;
                 
                 let stars = '';
                 const starCount = window.activeUser.tier === 'A' ? 4 : window.activeUser.tier === 'B' ? 3 : window.activeUser.tier === 'C' ? 2 : 1;
                 for(let i=0; i<starCount; i++) stars += '<i class="fas fa-star"></i>';
-                starsContainer.innerHTML = stars;
+                if(starsContainer) starsContainer.innerHTML = stars;
+
+                let tierNominal = 0;
+                if (window.activeUser.tier === 'A') tierNominal = 28500000;
+                else if (window.activeUser.tier === 'B') tierNominal = 22250000;
+                else if (window.activeUser.tier === 'C') tierNominal = 15750000;
+                else if (window.activeUser.tier === 'D') tierNominal = 14250000;
+
+                const userProjects = window.dbProjects.filter(p => p.invEmail === window.activeUser.email);
+                const totalCapex = userProjects.reduce((sum, p) => sum + (p.capex || 0), 0);
+                const sisaDeposit = tierNominal - totalCapex;
+
+                const sisaDepositInfo = document.getElementById('sisa-deposit-info');
+                if (sisaDepositInfo) {
+                    if (sisaDeposit > 0) {
+                        sisaDepositInfo.classList.remove('hidden-el');
+                        document.getElementById('view-sisa-deposit').innerText = formatIDR(sisaDeposit);
+                    } else {
+                        sisaDepositInfo.classList.add('hidden-el');
+                    }
+                }
             } else {
                 grid.classList.remove('hidden-el');
-                activeInfo.classList.add('hidden-el');
-                starsContainer.innerHTML = '';
+                if(activeWrapper) activeWrapper.classList.add('hidden-el');
+                if(starsContainer) starsContainer.innerHTML = '';
             }
         };
 
