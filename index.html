@@ -1221,6 +1221,10 @@
             }
         }
 
+        // PEMBERSIH SPASI OTOMATIS: Anti-gagal untuk Copy-Paste
+        const cleanEmailStr = (str) => (str || '').toString().replace(/[\s\u200B-\u200D\uFEFF]/g, '').toLowerCase();
+        const cleanPassStr = (str) => (str || '').toString().replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
+
         function setupRealtime() {
             unsubscribeList.forEach(unsub => unsub()); 
             unsubscribeList = [
@@ -1271,7 +1275,7 @@
                 if (!window.activeUser) {
                     const sessionEmail = localStorage.getItem('kalimaja_session_email');
                     if (sessionEmail) {
-                        const found = window.dbUsers.find(u => u.email === sessionEmail);
+                        const found = window.dbUsers.find(u => cleanEmailStr(u.email) === cleanEmailStr(sessionEmail));
                         if (found) {
                             window.activeUser = found;
                             window.loadDashboard();
@@ -1282,7 +1286,7 @@
                         document.getElementById('auth-screen').classList.remove('hidden-el');
                     }
                 } else {
-                    const updatedMe = window.dbUsers.find(u => u.email === window.activeUser.email);
+                    const updatedMe = window.dbUsers.find(u => cleanEmailStr(u.email) === cleanEmailStr(window.activeUser.email));
                     if(updatedMe) window.activeUser = updatedMe;
                 }
 
@@ -1331,8 +1335,8 @@
 
         window.doRegister = async function() {
             const name = document.getElementById('reg-name').value.trim();
-            const email = document.getElementById('reg-email').value.toLowerCase().trim();
-            const pass = document.getElementById('reg-password').value.trim();
+            const email = cleanEmailStr(document.getElementById('reg-email').value);
+            const pass = cleanPassStr(document.getElementById('reg-password').value);
             const role = document.getElementById('reg-role').value;
             const nik = document.getElementById('reg-nik').value.trim();
             const phone = document.getElementById('reg-phone').value.trim();
@@ -1392,8 +1396,8 @@
             if(!window.fbUser) return window.showAlert("Koneksi cloud gagal.");
             
             const name = document.getElementById('tek-name').value.trim();
-            const email = document.getElementById('tek-email').value.toLowerCase().trim();
-            const pass = document.getElementById('tek-pass').value.trim();
+            const email = cleanEmailStr(document.getElementById('tek-email').value);
+            const pass = cleanPassStr(document.getElementById('tek-pass').value);
             const nik = document.getElementById('tek-nik').value.trim();
             const bank = document.getElementById('tek-bank').value.trim();
             const rek = document.getElementById('tek-rek').value.trim();
@@ -1404,7 +1408,7 @@
             const nikError = validateNIK(nik);
             if(nikError) return window.showAlert(nikError);
             
-            if(window.dbUsers.find(u => u.email === email)) return window.showAlert("Email sudah terdaftar digunakan akun lain!");
+            if(window.dbUsers.find(u => cleanEmailStr(u.email) === email)) return window.showAlert("Email sudah terdaftar digunakan akun lain!");
             if(window.dbUsers.find(u => u.nik === nik)) return window.showAlert("NIK KTP sudah terdaftar digunakan akun lain!");
 
             const newUser = { 
@@ -1412,6 +1416,11 @@
                 nik, phone, bank, rek, avatar: null 
             };
             
+            // Backup inject ke memori lokal secara instan anti-delay
+            const existingIndex = window.dbUsers.findIndex(u => cleanEmailStr(u.email) === email);
+            if(existingIndex >= 0) window.dbUsers[existingIndex] = newUser;
+            else window.dbUsers.push(newUser);
+
             await setDoc(getPubDoc('users', email), newUser);
             
             window.showAlert(`Berhasil! Akun Teknisi baru berhasil dibuat.\n\nEmail: ${email}\nSandi: ${pass}\n\nBerikan data login ini kepada Teknisi agar bisa mengakses sistem.`);
@@ -1421,17 +1430,17 @@
         };
 
         window.doLogin = function() {
-            const email = document.getElementById('login-email').value.toLowerCase().trim();
-            const pass = document.getElementById('login-password').value.trim();
+            const email = cleanEmailStr(document.getElementById('login-email').value);
+            const pass = cleanPassStr(document.getElementById('login-password').value);
             if(!email || !pass) return window.showAlert("Isi email dan kata sandi.");
 
-            const user = window.dbUsers.find(u => u.email === email && u.pass === pass);
+            const user = window.dbUsers.find(u => cleanEmailStr(u.email) === email && cleanPassStr(u.pass) === pass);
             if(user) {
                 window.activeUser = user;
-                localStorage.setItem('kalimaja_session_email', email);
+                localStorage.setItem('kalimaja_session_email', user.email);
                 window.loadDashboard();
             } else {
-                window.showAlert("Login Gagal: Email tidak ditemukan atau sandi salah.");
+                window.showAlert("Login Gagal: Akun Teknisi/User tidak ditemukan. Pastikan tidak ada spasi tak terlihat saat Copy-Paste.");
             }
         };
 
