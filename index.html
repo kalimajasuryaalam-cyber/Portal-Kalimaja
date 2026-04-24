@@ -958,7 +958,7 @@
                                     <th class="py-3 px-3 text-left">NIK KTP</th>
                                     <th class="py-3 px-3 text-left">No. HP / WA</th>
                                     <th class="py-3 px-3 text-left">Data Rekening</th>
-                                    <th class="py-3 px-3 text-right">Tagihan Total (Deposit + Kekurangan)</th>
+                                    <th class="py-3 px-3 text-right">Keuangan & Sisa Dana</th>
                                     <th class="py-3 px-3 text-left">Proyek Didanai</th>
                                     <th class="py-3 px-3 text-center">Aksi</th>
                                 </tr>
@@ -2153,8 +2153,10 @@
                     let totalShortfall = 0;
                     let unpaidShortfall = 0;
                     let shortfallButtons = '';
+                    let totalCapex = 0;
                     
                     userProjs.forEach(p => {
+                        totalCapex += (p.capex || 0);
                         if (p.capexShortfall) {
                             totalShortfall += p.capexShortfall;
                             if(!p.shortfallPaid) {
@@ -2166,6 +2168,9 @@
                         }
                     });
 
+                    let sisaDeposit = nominalTagihan - totalCapex;
+                    if (sisaDeposit < 0) sisaDeposit = 0;
+
                     if (nominalTagihan > 0 || totalShortfall > 0) {
                         let badges = '';
                         let depositStatus = u.tierPaid ? '<span class="text-[8px] text-emerald-600 bg-emerald-50 px-1 rounded ml-1 border border-emerald-100">LUNAS</span>' : '';
@@ -2176,6 +2181,10 @@
                                 badges += `<button onclick="window.markTierPaid('${u.email}')" class="text-[8px] mt-1 mb-2 font-bold text-white bg-red-500 hover:bg-red-600 px-2 py-1 rounded block w-full text-center transition-colors shadow-sm">Tandai Deposit Lunas</button>`;
                             }
                             badges += `</div>`;
+                        }
+
+                        if (u.tierPaid && nominalTagihan > 0) {
+                            badges += `<div class="mb-2"><span class="text-[8px] font-bold text-blue-600 bg-blue-50 border-blue-100 px-2 py-0.5 rounded mt-1 inline-block uppercase tracking-widest border">Sisa Dana: ${formatIDR(sisaDeposit)}</span></div>`;
                         }
                         
                         if(totalShortfall > 0) {
