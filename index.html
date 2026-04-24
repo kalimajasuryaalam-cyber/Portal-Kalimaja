@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal Kalimaja | PT Kalimaja Surya Alam</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -566,6 +567,41 @@
             <!-- TAMPILAN DASHBOARD UTAMA -->
             <div id="view-dashboard">
                 
+                <!-- GLOBAL FINANCIAL SUMMARY (ADMIN ONLY) -->
+                <div id="admin-global-financials" class="hidden-el mb-10">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="h-10 w-10 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center text-lg">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-black italic uppercase tracking-tight text-slate-900 text-xl leading-none">Global Financial Summary</h3>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Laba Perusahaan dari Seluruh Proyek</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 text-left">
+                        <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm">
+                            <span class="text-[10px] font-bold px-3 py-1 bg-indigo-50 text-indigo-600 rounded-lg uppercase tracking-widest">Laba Bulan Ini</span>
+                            <p class="text-3xl font-black text-indigo-900 mt-4 mono truncate" id="admin-profit-month">Rp 0</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm">
+                            <span class="text-[10px] font-bold px-3 py-1 bg-emerald-50 text-emerald-600 rounded-lg uppercase tracking-widest">Laba Tahun Ini</span>
+                            <p class="text-3xl font-black text-emerald-900 mt-4 mono truncate" id="admin-profit-year">Rp 0</p>
+                        </div>
+                        <div class="bg-indigo-950 p-6 rounded-[2rem] shadow-xl text-white">
+                            <span class="text-[10px] font-bold px-3 py-1 bg-white/10 text-indigo-200 rounded-lg uppercase tracking-widest">Total Laba Keseluruhan</span>
+                            <p class="text-2xl font-black text-amber-400 mt-4 mono truncate" id="admin-profit-total">Rp 0</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm text-left">
+                        <h4 class="font-bold text-xs text-slate-500 uppercase tracking-widest mb-6">Grafik Laba Perusahaan (6 Bulan Terakhir)</h4>
+                        <div class="relative h-64 w-full">
+                            <canvas id="adminProfitChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- DASHBOARD KHUSUS MITRA / REKANAN -->
                 <div id="rekanan-dashboard-section" class="hidden-el space-y-6 text-left mb-10">
                     <div class="flex items-center gap-3 mb-6">
@@ -2402,6 +2438,7 @@
             window.renderInvestorTier();
             window.renderInvestorPortfolio(); 
             window.renderRekananPortfolio();
+            window.renderAdminFinancials();
         };
 
         window.changeActiveProject = function(projId) {
@@ -2927,6 +2964,95 @@
                 setUI('rek-total-komisi-sales', formatIDR(totalAkumulasiSales));
                 setUI('rek-total-komisi-tek', formatIDR(totalAkumulasiTeknisi));
                 document.getElementById('rekanan-portfolio-grid').innerHTML = gridHtml;
+            }
+        };
+
+        window.renderAdminFinancials = function() {
+            const container = document.getElementById('admin-global-financials');
+            if(!container) return;
+
+            if(window.activeUser.role !== 'admin' && window.activeUser.role !== 'admin_op') {
+                container.classList.add('hidden-el');
+                return;
+            }
+            container.classList.remove('hidden-el');
+
+            let currentMonthProfit = 0;
+            let currentYearProfit = 0;
+            let totalProfit = 0;
+
+            const now = new Date();
+            const currentMonthStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+            const currentYearStr = now.getFullYear().toString();
+
+            const monthlyData = {};
+            // Mengambil data 6 bulan terakhir ke belakang
+            for(let i=5; i>=0; i--) {
+                let d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                let y = d.getFullYear();
+                let m = String(d.getMonth() + 1).padStart(2, '0');
+                monthlyData[`${y}-${m}`] = 0;
+            }
+
+            window.dbLogs.forEach(log => {
+                const proj = window.dbProjects.find(p => p.id === log.projectId);
+                if (!proj) return;
+
+                const saving = Math.max(0, (proj.baseline - log.kwhReal) * TARIF_PLN);
+                const split = window.getSplitRatio(proj.createdAt, log.period);
+                const tagihanGross = saving * split.invGross;
+                const companyProfit = tagihanGross * 0.3;
+
+                totalProfit += companyProfit;
+
+                if (log.period === currentMonthStr) {
+                    currentMonthProfit += companyProfit;
+                }
+                if (log.period && log.period.startsWith(currentYearStr)) {
+                    currentYearProfit += companyProfit;
+                }
+
+                if (monthlyData[log.period] !== undefined) {
+                    monthlyData[log.period] += companyProfit;
+                }
+            });
+
+            setUI('admin-profit-month', formatIDR(currentMonthProfit));
+            setUI('admin-profit-year', formatIDR(currentYearProfit));
+            setUI('admin-profit-total', formatIDR(totalProfit));
+
+            const ctx = document.getElementById('adminProfitChart');
+            if(ctx) {
+                if(window.adminChartInstance) window.adminChartInstance.destroy();
+                
+                const labels = Object.keys(monthlyData).map(k => {
+                    const [y, m] = k.split('-');
+                    const date = new Date(y, m-1);
+                    return date.toLocaleDateString('id-ID', {month: 'short', year: 'numeric'});
+                });
+                const data = Object.values(monthlyData);
+
+                window.adminChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Laba Perusahaan (Rp)',
+                            data: data,
+                            backgroundColor: 'rgba(79, 70, 229, 0.8)',
+                            borderRadius: 6,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, grid: { borderDash: [4, 4] } },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
             }
         };
 
