@@ -915,6 +915,7 @@
                                     <th class="py-5 px-6 text-left">No. HP / WA</th>
                                     <th class="py-5 px-6 text-left">Data Rekening</th>
                                     <th class="py-5 px-6 text-left">Proyek Terhubung</th>
+                                    <th class="py-5 px-6 text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="table-customers-body" class="divide-y divide-slate-100">
@@ -945,6 +946,7 @@
                                     <th class="py-5 px-6 text-left">Data Rekening</th>
                                     <th class="py-5 px-6 text-right">Tagihan Total (Deposit + Kekurangan)</th>
                                     <th class="py-5 px-6 text-left">Proyek Didanai</th>
+                                    <th class="py-5 px-6 text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="table-investors-body" class="divide-y divide-slate-100">
@@ -956,66 +958,6 @@
             </div>
 
             <!-- TAMPILAN DAFTAR SALES (HANYA ADMIN) -->
-            <div id="view-sales" class="hidden-el space-y-8">
-                <div class="bg-white rounded-[40px] card-shadow border border-slate-100 overflow-hidden text-left">
-                    <div class="p-8 border-b border-slate-100 flex justify-between items-center bg-amber-50/50">
-                        <h3 class="font-black italic uppercase tracking-tight text-amber-900">
-                            <i class="fas fa-handshake mr-2 text-amber-600"></i> Database Mitra / Sales
-                        </h3>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse min-w-[800px]">
-                            <thead class="bg-slate-50 border-b border-slate-200 uppercase font-black text-[10px] text-slate-500 tracking-widest">
-                                <tr>
-                                    <th class="py-5 px-6 text-left">No</th>
-                                    <th class="py-5 px-6 text-left">Nama Sales</th>
-                                    <th class="py-5 px-6 text-left">Akun Login</th>
-                                    <th class="py-5 px-6 text-left">NIK KTP</th>
-                                    <th class="py-5 px-6 text-left">No. HP / WA</th>
-                                    <th class="py-5 px-6 text-left">Data Rekening</th>
-                                    <th class="py-5 px-6 text-left">Status Proyek</th>
-                                    <th class="py-5 px-6 text-center">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="table-sales-body" class="divide-y divide-slate-100">
-                                <!-- Data diinjeksi via JS -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAMPILAN DAFTAR TEKNISI (HANYA ADMIN) -->
-            <div id="view-teknisi" class="hidden-el space-y-8">
-                <div class="bg-white rounded-[40px] card-shadow border border-slate-100 overflow-hidden text-left">
-                    <div class="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                        <h3 class="font-black italic uppercase tracking-tight text-slate-900">
-                            <i class="fas fa-tools mr-2 text-slate-600"></i> Database Teknisi Pemasangan
-                        </h3>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse min-w-[800px]">
-                            <thead class="bg-slate-50 border-b border-slate-200 uppercase font-black text-[10px] text-slate-500 tracking-widest">
-                                <tr>
-                                    <th class="py-5 px-6 text-left">No</th>
-                                    <th class="py-5 px-6 text-left">Nama Teknisi</th>
-                                    <th class="py-5 px-6 text-left">Akun Login</th>
-                                    <th class="py-5 px-6 text-left">NIK KTP</th>
-                                    <th class="py-5 px-6 text-left">No. HP / WA</th>
-                                    <th class="py-5 px-6 text-left">Data Rekening</th>
-                                    <th class="py-5 px-6 text-left">Status Proyek</th>
-                                    <th class="py-5 px-6 text-center">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="table-teknisi-body" class="divide-y divide-slate-100">
-                                <!-- Data diinjeksi via JS -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-        </main>
     </div>
 
     <!-- MODAL: BUAT AKUN TEKNISI (ADMIN) -->
@@ -2172,24 +2114,28 @@
                     }
                 }
 
-                let aksiColumn = '';
-                if (roleType === 'sales' || roleType === 'teknisi') {
-                    aksiColumn = `
-                        <td class="py-5 px-6 text-center whitespace-nowrap align-top">
-                            ${window.activeUser.role === 'admin' ? `
-                            <button onclick="window.payUserFee('${u.email}')" class="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors inline-flex items-center gap-1 mb-1 w-full justify-center" title="Proses Bayar Fee">
-                                <i class="fas fa-money-check-alt"></i> Bayar Fee
-                            </button>
-                            ` : ''}
-                            ${roleType === 'teknisi' && window.activeUser.role === 'admin' ? `
-                            <br>
-                            <button onclick="window.deleteUserAccount('${u.email}')" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors inline-flex items-center gap-1 w-full justify-center" title="Hapus Teknisi">
-                                <i class="fas fa-trash-alt"></i> Hapus
-                            </button>
-                            ` : ''}
-                        </td>
+                let aksiColumn = `<td class="py-5 px-6 text-center whitespace-nowrap align-top">`;
+                
+                if ((roleType === 'sales' || roleType === 'teknisi') && window.activeUser.role === 'admin') {
+                    aksiColumn += `
+                        <button onclick="window.payUserFee('${u.email}')" class="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors inline-flex items-center gap-1 mb-1 w-full justify-center" title="Proses Bayar Fee">
+                            <i class="fas fa-money-check-alt"></i> Bayar Fee
+                        </button>
                     `;
                 }
+                
+                if (window.activeUser.role === 'admin') {
+                    if (roleType === 'sales' || roleType === 'teknisi') {
+                        aksiColumn += `<br>`;
+                    }
+                    aksiColumn += `
+                        <button onclick="window.deleteUserAccount('${u.email}')" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors inline-flex items-center gap-1 w-full justify-center" title="Hapus Akun">
+                            <i class="fas fa-trash-alt"></i> Hapus
+                        </button>
+                    `;
+                }
+                
+                aksiColumn += `</td>`;
 
                 tbody.insertAdjacentHTML('beforeend', `
                     <tr class="text-xs border-b border-slate-50 hover:bg-slate-50 transition-colors">
