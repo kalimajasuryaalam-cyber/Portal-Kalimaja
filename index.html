@@ -2609,16 +2609,24 @@
             document.getElementById('dash-view').classList.remove('hidden-el');
             
             const thTagihan = document.getElementById('th-tagihan-inv');
+            const thStatusTransfer = document.getElementById('th-status-transfer-inv');
+
             if (thTagihan) {
-                thTagihan.innerText = window.activeUser.role === 'investor' ? 'Tagihan ke Customer (Rasio)' : 'Tagihan Investor (Rasio)';
+                if (window.activeUser.role === 'investor') thTagihan.innerText = 'Tagihan ke Customer (Rasio)';
+                else if (window.activeUser.role === 'sales' || window.activeUser.role === 'teknisi' || window.activeUser.role === 'rekanan') thTagihan.innerText = 'Komisi / Fee Anda';
+                else thTagihan.innerText = 'Tagihan Investor (Rasio)';
             }
 
-            const thStatusTransfer = document.getElementById('th-status-transfer-inv');
             if (thStatusTransfer) {
                 if (window.activeUser.role === 'customer') {
                     thStatusTransfer.classList.add('hidden-el');
                 } else {
                     thStatusTransfer.classList.remove('hidden-el');
+                    if (window.activeUser.role === 'sales' || window.activeUser.role === 'teknisi' || window.activeUser.role === 'rekanan') {
+                        thStatusTransfer.innerText = 'Status Pembayaran Fee';
+                    } else {
+                        thStatusTransfer.innerText = 'Status Transfer Inv.';
+                    }
                 }
             }
             
@@ -2790,8 +2798,79 @@
                     const statusLabel = l.status === 'paid' ? 'LUNAS' : 'BELUM DIBAYAR';
                     const statusClass = l.status === 'paid' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700';
                     
-                    const invStatusLabel = l.invStatus === 'paid' ? 'SUDAH DITRANSFER' : 'BELUM DIBAYAR';
-                    const invStatusClass = l.invStatus === 'paid' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700';
+                    let col4Html = '';
+                    let col5Html = '';
+
+                    if (window.activeUser.role === 'sales' || window.activeUser.role === 'teknisi' || window.activeUser.role === 'rekanan') {
+                        let mySalesFee = 0;
+                        let myTekFee = 0;
+                        const companyProfitTable = tagihanInvestorGrossTable * 0.3;
+                        
+                        if(window.activeProject.rekCustEmail === window.activeUser.email) mySalesFee += companyProfitTable * 0.25;
+                        if(window.activeProject.rekInvEmail === window.activeUser.email) mySalesFee += companyProfitTable * 0.15;
+
+                        if (window.activeProject.rekTekEmail === window.activeUser.email) {
+                            const totalUnits = window.activeProject.units.reduce((a,b)=>a+b.q,0);
+                            const invUser = window.dbUsers.find(u => u.email === window.activeProject.invEmail);
+                            const pTier = (invUser && invUser.tier) ? invUser.tier : 'D';
+                            let feePerUnit = 150000;
+                            if (pTier === 'A') feePerUnit = 450000;
+                            else if (pTier === 'B') feePerUnit = 350000;
+                            else if (pTier === 'C') feePerUnit = 250000;
+                            myTekFee = feePerUnit * totalUnits;
+                        }
+
+                        let feeText = '';
+                        if (mySalesFee > 0 && myTekFee > 0) feeText = `Sales: ${formatIDR(mySalesFee)}<br>Teknisi: ${formatIDR(myTekFee)}`;
+                        else if (myTekFee > 0) feeText = `${formatIDR(myTekFee)}`;
+                        else feeText = `${formatIDR(mySalesFee)}`;
+                        
+                        col4Html = `
+                            <td class="py-5 px-6 text-right font-black text-indigo-700 text-sm align-top">
+                                ${feeText} <br>
+                                <span class="text-[9px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded mt-1 inline-block">Komisi Kemitraan</span>
+                            </td>
+                        `;
+
+                        const logDate = new Date(l.timestamp);
+                        const paidDate = window.activeUser.lastFeePaidAt ? new Date(window.activeUser.lastFeePaidAt) : null;
+                        const isFeePaid = paidDate && paidDate > logDate;
+
+                        const feeStatusLabel = isFeePaid ? 'SUDAH DIBAYAR' : 'BELUM DIBAYAR';
+                        const feeStatusClass = isFeePaid ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700';
+
+                        col5Html = `
+                            <td class="py-5 px-6 text-center align-top">
+                                <span class="status-pill ${feeStatusClass}">${feeStatusLabel}</span>
+                                <div class="mt-2 pt-2 border-t border-slate-100">
+                                    <span class="block text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Pencairan:</span>
+                                    <span class="block text-xs font-black text-slate-600">Transfer Bank</span>
+                                </div>
+                            </td>
+                        `;
+                    } else {
+                        const rasioLabel = `Inv ${Math.round(logSplit.invGross * 100)}% : Cust ${Math.round(logSplit.cust * 100)}%`;
+                        col4Html = `
+                            <td class="py-5 px-6 text-right font-black text-indigo-700 text-sm align-top">
+                                ${formatIDR(tagihanInvestorGrossTable)} <br>
+                                <span class="text-[9px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded mt-1 inline-block">${rasioLabel}</span>
+                            </td>
+                        `;
+
+                        if (window.activeUser.role !== 'customer') {
+                            const invStatusLabel = l.invStatus === 'paid' ? 'SUDAH DITRANSFER' : 'BELUM DIBAYAR';
+                            const invStatusClass = l.invStatus === 'paid' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700';
+                            col5Html = `
+                                <td class="py-5 px-6 text-center align-top">
+                                    <span class="status-pill ${invStatusClass}">${invStatusLabel}</span>
+                                    <div class="mt-2 pt-2 border-t border-slate-100">
+                                        <span class="block text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Nominal Transfer:</span>
+                                        <span class="block text-xs font-black text-emerald-600 mono">${formatIDR(invNetProfitTable)}</span>
+                                    </div>
+                                </td>
+                            `;
+                        }
+                    }
 
                     let actionBtn = '';
                     if (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op') {
@@ -2815,32 +2894,14 @@
                         actionBtn += `</div>`;
                     }
 
-                    const rasioLabel = `Inv ${Math.round(logSplit.invGross * 100)}% : Cust ${Math.round(logSplit.cust * 100)}%`;
-
-                    let invTransferTd = '';
-                    if (window.activeUser.role !== 'customer') {
-                        invTransferTd = `
-                            <td class="py-5 px-6 text-center">
-                                <span class="status-pill ${invStatusClass}">${invStatusLabel}</span>
-                                <div class="mt-2 pt-2 border-t border-slate-100">
-                                    <span class="block text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Nominal Transfer:</span>
-                                    <span class="block text-xs font-black text-emerald-600 mono">${formatIDR(invNetProfitTable)}</span>
-                                </div>
-                            </td>
-                        `;
-                    }
-
                     table.insertAdjacentHTML('beforeend', `
                         <tr class="text-xs font-bold italic border-b border-slate-50 hover:bg-slate-50 transition-colors">
-                            <td class="py-5 px-6">${l.period}</td>
-                            <td class="py-5 px-6 text-right text-indigo-600">${formatNum(l.kwhReal)} kWh</td>
-                            <td class="py-5 px-6 text-right text-emerald-600">${formatIDR(s)}</td>
-                            <td class="py-5 px-6 text-right font-black text-indigo-700 text-sm">
-                                ${formatIDR(tagihanInvestorGrossTable)} <br>
-                                <span class="text-[9px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded mt-1 inline-block">${rasioLabel}</span>
-                            </td>
-                            ${invTransferTd}
-                            <td class="py-5 px-6 text-center text-amber-600">${endDateStr}</td>
+                            <td class="py-5 px-6 align-top">${l.period}</td>
+                            <td class="py-5 px-6 text-right text-indigo-600 align-top">${formatNum(l.kwhReal)} kWh</td>
+                            <td class="py-5 px-6 text-right text-emerald-600 align-top">${formatIDR(s)}</td>
+                            ${col4Html}
+                            ${col5Html}
+                            <td class="py-5 px-6 text-center text-amber-600 align-top">${endDateStr}</td>
                             <td class="py-5 px-6 text-center leading-tight align-top">
                                 <span class="status-pill ${statusClass}">${statusLabel}</span>
                                 ${actionBtn}
