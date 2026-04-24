@@ -107,11 +107,15 @@
         // Fungsi UI Sederhana
         window.showRegister = function() {
             document.getElementById('login-view').classList.add('hidden-el');
+            document.getElementById('forgot-view').classList.add('hidden-el');
+            document.getElementById('new-pass-view').classList.add('hidden-el');
             document.getElementById('register-view').classList.remove('hidden-el');
         };
 
         window.showLogin = function() {
             document.getElementById('register-view').classList.add('hidden-el');
+            document.getElementById('forgot-view').classList.add('hidden-el');
+            document.getElementById('new-pass-view').classList.add('hidden-el');
             document.getElementById('login-view').classList.remove('hidden-el');
         };
 
@@ -221,7 +225,10 @@
                         <input type="email" id="login-email" placeholder="email@bisnis.com">
                     </div>
                     <div class="space-y-1">
-                        <label class="text-[10px] font-black text-slate-400 uppercase px-2 block">Kata Sandi</label>
+                        <div class="flex justify-between items-center px-2">
+                            <label class="text-[10px] font-black text-slate-400 uppercase block">Kata Sandi</label>
+                            <button onclick="window.showForgotPassword()" class="text-[10px] font-bold text-indigo-600 hover:text-indigo-800 transition-colors">Lupa Sandi?</button>
+                        </div>
                         <input type="password" id="login-password" placeholder="••••••••">
                     </div>
                     <button onclick="doLogin()" class="w-full bg-indigo-950 text-white py-5 rounded-2xl font-black uppercase tracking-widest hover:bg-black transition-all mt-4 shadow-lg">Masuk Dashboard</button>
@@ -295,6 +302,41 @@
                     <p class="text-xs font-bold text-slate-500">
                         Sudah punya akun? <button onclick="showLogin()" class="text-indigo-600 underline font-black ml-1">Kembali Login</button>
                     </p>
+                </div>
+            </div>
+
+            <!-- TAMPILAN LUPA SANDI -->
+            <div id="forgot-view" class="hidden-el">
+                <div class="text-center mb-6">
+                    <h3 class="text-xl font-black italic uppercase text-slate-900">Reset Sandi</h3>
+                    <p class="text-xs text-slate-500 mt-1">Verifikasi identitas Anda untuk melanjutkan.</p>
+                </div>
+                <div class="space-y-4">
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black text-slate-400 uppercase px-2 block">Email Terdaftar</label>
+                        <input type="email" id="forgot-email" placeholder="email@bisnis.com">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black text-slate-400 uppercase px-2 block">Nomor NIK KTP (Verifikasi)</label>
+                        <input type="text" inputmode="numeric" id="forgot-nik" placeholder="16 Digit NIK KTP" maxlength="16">
+                    </div>
+                    <button onclick="window.verifyForgotPassword()" class="w-full bg-indigo-600 text-white py-5 rounded-2xl font-black uppercase tracking-widest hover:bg-indigo-700 transition-all mt-4 shadow-lg">Verifikasi Data</button>
+                    <button onclick="window.showLogin()" class="w-full bg-slate-100 text-slate-600 py-4 rounded-2xl font-bold uppercase tracking-widest hover:bg-slate-200 transition-all mt-2">Batal & Kembali</button>
+                </div>
+            </div>
+
+            <!-- TAMPILAN SANDI BARU -->
+            <div id="new-pass-view" class="hidden-el">
+                <div class="text-center mb-6">
+                    <h3 class="text-xl font-black italic uppercase text-emerald-600">Akses Terbuka</h3>
+                    <p class="text-xs text-slate-500 mt-1">Identitas terverifikasi. Silakan buat sandi baru.</p>
+                </div>
+                <div class="space-y-4">
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black text-slate-400 uppercase px-2 block">Kata Sandi Baru</label>
+                        <input type="password" id="new-password" placeholder="Minimal 6 karakter">
+                    </div>
+                    <button onclick="window.saveNewPassword()" class="w-full bg-emerald-500 text-white py-5 rounded-2xl font-black uppercase tracking-widest hover:bg-emerald-600 transition-all mt-4 shadow-lg">Simpan & Login</button>
                 </div>
             </div>
         </div>
@@ -1458,6 +1500,57 @@
             localStorage.removeItem('kalimaja_session_email');
             window.activeUser = null;
             location.reload();
+        };
+
+        window.resetTargetEmail = null;
+
+        window.showForgotPassword = function() {
+            document.getElementById('login-view').classList.add('hidden-el');
+            document.getElementById('register-view').classList.add('hidden-el');
+            document.getElementById('new-pass-view').classList.add('hidden-el');
+            document.getElementById('forgot-view').classList.remove('hidden-el');
+            document.getElementById('forgot-email').value = '';
+            document.getElementById('forgot-nik').value = '';
+        };
+
+        window.verifyForgotPassword = function() {
+            const email = cleanEmailStr(document.getElementById('forgot-email').value);
+            const nik = document.getElementById('forgot-nik').value.trim();
+
+            if(!email || !nik) return window.showAlert("Harap masukkan Email dan NIK KTP Anda.");
+
+            const user = window.dbUsers.find(u => cleanEmailStr(u.email) === email && u.nik === nik);
+            if(user) {
+                window.resetTargetEmail = email;
+                document.getElementById('forgot-view').classList.add('hidden-el');
+                document.getElementById('new-pass-view').classList.remove('hidden-el');
+                document.getElementById('new-password').value = '';
+            } else {
+                window.showAlert("Verifikasi Gagal: Kombinasi Email dan NIK KTP tidak ditemukan atau tidak cocok.");
+            }
+        };
+
+        window.saveNewPassword = async function() {
+            const newPass = cleanPassStr(document.getElementById('new-password').value);
+            if(!newPass || newPass.length < 6) return window.showAlert("Kata sandi baru minimal 6 karakter.");
+            if(!window.fbUser) return window.showAlert("Koneksi cloud terputus.");
+
+            const userIndex = window.dbUsers.findIndex(u => cleanEmailStr(u.email) === window.resetTargetEmail);
+            if(userIndex >= 0) {
+                const updatedUser = { ...window.dbUsers[userIndex], pass: newPass };
+                
+                try {
+                    await setDoc(getPubDoc('users', window.resetTargetEmail), updatedUser);
+                    window.dbUsers[userIndex] = updatedUser; 
+                    
+                    window.showAlert("Kata sandi berhasil diubah! Silakan masuk dengan sandi baru Anda.");
+                    document.getElementById('login-email').value = window.resetTargetEmail;
+                    document.getElementById('login-password').value = newPass;
+                    window.showLogin();
+                } catch(e) {
+                    window.showAlert("Gagal mereset sandi: " + e.message);
+                }
+            }
         };
 
         window.uploadProfilePic = async function(event) {
