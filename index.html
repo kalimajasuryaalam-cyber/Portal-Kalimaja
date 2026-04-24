@@ -2201,7 +2201,7 @@
                     
                     if(lockedView) {
                         lockedView.classList.remove('hidden-el');
-                        setUI('locked-bill-details', billDetails);
+                        document.getElementById('locked-bill-details').innerHTML = billDetails;
                         setUI('locked-total-bill', formatIDR(totalBill));
                     }
                     
