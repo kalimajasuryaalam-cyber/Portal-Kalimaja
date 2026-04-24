@@ -178,22 +178,22 @@
 
             if(viewName === 'dashboard') {
                 document.getElementById('view-dashboard').classList.remove('hidden-el');
-                if(typeof refreshProjectData === 'function') refreshProjectData();
+                if(window.refreshProjectData) window.refreshProjectData();
             } else if(viewName === 'projects') {
                 document.getElementById('view-projects').classList.remove('hidden-el');
-                if(typeof renderProjectTable === 'function') renderProjectTable();
+                if(window.renderProjectTable) window.renderProjectTable();
             } else if(viewName === 'customers') {
                 document.getElementById('view-customers').classList.remove('hidden-el');
-                if(typeof renderUserTable === 'function') renderUserTable('customer');
+                if(window.renderUserTable) window.renderUserTable('customer');
             } else if(viewName === 'investors') {
                 document.getElementById('view-investors').classList.remove('hidden-el');
-                if(typeof renderUserTable === 'function') renderUserTable('investor');
+                if(window.renderUserTable) window.renderUserTable('investor');
             } else if(viewName === 'sales') {
                 document.getElementById('view-sales').classList.remove('hidden-el');
-                if(typeof renderUserTable === 'function') renderUserTable('sales');
+                if(window.renderUserTable) window.renderUserTable('sales');
             } else if(viewName === 'teknisi') {
                 document.getElementById('view-teknisi').classList.remove('hidden-el');
-                if(typeof renderUserTable === 'function') renderUserTable('teknisi');
+                if(window.renderUserTable) window.renderUserTable('teknisi');
             } else if(viewName === 'chat') {
                 document.getElementById('view-chat').classList.remove('hidden-el');
             }
@@ -958,6 +958,66 @@
             </div>
 
             <!-- TAMPILAN DAFTAR SALES (HANYA ADMIN) -->
+            <div id="view-sales" class="hidden-el space-y-8">
+                <div class="bg-white rounded-[40px] card-shadow border border-slate-100 overflow-hidden text-left">
+                    <div class="p-8 border-b border-slate-100 flex justify-between items-center bg-amber-50/50">
+                        <h3 class="font-black italic uppercase tracking-tight text-amber-900">
+                            <i class="fas fa-handshake mr-2 text-amber-600"></i> Database Mitra / Sales
+                        </h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse min-w-[800px]">
+                            <thead class="bg-slate-50 border-b border-slate-200 uppercase font-black text-[10px] text-slate-500 tracking-widest">
+                                <tr>
+                                    <th class="py-5 px-6 text-left">No</th>
+                                    <th class="py-5 px-6 text-left">Nama Sales</th>
+                                    <th class="py-5 px-6 text-left">Akun Login</th>
+                                    <th class="py-5 px-6 text-left">NIK KTP</th>
+                                    <th class="py-5 px-6 text-left">No. HP / WA</th>
+                                    <th class="py-5 px-6 text-left">Data Rekening</th>
+                                    <th class="py-5 px-6 text-left">Status Proyek</th>
+                                    <th class="py-5 px-6 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-sales-body" class="divide-y divide-slate-100">
+                                <!-- Data diinjeksi via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAMPILAN DAFTAR TEKNISI (HANYA ADMIN) -->
+            <div id="view-teknisi" class="hidden-el space-y-8">
+                <div class="bg-white rounded-[40px] card-shadow border border-slate-100 overflow-hidden text-left">
+                    <div class="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                        <h3 class="font-black italic uppercase tracking-tight text-slate-900">
+                            <i class="fas fa-tools mr-2 text-slate-600"></i> Database Teknisi Pemasangan
+                        </h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse min-w-[800px]">
+                            <thead class="bg-slate-50 border-b border-slate-200 uppercase font-black text-[10px] text-slate-500 tracking-widest">
+                                <tr>
+                                    <th class="py-5 px-6 text-left">No</th>
+                                    <th class="py-5 px-6 text-left">Nama Teknisi</th>
+                                    <th class="py-5 px-6 text-left">Akun Login</th>
+                                    <th class="py-5 px-6 text-left">NIK KTP</th>
+                                    <th class="py-5 px-6 text-left">No. HP / WA</th>
+                                    <th class="py-5 px-6 text-left">Data Rekening</th>
+                                    <th class="py-5 px-6 text-left">Status Proyek</th>
+                                    <th class="py-5 px-6 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-teknisi-body" class="divide-y divide-slate-100">
+                                <!-- Data diinjeksi via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </main>
     </div>
 
     <!-- MODAL: BUAT AKUN TEKNISI (ADMIN) -->
