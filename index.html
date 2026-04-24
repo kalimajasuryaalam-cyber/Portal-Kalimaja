@@ -2171,6 +2171,7 @@
                     const s = Math.max(0, (window.activeProject.baseline - l.kwhReal) * 1615);
                     const logSplit = window.getSplitRatio(window.activeProject.createdAt, l.period);
                     const tagihanInvestorGrossTable = s * logSplit.invGross; 
+                    const invNetProfitTable = tagihanInvestorGrossTable * 0.7;
                     
                     const startDate = new Date(window.activeProject.createdAt || Date.now());
                     const endDate = new Date(startDate);
@@ -2214,6 +2215,10 @@
                             </td>
                             <td class="py-5 px-6 text-center">
                                 <span class="status-pill ${invStatusClass}">${invStatusLabel}</span>
+                                <div class="mt-2 pt-2 border-t border-slate-100">
+                                    <span class="block text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Nominal Transfer:</span>
+                                    <span class="block text-xs font-black text-emerald-600 mono">${formatIDR(invNetProfitTable)}</span>
+                                </div>
                             </td>
                             <td class="py-5 px-6 text-center text-amber-600">${endDateStr}</td>
                             <td class="py-5 px-6 text-center leading-tight align-top">
