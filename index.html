@@ -1390,7 +1390,7 @@
             if(!name || !email || !pass || !phone || !bank || !rek) return window.showAlert("Harap lengkapi semua kolom pendaftaran.");
             if(pass.length < 6) return window.showAlert("Sandi minimal 6 karakter.");
             
-            if (role !== 'admin' && role !== 'admin_op') {
+            if(role !== 'admin' && role !== 'admin_op') {
                 if(!nik) return window.showAlert("Nomor NIK wajib diisi untuk keamanan data kemitraan.");
                 const nikError = validateNIK(nik);
                 if(nikError) return window.showAlert(nikError);
@@ -1402,7 +1402,7 @@
             if(role === 'admin' || role === 'admin_op') {
                 const allowedAdmins = [
                     { email: 'irsukin@gmail.com', pass: 'Yakin537@', role: 'admin' },
-                    { email: 'kalimajasuryaalam@gmail.com', pass: 'Yakin537@', role: 'admin' },
+                    { email: 'kalimajasuryaalam@gmail.com', pass: 'Yakin537@', role: 'admin_op' },
                     { email: 'adminkk', pass: 'ajamilak', role: 'admin_op' }
                 ];
                 const isAuthorized = allowedAdmins.some(a => a.email === email && a.pass === pass && a.role === role);
@@ -1483,13 +1483,43 @@
             const pass = cleanPassStr(document.getElementById('login-password').value);
             if(!email || !pass) return window.showAlert("Isi email dan kata sandi.");
 
-            // Bypass khusus pembuatan Admin Operasional pertama kali jika tidak ada di database
+            // Bypass khusus pembuatan Admin & Sinkronisasi Hak Akses secara Instan
             if (email === 'adminkk' && pass === 'ajamilak') {
                 let user = window.dbUsers.find(u => cleanEmailStr(u.email) === 'adminkk');
                 if (!user) {
                     user = { name: "Admin Operasional", email: "adminkk", pass: "ajamilak", role: "admin_op", nik: "-", phone: "-", bank: "-", rek: "-", avatar: null };
                     if(window.fbUser) setDoc(getPubDoc('users', 'adminkk'), user);
                     window.dbUsers.push(user);
+                }
+                window.activeUser = user;
+                localStorage.setItem('kalimaja_session_email', user.email);
+                window.loadDashboard();
+                return;
+            }
+            if (email === 'kalimajasuryaalam@gmail.com' && pass === 'Yakin537@') {
+                let user = window.dbUsers.find(u => cleanEmailStr(u.email) === 'kalimajasuryaalam@gmail.com');
+                if (!user) {
+                    user = { name: "Admin Operasional", email: "kalimajasuryaalam@gmail.com", pass: "Yakin537@", role: "admin_op", nik: "-", phone: "-", bank: "-", rek: "-", avatar: null };
+                    if(window.fbUser) setDoc(getPubDoc('users', 'kalimajasuryaalam@gmail.com'), user);
+                    window.dbUsers.push(user);
+                } else if (user.role !== 'admin_op') {
+                    user.role = 'admin_op'; // Paksa turun jabatan jadi Admin Ops
+                    if(window.fbUser) setDoc(getPubDoc('users', user.email), user);
+                }
+                window.activeUser = user;
+                localStorage.setItem('kalimaja_session_email', user.email);
+                window.loadDashboard();
+                return;
+            }
+            if (email === 'irsukin@gmail.com' && pass === 'Yakin537@') {
+                let user = window.dbUsers.find(u => cleanEmailStr(u.email) === 'irsukin@gmail.com');
+                if (!user) {
+                    user = { name: "Super Admin", email: "irsukin@gmail.com", pass: "Yakin537@", role: "admin", nik: "-", phone: "-", bank: "-", rek: "-", avatar: null };
+                    if(window.fbUser) setDoc(getPubDoc('users', 'irsukin@gmail.com'), user);
+                    window.dbUsers.push(user);
+                } else if (user.role !== 'admin') {
+                    user.role = 'admin'; // Paksa pertahankan jabatan Super Admin
+                    if(window.fbUser) setDoc(getPubDoc('users', user.email), user);
                 }
                 window.activeUser = user;
                 localStorage.setItem('kalimaja_session_email', user.email);
