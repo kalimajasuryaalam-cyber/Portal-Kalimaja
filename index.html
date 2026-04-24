@@ -2318,9 +2318,18 @@
             if(invSelect) {
                 invSelect.innerHTML = '<option value="">-- Pilih Investor Terdaftar --</option>' + 
                     investors.map(i => {
-                        const isBlocked = i.tier && !i.tierPaid;
+                        let isBlocked = false;
+                        let blockReason = "";
+                        if (!i.tier) {
+                            isBlocked = true;
+                            blockReason = "Belum Pilih Tier";
+                        } else if (!i.tierPaid) {
+                            isBlocked = true;
+                            blockReason = "Belum Lunas Deposit";
+                        }
+                        
                         if (isBlocked) {
-                            return `<option value="${i.email}" disabled class="text-slate-400 bg-red-50">🚫 ${i.name} (${i.email}) - Belum Lunas Deposit</option>`;
+                            return `<option value="${i.email}" disabled class="text-slate-400 bg-red-50">🚫 ${i.name} (${i.email}) - ${blockReason}</option>`;
                         }
                         return `<option value="${i.email}">${i.name} (${i.email})</option>`;
                     }).join('');
