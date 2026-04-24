@@ -609,7 +609,7 @@
                 <div id="dash-view" class="space-y-10 hidden-el">
                     <!-- INFO PROYEK UTAMA -->
                     <div class="grid lg:grid-cols-3 gap-8 text-left">
-                        <div class="lg:col-span-2 bg-white rounded-[32px] p-8 card-shadow border border-slate-100 relative overflow-hidden">
+                        <div id="main-info-card" class="lg:col-span-2 bg-white rounded-[32px] p-8 card-shadow border border-slate-100 relative overflow-hidden">
                             <div class="mb-8">
                                 <span class="status-pill bg-emerald-100 text-emerald-700 mb-2 inline-block">Verified Active Project</span>
                                 <h2 id="view-loc-name" class="text-2xl font-black italic uppercase text-slate-900 leading-none mb-1">-</h2>
@@ -622,7 +622,7 @@
                                 <div><p class="text-[9px] font-black text-slate-400 uppercase mb-1">Hari Kerja/Bln</p><p id="view-days" class="text-xs font-bold text-indigo-900">-</p></div>
                             </div>
                         </div>
-                        <div class="bg-indigo-950 rounded-[32px] p-8 card-shadow text-white relative overflow-hidden text-left">
+                        <div id="investor-portfolio-card" class="bg-indigo-950 rounded-[32px] p-8 card-shadow text-white relative overflow-hidden text-left">
                             <p class="text-[9px] font-black text-indigo-400 uppercase tracking-widest mb-2 italic">Investor Portfolio</p>
                             <h3 id="view-inv-email" class="text-lg font-black italic uppercase mb-4 tracking-tighter truncate">-</h3>
                             <div class="space-y-4">
@@ -2036,6 +2036,20 @@
                 }
             }
             
+            const invPortCard = document.getElementById('investor-portfolio-card');
+            const mainInfoCard = document.getElementById('main-info-card');
+            if (invPortCard && mainInfoCard) {
+                if (window.activeUser.role === 'customer') {
+                    invPortCard.classList.add('hidden-el');
+                    mainInfoCard.classList.remove('lg:col-span-2');
+                    mainInfoCard.classList.add('lg:col-span-3');
+                } else {
+                    invPortCard.classList.remove('hidden-el');
+                    mainInfoCard.classList.remove('lg:col-span-3');
+                    mainInfoCard.classList.add('lg:col-span-2');
+                }
+            }
+
             const custObj = window.dbUsers.find(u => u.email === window.activeProject.custEmail) || {};
             const custNameDisplay = custObj.name || "Customer Tidak Diketahui";
             
