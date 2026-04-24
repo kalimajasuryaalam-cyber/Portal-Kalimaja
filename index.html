@@ -2182,7 +2182,7 @@
                     else if (window.activeUser.tier === 'D') nominalTagihan = 14250000;
                     
                     totalBill += nominalTagihan;
-                    billDetails += `<div class="flex justify-between items-center"><span class="text-xs font-bold text-red-800 uppercase">Deposit Awal (Tier ${window.activeUser.tier})</span><span class="text-sm font-black text-red-600 mono">${formatIDR(nominalTagihan)}</span></div>`;
+                    billDetails += `<div class="flex justify-between items-center bg-white p-4 rounded-xl border border-red-100 shadow-sm"><span class="text-xs font-bold text-red-800 uppercase">Deposit Awal (Tier ${window.activeUser.tier})</span><span class="text-sm font-black text-red-600 mono">${formatIDR(nominalTagihan)}</span></div>`;
                 }
 
                 userProjects.forEach(p => {
@@ -2190,7 +2190,7 @@
                     if(p.capexShortfall > 0 && !isShortfallPaid) {
                         locked = true;
                         totalBill += p.capexShortfall;
-                        billDetails += `<div class="flex justify-between items-center"><span class="text-xs font-bold text-red-800 uppercase">Kekurangan CAPEX <br><span class="text-[9px] text-red-500">${p.location}</span></span><span class="text-sm font-black text-red-600 mono">${formatIDR(p.capexShortfall)}</span></div>`;
+                        billDetails += `<div class="flex justify-between items-center bg-white p-4 rounded-xl border border-red-100 shadow-sm"><span class="text-xs font-bold text-red-800 uppercase">Kekurangan CAPEX <br><span class="text-[9px] text-red-500 mt-1 block">${p.location}</span></span><span class="text-sm font-black text-red-600 mono">${formatIDR(p.capexShortfall)}</span></div>`;
                     }
                 });
 
