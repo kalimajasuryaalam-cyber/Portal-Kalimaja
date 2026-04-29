@@ -581,21 +581,9 @@
                                 </div>
                             </div>
                             <div class="space-y-3 border-l-0 md:border-l-2 border-slate-100 pl-0 md:pl-6">
-                                <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                                    <span class="text-[9px] font-bold text-slate-600 uppercase">Bos Besar Sukin (30%)</span>
-                                    <span class="text-xs font-black text-amber-600 mono" id="view-div-sukin">Rp 0</span>
-                                </div>
-                                <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                                    <span class="text-[9px] font-bold text-slate-600 uppercase">Heri Budiman (30%)</span>
-                                    <span class="text-xs font-black text-amber-600 mono" id="view-div-heri">Rp 0</span>
-                                </div>
-                                <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                                    <span class="text-[9px] font-bold text-slate-600 uppercase">Parpudi Lubis (15%)</span>
-                                    <span class="text-xs font-black text-amber-600 mono" id="view-div-parpudi">Rp 0</span>
-                                </div>
-                                <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                                    <span class="text-[9px] font-bold text-slate-600 uppercase">Surya Dzuhurillahi (5%)</span>
-                                    <span class="text-xs font-black text-amber-600 mono" id="view-div-surya">Rp 0</span>
+                                <div class="flex justify-between items-center bg-amber-50 p-4 md:p-5 rounded-xl border border-amber-200 shadow-sm h-full">
+                                    <span class="text-[10px] md:text-xs font-black text-amber-700 uppercase" id="label-my-dividen">Hak Dividen Anda</span>
+                                    <span class="text-lg md:text-xl font-black text-amber-600 mono" id="val-my-dividen">Rp 0</span>
                                 </div>
                             </div>
                         </div>
@@ -3138,11 +3126,30 @@
 
             // Rincian Alokasi Laba & Dividen (Semua Proyek)
             setUI('view-div-total', formatIDR(totalProfit));
-            setUI('view-div-sukin', formatIDR(totalProfit * 0.30));
-            setUI('view-div-heri', formatIDR(totalProfit * 0.30));
-            setUI('view-div-parpudi', formatIDR(totalProfit * 0.15));
-            setUI('view-div-surya', formatIDR(totalProfit * 0.05));
             setUI('view-div-sisa', formatIDR(totalProfit * 0.20));
+
+            let myShareName = "Hak Dividen Anda";
+            let myShareValue = window.activeUser.share || 0;
+            
+            if (window.activeUser.email === 'irsukin@gmail.com') {
+                myShareName = "Dividen BOS BESAR SUKIN (30%)";
+                myShareValue = 0.30;
+            } else if (window.activeUser.email === 'heribudiman') {
+                myShareName = "Dividen Heri Budiman (30%)";
+                myShareValue = 0.30;
+            } else if (window.activeUser.email === 'parpudilubis') {
+                myShareName = "Dividen Parpudi Lubis (15%)";
+                myShareValue = 0.15;
+            } else if (window.activeUser.email === 'suryadzuhurillahi') {
+                myShareName = "Dividen Surya Dzuhurillahi (5%)";
+                myShareValue = 0.05;
+            } else if (window.activeUser.role === 'admin_op') {
+                myShareName = "Bukan Hak Akses Operasional";
+                myShareValue = 0;
+            }
+            
+            setUI('label-my-dividen', myShareName);
+            setUI('val-my-dividen', formatIDR(totalProfit * myShareValue));
 
             const ctx = document.getElementById('adminProfitChart');
             if(ctx) {
