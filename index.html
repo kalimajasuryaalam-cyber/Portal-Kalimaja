@@ -2931,85 +2931,48 @@
 
         window.saveProject = async function() {
             if(!window.fbUser) return window.showAlert("Terputus dari server cloud.");
-            const custEmail = document.getElementById('form-cust-email').value.toLowerCase();
-            const invEmail = document.getElementById('form-inv-email').value.toLowerCase();
-            const loc = document.getElementById('form-loc').value;
-            const h = parseInt(document.getElementById('form-hours').value) || 12;
-            const d = parseInt(document.getElementById('form-days').value) || 26;
-            
-            const rekCustEmail = document.getElementById('form-rek-cust').value.toLowerCase();
-            const rekInvEmail = document.getElementById('form-rek-inv').value.toLowerCase();
-            const rekTekEmail = document.getElementById('form-rek-tek').value.toLowerCase();
+            const custEmail = document.getElementById('form-cust-email').value.toLowerCase(); const invEmail = document.getElementById('form-inv-email').value.toLowerCase();
+            const loc = document.getElementById('form-loc').value; const h = parseInt(document.getElementById('form-hours').value) || 12; const d = parseInt(document.getElementById('form-days').value) || 26;
+            const rekCustEmail = document.getElementById('form-rek-cust').value.toLowerCase(); const rekInvEmail = document.getElementById('form-rek-inv').value.toLowerCase(); const rekTekEmail = document.getElementById('form-rek-tek').value.toLowerCase();
 
             if(!custEmail || !invEmail || !loc) return window.showAlert("Pilih Email Customer, Investor, & Isi Lokasi Gedung!");
 
-            const selectedInv = window.dbUsers.find(u => u.email === invEmail);
-            const pTier = (selectedInv && selectedInv.tier) ? selectedInv.tier : 'D';
-            let feePerUnit = 150000;
-            let tierDiscount = 0;
-            
-            if (pTier === 'A') { feePerUnit = 450000; tierDiscount = 28500000; }
-            else if (pTier === 'B') { feePerUnit = 350000; tierDiscount = 22250000; }
-            else if (pTier === 'C') { feePerUnit = 250000; tierDiscount = 15750000; }
-            else if (pTier === 'D') { feePerUnit = 150000; tierDiscount = 14250000; }
+            const selectedInv = window.dbUsers.find(u => u.email === invEmail); const pTier = (selectedInv && selectedInv.tier) ? selectedInv.tier : 'D';
+            let feePerUnit = 150000; let tierDiscount = 0;
+            if (pTier === 'A') { feePerUnit = 450000; tierDiscount = 28500000; } else if (pTier === 'B') { feePerUnit = 350000; tierDiscount = 22250000; }
+            else if (pTier === 'C') { feePerUnit = 250000; tierDiscount = 15750000; } else if (pTier === 'D') { feePerUnit = 150000; tierDiscount = 14250000; }
 
             let units = []; let totalWatt = 0; let totalJasaTeknisi = 0; let totalNilaiAC = 0;
             document.querySelectorAll('#unit-rows-area > div').forEach(r => {
-                const pk = r.querySelector('.pk-sel').value;
-                const q = parseInt(r.querySelector('.qty-in').value) || 0;
-                if(q > 0) { 
-                    units.push({pk, q}); 
-                    totalWatt += WATTS[pk] * q; 
-                    totalJasaTeknisi += feePerUnit * q;
-                    totalNilaiAC += PRICES[pk] * q;
-                }
+                const pk = r.querySelector('.pk-sel').value; const q = parseInt(r.querySelector('.qty-in').value) || 0;
+                if(q > 0) { units.push({pk, q}); totalWatt += WATTS[pk] * q; totalJasaTeknisi += feePerUnit * q; totalNilaiAC += PRICES[pk] * q; }
             });
 
             if(units.length === 0) return window.showAlert("Tambahkan minimal 1 Unit AC.");
-
-            let capexShortfall = totalNilaiAC - tierDiscount;
-            if(capexShortfall < 0) capexShortfall = 0;
+            let capexShortfall = totalNilaiAC - tierDiscount; if(capexShortfall < 0) capexShortfall = 0;
 
             const projId = window.editingProjectId || ('PRJ-' + Date.now());
             const newProj = {
-                id: projId,
-                custEmail: custEmail,
-                invEmail: invEmail,
-                rekCustEmail: rekCustEmail,
-                rekInvEmail: rekInvEmail,
-                rekTekEmail: rekTekEmail,
-                jasaTeknisi: totalJasaTeknisi,
-                location: loc,
-                capex: totalNilaiAC,
-                capexShortfall: capexShortfall,
-                shortfallPaid: capexShortfall === 0,
-                baseline: (totalWatt/1000) * h * d,
-                hours: h,
-                days: d,
-                units: units,
+                id: projId, custEmail: custEmail, invEmail: invEmail, rekCustEmail: rekCustEmail, rekInvEmail: rekInvEmail, rekTekEmail: rekTekEmail,
+                jasaTeknisi: totalJasaTeknisi, location: loc, capex: totalNilaiAC, capexShortfall: capexShortfall, shortfallPaid: capexShortfall === 0,
+                baseline: (totalWatt/1000) * h * d, hours: h, days: d, units: units,
                 createdAt: window.editingProjectId ? (window.dbProjects.find(p => p.id === window.editingProjectId)?.createdAt || new Date().toISOString()) : new Date().toISOString()
             };
 
             await setDoc(getPubDoc('projects', projId), newProj);
-            
             window.showAlert(window.editingProjectId ? "Perubahan Proyek Tersimpan ke Cloud!" : "Kontrak Proyek Cloud Berhasil Diaktifkan!");
-            window.uiModal('project-modal', false);
-            window.editingProjectId = null;
+            window.uiModal('project-modal', false); window.editingProjectId = null;
         };
 
         window.openKwhModal = function() {
             if(!window.activeProject) return window.showAlert("Tidak ada proyek yang aktif untuk diupdate.");
+            if(!window.activeProject.units || window.activeProject.units.length === 0) return window.showAlert("Proyek ini belum memiliki rincian unit AC. Silakan edit proyek terlebih dahulu.");
             
-            // Proteksi Tambahan Jika Unit AC Kosong
-            if(!window.activeProject.units || window.activeProject.units.length === 0) {
-                return window.showAlert("Proyek ini belum memiliki data unit AC. Silakan edit proyek terlebih dahulu.");
-            }
-            
-            window.editingLogId = null;
-            setUI('kwh-modal-title', 'Input Realisasi per Unit');
+            window.editingLogId = null; 
+            setUI('kwh-modal-title', 'Input Realisasi per Unit'); 
             setUI('kwh-modal-project-name', 'PROYEK: ' + window.activeProject.location);
             
-            const container = document.getElementById('kwh-inputs-container');
+            const container = document.getElementById('kwh-inputs-container'); 
             container.innerHTML = '';
             
             let unitIndex = 1;
@@ -3024,33 +2987,31 @@
                     unitIndex++;
                 }
             });
-            
-            document.getElementById('in-kwh-period').value = '';
-            setUI('in-kwh-total', '0 kWh');
+            document.getElementById('in-kwh-period').value = ''; 
+            setUI('in-kwh-total', '0 kWh'); 
             window.uiModal('kwh-modal', true);
         };
 
         window.editKwh = function(logId) {
-            const logToEdit = window.dbLogs.find(l => (l.id || l.timestamp) === logId);
+            const logToEdit = window.dbLogs.find(l => (l.id || l.timestamp) === logId); 
             if(!logToEdit) return window.showAlert("Data riwayat tidak ditemukan.");
             if(logToEdit.status === 'paid') return window.showAlert("Tagihan yang sudah LUNAS tidak dapat diedit lagi demi keamanan data.");
-
-            window.editingLogId = logId;
-            setUI('kwh-modal-title', 'Edit Realisasi per Unit');
+            
+            window.editingLogId = logId; 
+            setUI('kwh-modal-title', 'Edit Realisasi per Unit'); 
             setUI('kwh-modal-project-name', 'PROYEK: ' + window.activeProject.location);
             
-            const container = document.getElementById('kwh-inputs-container');
+            const container = document.getElementById('kwh-inputs-container'); 
             container.innerHTML = '';
             
             let unitIndex = 1;
             (window.activeProject.units || []).forEach(u => {
                 for(let i=0; i<u.q; i++) {
                     let existingVal = '';
-                    if(logToEdit.breakdown && logToEdit.breakdown.length > 0) {
-                        const found = logToEdit.breakdown.find(b => b.unit == unitIndex);
-                        if(found) existingVal = found.kwh;
+                    if(logToEdit.breakdown && logToEdit.breakdown.length > 0) { 
+                        const found = logToEdit.breakdown.find(b => b.unit == unitIndex); 
+                        if(found) existingVal = found.kwh; 
                     }
-
                     container.insertAdjacentHTML('beforeend', `
                         <div class="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
                             <span class="text-[10px] font-bold text-slate-700 uppercase tracking-widest">Unit ${unitIndex} <span class="text-[9px] font-black bg-indigo-50 text-indigo-600 px-2 py-1 rounded ml-1">${u.pk} PK</span></span>
@@ -3060,43 +3021,35 @@
                     unitIndex++;
                 }
             });
-            
-            document.getElementById('in-kwh-period').value = logToEdit.period;
+            document.getElementById('in-kwh-period').value = logToEdit.period; 
             window.calcDynamicKwhTotal(); 
             window.uiModal('kwh-modal', true);
         };
 
         window.calcDynamicKwhTotal = function() {
-            let total = 0;
-            document.querySelectorAll('#kwh-inputs-container .kwh-unit-input').forEach(inp => {
-                total += parseFloat(inp.value) || 0;
+            let total = 0; 
+            document.querySelectorAll('.kwh-unit-input').forEach(inp => { 
+                total += parseFloat(inp.value) || 0; 
             });
             setUI('in-kwh-total', formatNum(total) + ' kWh');
         };
 
         window.saveKwh = async function() {
             if(!window.fbUser) return window.showAlert("Terputus dari cloud.");
-            const period = document.getElementById('in-kwh-period').value;
+            const period = document.getElementById('in-kwh-period').value; 
             if(!period) return window.showAlert("Pilih Periode Bulan Tagihan!");
             
-            let totalVal = 0;
-            let breakdownData = [];
-            let allFilled = true;
-
-            document.querySelectorAll('#kwh-inputs-container .kwh-unit-input').forEach(inp => {
-                const val = parseFloat(inp.value);
-                if(isNaN(val)) allFilled = false;
-                totalVal += val || 0;
-                
-                breakdownData.push({
-                    unit: inp.getAttribute('data-unit'),
-                    pk: inp.getAttribute('data-pk'),
-                    kwh: val || 0
-                });
+            let totalVal = 0; 
+            let breakdownData = []; 
+            
+            document.querySelectorAll('.kwh-unit-input').forEach(inp => {
+                let val = parseFloat(inp.value); 
+                if(isNaN(val)) val = 0; // Otomatis jadikan 0 jika kosong
+                totalVal += val;
+                breakdownData.push({ unit: inp.getAttribute('data-unit'), pk: inp.getAttribute('data-pk'), kwh: val });
             });
 
-            if(!allFilled) return window.showAlert("Harap isi nilai kWh untuk seluruh unit. Isi dengan 0 jika unit tidak menyala.");
-            if(totalVal <= 0) return window.showAlert("Total kWh akumulasi tidak boleh 0.");
+            if(totalVal <= 0) return window.showAlert("Total kWh akumulasi tidak boleh 0 atau kosong.");
 
             try {
                 const logId = window.editingLogId || ('LOG-' + Date.now());
@@ -3106,10 +3059,10 @@
                 }
 
                 const logData = {
-                    id: logId,
-                    projectId: window.activeProject.id,
-                    period: period,
-                    kwhReal: totalVal,
+                    id: logId, 
+                    projectId: window.activeProject.id, 
+                    period: period, 
+                    kwhReal: totalVal, 
                     breakdown: breakdownData, 
                     status: existingLog ? (existingLog.status || 'unpaid') : 'unpaid',
                     invStatus: existingLog ? (existingLog.invStatus || 'unpaid') : 'unpaid',
@@ -3118,13 +3071,11 @@
                 };
 
                 await setDoc(getPubDoc('logs', logId), logData);
-                
-                window.uiModal('kwh-modal', false);
+                window.uiModal('kwh-modal', false); 
                 window.editingLogId = null;
-                window.showAlert("Data kWh bulanan berhasil dihitung dan disimpan ke Cloud!");
+                window.showAlert("Data kWh berhasil disimpan dan langsung disinkronkan ke Cloud!");
             } catch (err) {
-                console.error("Simpan KWH Error: ", err);
-                window.showAlert("Gagal menyimpan data ke Cloud: " + err.message);
+                window.showAlert("Gagal menyimpan data: " + err.message);
             }
         };
 
