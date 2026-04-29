@@ -857,6 +857,10 @@
                                     <span id="label-share-company" class="text-[11px] font-black text-amber-600 uppercase tracking-widest">Laba Perusahaan</span>
                                     <span id="view-share-company" class="font-black text-amber-700 italic text-xl">Rp 0</span>
                                 </div>
+                                <div id="direksi-share-container" class="hidden-el flex justify-between p-5 bg-blue-50 rounded-2xl border border-blue-100 items-center">
+                                    <span id="label-share-direksi" class="text-[11px] font-black text-blue-600 uppercase tracking-widest">Hak Dividen Anda</span>
+                                    <span id="view-share-direksi" class="font-black text-blue-700 italic text-xl">Rp 0</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -2831,11 +2835,7 @@
                         if(elShareCom) elShareCom.innerHTML = formatIDR(komisiBulananSales);
                     }
                 } else {
-                    if (window.activeUser.role === 'direksi') {
-                        setUI('label-share-company', `Laba Perusahaan (30%) | Hak Anda: ${formatIDR(companyProfit * (window.activeUser.share || 0))}`);
-                    } else {
-                        setUI('label-share-company', `Laba Perusahaan (30% dari Tagihan)`);
-                    }
+                    setUI('label-share-company', `Laba Perusahaan (30% dari Tagihan)`);
                     
                     let rekShareInfo = '';
                     let totalPotonganRekanan = 0;
@@ -2846,6 +2846,17 @@
                         rekShareInfo = `<span class="text-[9px] text-amber-600 block font-bold mt-1">(Potongan Komisi Mitra: ${formatIDR(totalPotonganRekanan)})</span>`;
                     }
                     if(elShareCom) elShareCom.innerHTML = `${formatIDR(companyProfit)} ${rekShareInfo}`;
+                }
+                
+                const dirShareContainer = document.getElementById('direksi-share-container');
+                if (dirShareContainer) {
+                    if (window.activeUser.role === 'direksi') {
+                        dirShareContainer.classList.remove('hidden-el');
+                        setUI('label-share-direksi', `Hak Dividen Anda (${Math.round((window.activeUser.share || 0) * 100)}% dari Laba PT)`);
+                        setUI('view-share-direksi', formatIDR(companyProfit * (window.activeUser.share || 0)));
+                    } else {
+                        dirShareContainer.classList.add('hidden-el');
+                    }
                 }
                 
                 document.getElementById('view-bar').style.width = "100%";
@@ -3025,11 +3036,15 @@
                 setUI('view-share-cust', "Rp 0");
                 setUI('view-share-inv', "Rp 0");
                 setUI('view-share-company', "Rp 0");
+                setUI('view-share-direksi', "Rp 0");
                 setUI('view-bep', "0.0 Bulan");
                 setUI('view-investor-payout', "Rp 0");
                 
                 const shortfallEl = document.querySelector('.shortfall-container');
                 if(shortfallEl) shortfallEl.classList.add('hidden-el');
+
+                const dirShareContainer = document.getElementById('direksi-share-container');
+                if(dirShareContainer) dirShareContainer.classList.add('hidden-el');
                 
                 if (window.activeUser.role === 'customer') {
                     setUI('label-share-inv', `Tagihan Investor`);
