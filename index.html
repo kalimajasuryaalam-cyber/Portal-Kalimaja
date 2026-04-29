@@ -866,6 +866,7 @@
                                         <th class="py-3 px-4 text-right">Meter Listrik Real</th>
                                         <th class="py-3 px-4 text-right">Saving Murni</th>
                                         <th id="th-tagihan-inv" class="py-3 px-4 text-right text-indigo-600">Tagihan Investor (Rasio)</th>
+                                        <th id="th-dividen-direksi" class="py-3 px-4 text-right text-amber-600 hidden-el">Dividen Anda</th>
                                         <th id="th-status-transfer-inv" class="py-3 px-4 text-center">Status Transfer Inv.</th>
                                         <th class="py-3 px-4 text-center">Akhir Kontrak</th>
                                         <th class="py-3 px-4 text-center">Status (Cust)</th>
@@ -2679,6 +2680,7 @@
             
             const thTagihan = document.getElementById('th-tagihan-inv');
             const thStatusTransfer = document.getElementById('th-status-transfer-inv');
+            const thDividenDireksi = document.getElementById('th-dividen-direksi');
 
             if (thTagihan) {
                 if (window.activeUser.role === 'customer') thTagihan.innerText = 'Tagihan Bagi Hasil';
@@ -2696,6 +2698,14 @@
                     } else {
                         thStatusTransfer.innerText = 'Status Transfer Inv.';
                     }
+                }
+            }
+            
+            if (thDividenDireksi) {
+                if (window.activeUser.role === 'direksi' || window.activeUser.email === 'irsukin@gmail.com') {
+                    thDividenDireksi.classList.remove('hidden-el');
+                } else {
+                    thDividenDireksi.classList.add('hidden-el');
                 }
             }
             
@@ -2893,10 +2903,11 @@
                     const endDateStr = endDate.toLocaleDateString('id-ID', { month: 'short', year: 'numeric' });
 
                     const statusLabel = l.status === 'paid' ? 'LUNAS (CUST)' : 'BELUM DIBAYAR';
-                    const statusClass = l.status === 'paid' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700';
+                    const statusClass = l.status === 'paid' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700';
                     
                     let col4Html = '';
                     let col5Html = '';
+                    let colDividenHtml = '';
 
                     if (window.activeUser.role === 'sales' || window.activeUser.role === 'teknisi' || window.activeUser.role === 'rekanan') {
                         let mySalesFee = 0;
@@ -2973,6 +2984,12 @@
                             `;
                         }
                     }
+                    
+                    if (window.activeUser.role === 'direksi' || window.activeUser.email === 'irsukin@gmail.com') {
+                        const myShare = window.activeUser.share || (window.activeUser.email === 'irsukin@gmail.com' ? 0.30 : 0);
+                        const myDividenVal = tagihanInvestorGrossTable * 0.3 * myShare;
+                        colDividenHtml = `<td class="py-3 px-4 text-right font-black text-amber-600 align-top"><span class="block text-[8px] font-bold text-slate-400 mb-0.5 uppercase">Hak Bulanan</span>${formatIDR(myDividenVal)}</td>`;
+                    }
 
                     let actionBtn = '';
                     if (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op') {
@@ -3002,6 +3019,7 @@
                             <td class="py-3 px-4 text-right text-indigo-600 align-top">${formatNum(l.kwhReal)} kWh</td>
                             <td class="py-3 px-4 text-right text-emerald-600 align-top">${formatIDR(s)}</td>
                             ${col4Html}
+                            ${colDividenHtml}
                             ${col5Html}
                             <td class="py-3 px-4 text-center text-amber-600 align-top">${endDateStr}</td>
                             <td class="py-3 px-4 text-center leading-tight align-top">
