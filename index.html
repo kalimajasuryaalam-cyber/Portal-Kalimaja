@@ -36,7 +36,6 @@
         input, select { border: 2px solid #f1f5f9 !important; border-radius: 0.75rem !important; padding: 0.75rem 1rem !important; font-weight: 600 !important; font-size: 0.875rem !important; outline: none !important; width: 100%; transition: all 0.2s ease;}
         input:focus, select:focus { border-color: #4f46e5 !important; background: #f8fafc !important; }
 
-        /* Scrollbar styling */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
@@ -44,18 +43,11 @@
         @media print {
             .no-print { display: none !important; }
             body { background: white; padding: 0; margin: 0; }
-            
-            body.invoice-mode #app-content,
-            body.invoice-mode #auth-screen,
-            body.invoice-mode .modal-overlay,
-            body.invoice-mode aside,
-            body.invoice-mode nav { display: none !important; }
+            body.invoice-mode #app-content, body.invoice-mode #auth-screen, body.invoice-mode .modal-overlay, body.invoice-mode aside, body.invoice-mode nav { display: none !important; }
             body.invoice-mode #invoice-print-template { display: block !important; }
         }
-
         #invoice-print-template { display: none; }
         
-        /* Cloud Loader */
         #cloud-loader {
             position: fixed; inset: 0; z-index: 999; background: #020617;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -67,13 +59,11 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Custom Alert Modal */
         #custom-alert-modal { z-index: 9999; }
         #custom-alert-modal .modal-container { max-width: 24rem; padding: 1.5rem; overflow: visible; border-radius: 1.5rem; }
     </style>
 
     <script>
-        // Custom Alert & Confirm Modals
         window.customAlertModal = function(msg, isConfirm = false, onConfirm = null) {
             const modal = document.getElementById('custom-alert-modal');
             document.getElementById('alert-msg').innerText = msg;
@@ -93,26 +83,18 @@
             }
 
             modal.classList.add('modal-active');
-
-            btnOk.onclick = function() {
-                modal.classList.remove('modal-active');
-                if(isConfirm && onConfirm) onConfirm();
-            };
-            btnCancel.onclick = function() {
-                modal.classList.remove('modal-active');
-            };
+            btnOk.onclick = function() { modal.classList.remove('modal-active'); if(isConfirm && onConfirm) onConfirm(); };
+            btnCancel.onclick = function() { modal.classList.remove('modal-active'); };
         };
 
         window.showAlert = (msg) => window.customAlertModal(msg, false);
         window.showConfirm = (msg, onConfirm) => window.customAlertModal(msg, true, onConfirm);
 
-        // Fungsi UI Sederhana
         window.showRegister = function() {
             document.getElementById('login-view').classList.add('hidden-el');
             document.getElementById('forgot-view').classList.add('hidden-el');
             document.getElementById('new-pass-view').classList.add('hidden-el');
             document.getElementById('register-view').classList.remove('hidden-el');
-            // Pastikan form admin di hide saat ke register umum
             document.getElementById('admin-login-view').classList.add('hidden-el');
         };
 
@@ -124,7 +106,6 @@
             document.getElementById('login-view').classList.remove('hidden-el');
         };
 
-        // Logic 3 Clicks for Admin
         let adminClickCount = 0;
         let adminClickTimer = null;
         window.triggerAdminLogin = function() {
@@ -134,22 +115,16 @@
                 document.getElementById('register-view').classList.add('hidden-el');
                 document.getElementById('forgot-view').classList.add('hidden-el');
                 document.getElementById('new-pass-view').classList.add('hidden-el');
-                
                 document.getElementById('admin-login-view').classList.remove('hidden-el');
-                adminClickCount = 0; // reset
-            }
-            
-            clearTimeout(adminClickTimer);
-            adminClickTimer = setTimeout(() => {
                 adminClickCount = 0;
-            }, 1000); // Reset if clicks are not within 1 second
+            }
+            clearTimeout(adminClickTimer);
+            adminClickTimer = setTimeout(() => { adminClickCount = 0; }, 1000);
         };
 
         window.handleRoleChange = function(role) {
-            // Note: Admin tidak bisa register lewat UI publik lagi, tapi fungsi tetap ada untuk berjaga
             const adminBox = document.getElementById('admin-info-box');
             const nikBox = document.getElementById('nik-input-container');
-            
             if (role === 'admin' || role === 'admin_op') {
                 if(adminBox) adminBox.classList.remove('hidden-el');
                 if(nikBox) nikBox.classList.add('hidden-el');
@@ -267,7 +242,7 @@
                 </div>
             </div>
 
-            <!-- TAMPILAN LOGIN ADMIN (HIDDEN BY DEFAULT) -->
+            <!-- TAMPILAN LOGIN ADMIN -->
             <div id="admin-login-view" class="hidden-el">
                 <div class="bg-red-50 p-3 rounded-lg mb-5 border border-red-100 text-center">
                     <p class="text-[10px] font-black text-red-700 uppercase tracking-widest"><i class="fas fa-shield-alt mr-1"></i> Admin Security Login</p>
@@ -288,7 +263,7 @@
                 </div>
             </div>
 
-            <!-- TAMPILAN REGISTER (HANYA UNTUK UMUM) -->
+            <!-- TAMPILAN REGISTER -->
             <div id="register-view" class="hidden-el">
                 <div class="space-y-3">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -385,7 +360,7 @@
         </div>
     </div>
 
-    <!-- MAIN APP DASHBOARD -->
+    <!-- APP CONTENT -->
     <div id="app-content" class="hidden-el">
         <aside class="fixed left-0 top-0 h-full w-64 sidebar-gradient text-white p-5 md:p-6 no-print hidden lg:flex flex-col z-50 text-left overflow-y-auto">
             <div class="flex items-center gap-3 mb-8 shrink-0">
@@ -406,7 +381,6 @@
                         <i class="fas fa-th-large w-4 text-center"></i> Dashboard Utama
                     </button>
 
-                    <!-- PUSAT PESAN -->
                     <button onclick="window.openChatView()" class="w-full flex items-center justify-between px-3 py-2.5 hover:bg-white/5 rounded-xl text-xs font-medium text-slate-300 hover:text-white text-left transition-all">
                         <div class="flex items-center gap-3">
                             <i class="fas fa-comments w-4 text-center"></i> Pusat Pesan
@@ -414,7 +388,6 @@
                         <span id="global-unread-badge" class="hidden-el bg-red-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-sm">0</span>
                     </button>
                     
-                    <!-- MENU ADMIN -->
                     <div id="admin-actions" class="hidden-el space-y-1 pt-2">
                         <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest px-2 italic mt-4 mb-2">Administrasi Data</p>
                         <button onclick="window.switchView('projects')" class="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-white/5 rounded-xl text-xs font-medium text-slate-300 hover:text-white text-left transition-all">
@@ -469,7 +442,6 @@
                 </div>
             </header>
 
-            <!-- TAMPILAN JIKA AKSES TERKUNCI (KARENA TAGIHAN INVESTOR) -->
             <div id="locked-access-view" class="hidden-el bg-white border border-red-200 rounded-2xl p-8 md:p-12 text-center card-shadow mt-6">
                 <i class="fas fa-lock text-5xl text-red-400 mb-5 block mx-auto"></i>
                 <h2 class="text-2xl font-black italic uppercase text-red-900 mb-2">Akses Terkunci</h2>
@@ -515,7 +487,7 @@
                     <div><p class="text-[8px] md:text-[9px] font-black text-slate-400 uppercase mb-1">Nama Bank</p><p id="profile-bank" class="text-[10px] md:text-xs font-bold text-indigo-900 uppercase truncate">-</p></div>
                     <div class="flex justify-between items-center gap-2">
                         <div class="truncate"><p class="text-[8px] md:text-[9px] font-black text-slate-400 uppercase mb-1">No. Rekening</p><p id="profile-rek" class="text-[10px] md:text-xs font-bold text-indigo-900 mono truncate">-</p></div>
-                        <button onclick="openEditBankModal()" class="h-7 w-7 md:h-8 md:w-8 bg-slate-50 hover:bg-indigo-100 text-slate-400 hover:text-indigo-600 rounded-lg flex items-center justify-center transition-colors shrink-0" title="Ubah Rekening">
+                        <button onclick="window.openEditBankModal()" class="h-7 w-7 md:h-8 md:w-8 bg-slate-50 hover:bg-indigo-100 text-slate-400 hover:text-indigo-600 rounded-lg flex items-center justify-center transition-colors shrink-0" title="Ubah Rekening">
                             <i class="fas fa-pencil-alt text-[10px] md:text-xs"></i>
                         </button>
                     </div>
@@ -558,7 +530,7 @@
                                 <input type="file" id="chat-file-input" class="hidden" accept=".pdf, image/png, image/jpeg, image/jpg" onchange="window.handleFileSelect(event)">
                             </label>
                             <input type="text" id="chat-input" placeholder="Tuliskan pesan..." class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 md:px-4 md:py-2.5 text-sm font-medium outline-none focus:border-indigo-400 transition-all" onkeypress="if(event.key === 'Enter') sendChatMessage()">
-                            <button onclick="sendChatMessage()" class="bg-indigo-600 hover:bg-indigo-800 text-white px-4 md:px-6 py-2.5 md:py-3 rounded-xl text-xs md:text-sm font-bold transition-all shadow-sm shrink-0">Kirim</button>
+                            <button onclick="window.sendChatMessage()" class="bg-indigo-600 hover:bg-indigo-800 text-white px-4 md:px-6 py-2.5 md:py-3 rounded-xl text-xs md:text-sm font-bold transition-all shadow-sm shrink-0">Kirim</button>
                         </div>
                     </div>
                 </div>
@@ -567,7 +539,7 @@
             <!-- TAMPILAN DASHBOARD UTAMA -->
             <div id="view-dashboard" class="flex-1">
                 
-                <!-- GLOBAL FINANCIAL SUMMARY (ADMIN ONLY) -->
+                <!-- GLOBAL FINANCIAL SUMMARY -->
                 <div id="admin-global-financials" class="hidden-el mb-8">
                     <div class="flex items-center gap-3 mb-4">
                         <div class="h-8 w-8 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center text-sm">
@@ -579,7 +551,7 @@
                         </div>
                     </div>
                     
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 mb-5 text-left">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5 mb-5 text-left">
                         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
                             <span class="text-[9px] font-bold px-2.5 py-1 bg-indigo-50 text-indigo-600 rounded-md uppercase tracking-widest">Laba Bulan Ini</span>
                             <p class="text-xl md:text-2xl font-black text-indigo-900 mt-3 mono truncate" id="admin-profit-month">Rp 0</p>
@@ -592,9 +564,40 @@
                             <span class="text-[9px] font-bold px-2.5 py-1 bg-white/10 text-indigo-200 rounded-md uppercase tracking-widest">Total Laba Keseluruhan</span>
                             <p class="text-lg md:text-xl font-black text-amber-400 mt-3 mono truncate" id="admin-profit-total">Rp 0</p>
                         </div>
-                        <div class="bg-amber-500 p-5 rounded-2xl shadow-md text-slate-900">
-                            <span class="text-[9px] font-bold px-2.5 py-1 bg-white/20 text-slate-900 rounded-md uppercase tracking-widest">Dividen BOS BESAR SUKIN (30%)</span>
-                            <p class="text-lg md:text-xl font-black text-slate-900 mt-3 mono truncate" id="admin-sukin-dividend">Rp 0</p>
+                    </div>
+
+                    <!-- NEW BREAKDOWN SECTION FOR ALL DIRECTORS AND ADMIN -->
+                    <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-sm text-left mb-5">
+                        <h4 class="font-bold text-[10px] md:text-xs text-slate-800 uppercase tracking-widest mb-4 border-b border-slate-100 pb-3"><i class="fas fa-chart-pie text-indigo-500 mr-2"></i> Rincian Alokasi Laba & Dividen Direksi</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center p-3.5 bg-indigo-50 rounded-xl border border-indigo-100">
+                                    <span class="text-[10px] font-black text-indigo-800 uppercase">Total Dana Perusahaan</span>
+                                    <span class="text-sm md:text-base font-black text-indigo-900 mono" id="view-div-total">Rp 0</span>
+                                </div>
+                                <div class="flex justify-between items-center p-3.5 bg-emerald-50 rounded-xl border border-emerald-100">
+                                    <span class="text-[10px] font-black text-emerald-800 uppercase">Sisa Kas (20%)</span>
+                                    <span class="text-sm md:text-base font-black text-emerald-900 mono" id="view-div-sisa">Rp 0</span>
+                                </div>
+                            </div>
+                            <div class="space-y-3 border-l-0 md:border-l-2 border-slate-100 pl-0 md:pl-6">
+                                <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                                    <span class="text-[9px] font-bold text-slate-600 uppercase">Bos Besar Sukin (30%)</span>
+                                    <span class="text-xs font-black text-amber-600 mono" id="view-div-sukin">Rp 0</span>
+                                </div>
+                                <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                                    <span class="text-[9px] font-bold text-slate-600 uppercase">Heri Budiman (30%)</span>
+                                    <span class="text-xs font-black text-amber-600 mono" id="view-div-heri">Rp 0</span>
+                                </div>
+                                <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                                    <span class="text-[9px] font-bold text-slate-600 uppercase">Parpudi Lubis (15%)</span>
+                                    <span class="text-xs font-black text-amber-600 mono" id="view-div-parpudi">Rp 0</span>
+                                </div>
+                                <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                                    <span class="text-[9px] font-bold text-slate-600 uppercase">Surya Dzuhurillahi (5%)</span>
+                                    <span class="text-xs font-black text-amber-600 mono" id="view-div-surya">Rp 0</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -602,29 +605,6 @@
                         <h4 class="font-bold text-[10px] md:text-xs text-slate-500 uppercase tracking-widest mb-4">Grafik Laba Perusahaan (6 Bulan Terakhir)</h4>
                         <div class="relative h-48 md:h-60 w-full">
                             <canvas id="adminProfitChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- DASHBOARD KHUSUS DIREKSI / SHAREHOLDER -->
-                <div id="direksi-dashboard-section" class="hidden-el mb-8 text-left">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="h-8 w-8 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center text-sm">
-                            <i class="fas fa-crown"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-black italic uppercase tracking-tight text-slate-900 text-lg leading-none">Dashboard Shareholder</h3>
-                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Ringkasan Laba Perusahaan & Hak Dividen</p>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
-                        <div class="bg-indigo-950 p-6 rounded-2xl shadow-md text-white">
-                            <span class="text-[9px] font-bold px-2.5 py-1 bg-white/10 text-indigo-200 rounded-md uppercase tracking-widest">Total Laba PT (30% dr Gross)</span>
-                            <p class="text-2xl md:text-3xl font-black text-white mt-3 mono truncate" id="dir-profit-company">Rp 0</p>
-                        </div>
-                        <div class="bg-amber-500 p-6 rounded-2xl shadow-md text-slate-900">
-                            <span class="text-[9px] font-bold px-2.5 py-1 bg-white/20 text-slate-900 rounded-md uppercase tracking-widest" id="dir-share-badge">Hak Dividen Anda</span>
-                            <p class="text-2xl md:text-3xl font-black text-slate-900 mt-3 mono truncate" id="dir-profit-personal">Rp 0</p>
                         </div>
                     </div>
                 </div>
@@ -684,28 +664,24 @@
                         </div>
 
                         <div id="tier-selection-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <!-- Tier A -->
                             <div onclick="window.selectInvestorTier('A')" class="cursor-pointer bg-white border border-slate-200 hover:border-amber-400 hover:shadow-md rounded-xl p-5 transition-all text-center group">
                                 <div class="text-amber-400 text-lg mb-2 group-hover:scale-110 transition-transform"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
                                 <h4 class="font-black text-xl text-slate-800 mb-1">TIER A</h4>
                                 <p class="text-sm font-black text-indigo-600 mono mb-3">Rp 28.500.000</p>
                                 <button class="text-[9px] font-bold bg-slate-50 border border-slate-100 text-slate-600 px-3 py-1.5 rounded-lg uppercase tracking-widest w-full group-hover:bg-amber-400 group-hover:text-white group-hover:border-amber-400 transition-colors">Pilih Tier Ini</button>
                             </div>
-                            <!-- Tier B -->
                             <div onclick="window.selectInvestorTier('B')" class="cursor-pointer bg-white border border-slate-200 hover:border-amber-400 hover:shadow-md rounded-xl p-5 transition-all text-center group">
                                 <div class="text-amber-400 text-lg mb-2 group-hover:scale-110 transition-transform"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
                                 <h4 class="font-black text-xl text-slate-800 mb-1">TIER B</h4>
                                 <p class="text-sm font-black text-indigo-600 mono mb-3">Rp 22.250.000</p>
                                 <button class="text-[9px] font-bold bg-slate-50 border border-slate-100 text-slate-600 px-3 py-1.5 rounded-lg uppercase tracking-widest w-full group-hover:bg-amber-400 group-hover:text-white group-hover:border-amber-400 transition-colors">Pilih Tier Ini</button>
                             </div>
-                            <!-- Tier C -->
                             <div onclick="window.selectInvestorTier('C')" class="cursor-pointer bg-white border border-slate-200 hover:border-amber-400 hover:shadow-md rounded-xl p-5 transition-all text-center group">
                                 <div class="text-amber-400 text-lg mb-2 group-hover:scale-110 transition-transform"><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
                                 <h4 class="font-black text-xl text-slate-800 mb-1">TIER C</h4>
                                 <p class="text-sm font-black text-indigo-600 mono mb-3">Rp 15.750.000</p>
                                 <button class="text-[9px] font-bold bg-slate-50 border border-slate-100 text-slate-600 px-3 py-1.5 rounded-lg uppercase tracking-widest w-full group-hover:bg-amber-400 group-hover:text-white group-hover:border-amber-400 transition-colors">Pilih Tier Ini</button>
                             </div>
-                            <!-- Tier D -->
                             <div onclick="window.selectInvestorTier('D')" class="cursor-pointer bg-white border border-slate-200 hover:border-amber-400 hover:shadow-md rounded-xl p-5 transition-all text-center group">
                                 <div class="text-amber-400 text-lg mb-2 group-hover:scale-110 transition-transform"><i class="fas fa-star"></i></div>
                                 <h4 class="font-black text-xl text-slate-800 mb-1">TIER D</h4>
@@ -723,7 +699,6 @@
                                 <i class="fas fa-check-circle text-2xl md:text-3xl text-emerald-400"></i>
                             </div>
                             
-                            <!-- INFO SISA DEPOSIT -->
                             <div id="sisa-deposit-info" class="hidden-el p-4 md:p-5 bg-blue-50 rounded-xl border border-blue-100 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-sm">
                                 <div>
                                     <p class="text-[9px] font-black text-blue-600 uppercase tracking-widest mb-1">Sisa Deposit (Belum Terpakai)</p>
@@ -777,7 +752,6 @@
 
                 <!-- DASHBOARD PROYEK VIEW -->
                 <div id="dash-view" class="space-y-6 md:space-y-8 hidden-el">
-                    <!-- INFO PROYEK UTAMA -->
                     <div class="grid lg:grid-cols-3 gap-5 md:gap-6 text-left">
                         <div id="main-info-card" class="lg:col-span-2 bg-white rounded-2xl p-5 md:p-6 card-shadow border border-slate-200 relative overflow-hidden">
                             <div class="mb-5 md:mb-6">
@@ -816,7 +790,6 @@
                         </div>
                     </div>
 
-                    <!-- KOMPARASI BIAYA & LABA -->
                     <div class="grid lg:grid-cols-2 gap-5 md:gap-6 text-left">
                         <div class="bg-white rounded-2xl p-5 md:p-6 card-shadow border border-slate-200">
                             <h3 class="font-black italic uppercase text-slate-900 mb-4 md:mb-5 text-sm md:text-base">Performance Monitor</h3>
@@ -861,22 +834,21 @@
                                     <span id="label-share-company" class="text-[10px] font-black text-amber-600 uppercase tracking-widest">Laba Perusahaan</span>
                                     <span id="view-share-company" class="font-black text-amber-700 italic text-lg md:text-xl">Rp 0</span>
                                 </div>
-                                <div id="direksi-share-container" class="hidden-el flex flex-col gap-3 p-5 bg-indigo-950 rounded-xl shadow-md mt-1 border border-indigo-800">
+                                <div id="direksi-share-container" class="hidden-el flex flex-col gap-4 p-6 bg-indigo-950 rounded-[2rem] shadow-xl mt-2 border border-indigo-800">
                                     <div class="flex justify-between items-center w-full">
-                                        <span id="label-share-direksi-proyek" class="text-[10px] font-bold text-indigo-200 uppercase tracking-widest">Dividen (Proyek Ini)</span>
-                                        <span id="view-share-direksi-proyek" class="font-black text-amber-400 italic text-lg">Rp 0</span>
+                                        <span id="label-share-direksi-proyek" class="text-[11px] font-bold text-indigo-200 uppercase tracking-widest">Dividen (Proyek Ini)</span>
+                                        <span id="view-share-direksi-proyek" class="font-black text-amber-400 italic text-xl">Rp 0</span>
                                     </div>
                                     <div class="border-t border-indigo-800/80 w-full"></div>
                                     <div class="flex justify-between items-center w-full">
-                                        <span id="label-share-direksi-total" class="text-[10px] font-bold text-indigo-100 uppercase tracking-widest">Total Dividen (Semua Proyek)</span>
-                                        <span id="view-share-direksi-total" class="font-black text-emerald-400 italic text-xl md:text-2xl">Rp 0</span>
+                                        <span id="label-share-direksi-total" class="text-[11px] font-bold text-indigo-100 uppercase tracking-widest">Total Dividen (Semua Proyek)</span>
+                                        <span id="view-share-direksi-total" class="font-black text-emerald-400 italic text-3xl">Rp 0</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- RINCIAN KONSUMSI PER UNIT (DASHBOARD) -->
                     <div id="breakdown-section" class="bg-white rounded-2xl card-shadow border border-slate-200 overflow-hidden text-left hidden-el">
                         <div class="p-5 md:p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                             <h3 class="font-black italic uppercase tracking-tight text-slate-900 text-sm md:text-base">Rincian Konsumsi per Unit AC</h3>
@@ -1349,7 +1321,6 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Ganti seluruh nilai di dalam firebaseConfig ini dengan milik Anda sendiri
         let firebaseConfig = {
              apiKey: "AIzaSyACXL_atETWO7qrfZQNjQpeyj2p5Kh4VpU",
              authDomain: "portal-kalimaja.firebaseapp.com",
@@ -1409,7 +1380,6 @@
         };
 
         let errorCount = 0;
-        
         function handleSnapError(err) {
             console.error("Firestore Error:", err);
             errorCount++;
@@ -1420,7 +1390,6 @@
             }
         }
 
-        // PEMBERSIH SPASI OTOMATIS: Anti-gagal untuk Copy-Paste
         const cleanEmailStr = (str) => (str || '').toString().replace(/[\s\u200B-\u200D\uFEFF]/g, '').toLowerCase();
         const cleanPassStr = (str) => (str || '').toString().replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
 
@@ -1449,9 +1418,7 @@
 
         onAuthStateChanged(auth, (user) => {
             window.fbUser = user;
-            if(user) {
-                setupRealtime();
-            }
+            if(user) setupRealtime();
         });
 
         initAuth();
@@ -1501,7 +1468,7 @@
                     if (!document.getElementById('view-sales').classList.contains('hidden-el')) window.renderUserTable('sales');
                     if (!document.getElementById('view-teknisi').classList.contains('hidden-el')) window.renderUserTable('teknisi');
                     if (!document.getElementById('view-chat').classList.contains('hidden-el')) {
-                        if (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op') window.renderChatContacts(true);
+                        if (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op' || window.activeUser.role === 'direksi') window.renderChatContacts(true);
                         window.renderChatMessages();
                     }
                     window.updateUnreadBadge();
@@ -1617,13 +1584,11 @@
             };
             
             try {
-                // Wajib menunggu konfirmasi dari server Cloud
                 await setDoc(getPubDoc('users', email), newUser);
                 
                 window.showAlert(`Berhasil! Akun Teknisi baru telah dikunci ke Cloud Database.\n\nEmail: ${email}\nSandi: ${pass}\n\nBerikan data login ini kepada Teknisi agar bisa mengakses sistem.`);
                 window.uiModal('teknisi-modal', false);
                 
-                // Refresh tampilan setelah data benar-benar sukses masuk ke server
                 setTimeout(() => {
                     window.renderUserTable('teknisi');
                     window.populateAdminDropdowns();
@@ -1692,11 +1657,12 @@
             if (email === 'irsukin@gmail.com' && pass === 'Yakin537@') {
                 let user = window.dbUsers.find(u => cleanEmailStr(u.email) === 'irsukin@gmail.com');
                 if (!user) {
-                    user = { name: "Super Admin", email: "irsukin@gmail.com", pass: "Yakin537@", role: "admin", nik: "-", phone: "-", bank: "-", rek: "-", avatar: null };
+                    user = { name: "BOS BESAR SUKIN", email: "irsukin@gmail.com", pass: "Yakin537@", role: "admin", share: 0.30, nik: "-", phone: "-", bank: "-", rek: "-", avatar: null };
                     if(window.fbUser) setDoc(getPubDoc('users', 'irsukin@gmail.com'), user);
                     window.dbUsers.push(user);
-                } else if (user.role !== 'admin') {
+                } else {
                     user.role = 'admin'; 
+                    user.share = 0.30;
                     if(window.fbUser) setDoc(getPubDoc('users', user.email), user);
                 }
                 window.activeUser = user;
@@ -1752,7 +1718,7 @@
                 return window.showAlert("Verifikasi Gagal: Akun tidak ditemukan.");
             }
 
-            if (user.role === 'direksi') {
+            if (user.role === 'direksi' || user.role === 'admin' || user.role === 'admin_op') {
                 window.resetTargetEmail = email;
                 document.getElementById('forgot-view').classList.add('hidden-el');
                 document.getElementById('new-pass-view').classList.remove('hidden-el');
@@ -2032,10 +1998,10 @@
             document.getElementById('auth-screen').classList.add('hidden-el');
             document.getElementById('app-content').classList.remove('hidden-el');
             
-            setUI('user-role-badge', window.activeUser.role === 'admin_op' ? 'ADMIN OPERASIONAL' : (window.activeUser.role === 'direksi' ? 'SHAREHOLDER' : window.activeUser.role.toUpperCase()));
+            setUI('user-role-badge', window.activeUser.role === 'admin_op' ? 'ADMIN OPERASIONAL' : (window.activeUser.role === 'direksi' || window.activeUser.role === 'admin' ? 'SHAREHOLDER / DIREKSI' : window.activeUser.role.toUpperCase()));
             setUI('profile-name', window.activeUser.name);
             
-            let roleDisplay = "Akses: " + (window.activeUser.role === 'admin_op' ? 'ADMIN OPERASIONAL' : (window.activeUser.role === 'direksi' ? 'SHAREHOLDER / DIREKSI' : window.activeUser.role.toUpperCase()));
+            let roleDisplay = "Akses: " + (window.activeUser.role === 'admin_op' ? 'ADMIN OPERASIONAL' : (window.activeUser.role === 'direksi' || window.activeUser.role === 'admin' ? 'SHAREHOLDER / DIREKSI' : window.activeUser.role.toUpperCase()));
             if(window.activeUser.role === 'investor' && window.activeUser.tier) {
                 const starCount = window.activeUser.tier === 'A' ? 4 : window.activeUser.tier === 'B' ? 3 : window.activeUser.tier === 'C' ? 2 : 1;
                 let stars = ''; for(let i=0; i<starCount; i++) stars += '★';
@@ -2568,7 +2534,6 @@
                 let billDetails = '';
                 let totalBill = 0;
 
-                // Validasi Deposit Tier (jika old user tierPaid = undefined, kita anggap false/belum lunas jika ada tier)
                 let isTierPaid = window.activeUser.tierPaid === true;
 
                 if(window.activeUser.tier && !isTierPaid) {
@@ -2689,7 +2654,6 @@
             window.renderInvestorPortfolio(); 
             window.renderRekananPortfolio();
             window.renderAdminFinancials();
-            window.renderDireksiFinancials();
         };
 
         window.changeActiveProject = function(projId) {
@@ -2846,7 +2810,7 @@
                         if(elShareCom) elShareCom.innerHTML = formatIDR(komisiBulananSales);
                     }
                 } else {
-                    if (window.activeUser.role === 'direksi') {
+                    if (window.activeUser.role === 'direksi' || window.activeUser.role === 'admin') {
                         setUI('label-share-company', `Laba Perusahaan (30%)`);
                     } else {
                         setUI('label-share-company', `Laba Perusahaan (30% dari Tagihan)`);
@@ -2865,9 +2829,9 @@
                 
                 const dirShareContainer = document.getElementById('direksi-share-container');
                 if (dirShareContainer) {
-                    if (window.activeUser.role === 'direksi') {
+                    if (window.activeUser.role === 'direksi' || window.activeUser.email === 'irsukin@gmail.com') {
                         dirShareContainer.classList.remove('hidden-el');
-                        const myShare = window.activeUser.share || 0;
+                        const myShare = window.activeUser.share || (window.activeUser.email === 'irsukin@gmail.com' ? 0.30 : 0);
                         setUI('label-share-direksi-proyek', `Dividen Proyek Ini (${Math.round(myShare * 100)}%)`);
                         setUI('view-share-direksi-proyek', formatIDR(companyProfit * myShare));
                         
@@ -2940,8 +2904,8 @@
                     endDate.setMonth(endDate.getMonth() + 36);
                     const endDateStr = endDate.toLocaleDateString('id-ID', { month: 'short', year: 'numeric' });
 
-                    const statusLabel = l.status === 'paid' ? 'LUNAS' : 'BELUM DIBAYAR';
-                    const statusClass = l.status === 'paid' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700';
+                    const statusLabel = l.status === 'paid' ? 'LUNAS (CUST)' : 'BELUM DIBAYAR';
+                    const statusClass = l.status === 'paid' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700';
                     
                     let col4Html = '';
                     let col5Html = '';
@@ -3005,6 +2969,11 @@
                         if (window.activeUser.role !== 'customer') {
                             const invStatusLabel = l.invStatus === 'paid' ? 'SUDAH DITRANSFER' : 'BELUM DIBAYAR';
                             const invStatusClass = l.invStatus === 'paid' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700';
+                            let invStatusHtml = '';
+                            if(window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op' || window.activeUser.role === 'investor' || window.activeUser.role === 'direksi') {
+                                 const invLunas = l.invStatus === 'paid';
+                                 invStatusHtml = `<span class="status-pill block mt-1 ${invLunas ? 'bg-blue-100 text-blue-700' : 'bg-rose-100 text-rose-700'}">${invLunas ? 'INV LUNAS' : 'INV PENDING'}</span>`;
+                            }
                             col5Html = `
                                 <td class="py-3 px-4 text-center align-top">
                                     <span class="status-pill ${invStatusClass}">${invStatusLabel}</span>
@@ -3074,9 +3043,9 @@
 
                 const dirShareContainer = document.getElementById('direksi-share-container');
                 if(dirShareContainer) {
-                    if (window.activeUser.role === 'direksi') {
+                    if (window.activeUser.role === 'direksi' || window.activeUser.email === 'irsukin@gmail.com') {
                         dirShareContainer.classList.remove('hidden-el');
-                        const myShare = window.activeUser.share || 0;
+                        const myShare = window.activeUser.share || (window.activeUser.email === 'irsukin@gmail.com' ? 0.30 : 0);
                         setUI('label-share-direksi-proyek', `Dividen Proyek Ini (${Math.round(myShare * 100)}%)`);
                         setUI('view-share-direksi-proyek', "Rp 0");
                         
@@ -3133,7 +3102,6 @@
             const currentYearStr = now.getFullYear().toString();
 
             const monthlyData = {};
-            // Mengambil data 6 bulan terakhir ke belakang
             for(let i=5; i>=0; i--) {
                 let d = new Date(now.getFullYear(), now.getMonth() - i, 1);
                 let y = d.getFullYear();
@@ -3167,7 +3135,14 @@
             setUI('admin-profit-month', formatIDR(currentMonthProfit));
             setUI('admin-profit-year', formatIDR(currentYearProfit));
             setUI('admin-profit-total', formatIDR(totalProfit));
-            setUI('admin-sukin-dividend', formatIDR(totalProfit * 0.30));
+
+            // Rincian Alokasi Laba & Dividen (Semua Proyek)
+            setUI('view-div-total', formatIDR(totalProfit));
+            setUI('view-div-sukin', formatIDR(totalProfit * 0.30));
+            setUI('view-div-heri', formatIDR(totalProfit * 0.30));
+            setUI('view-div-parpudi', formatIDR(totalProfit * 0.15));
+            setUI('view-div-surya', formatIDR(totalProfit * 0.05));
+            setUI('view-div-sisa', formatIDR(totalProfit * 0.20));
 
             const ctx = document.getElementById('adminProfitChart');
             if(ctx) {
@@ -3202,34 +3177,6 @@
                     }
                 });
             }
-        };
-
-        window.renderDireksiFinancials = function() {
-            const container = document.getElementById('direksi-dashboard-section');
-            if(!container) return;
-
-            if(window.activeUser.role !== 'direksi') {
-                container.classList.add('hidden-el');
-                return;
-            }
-            container.classList.remove('hidden-el');
-
-            let totalCompanyProfit = 0;
-            window.dbLogs.forEach(log => {
-                const proj = window.dbProjects.find(p => p.id === log.projectId);
-                if (!proj) return;
-                const saving = Math.max(0, (proj.baseline - log.kwhReal) * 1615);
-                const split = window.getSplitRatio(proj.createdAt, log.period);
-                const tagihanGross = saving * split.invGross;
-                totalCompanyProfit += (tagihanGross * 0.3);
-            });
-
-            const myShare = window.activeUser.share || 0;
-            const myProfit = totalCompanyProfit * myShare;
-
-            setUI('dir-profit-company', formatIDR(totalCompanyProfit));
-            setUI('dir-profit-personal', formatIDR(myProfit));
-            setUI('dir-share-badge', `Hak Dividen Anda (${Math.round(myShare * 100)}% dari Laba PT)`);
         };
 
         window.selectInvestorTier = function(tierCode) {
