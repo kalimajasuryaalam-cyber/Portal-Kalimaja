@@ -247,8 +247,8 @@
             <div id="login-view">
                 <div class="space-y-4">
                     <div class="space-y-1">
-                        <label class="text-[10px] font-black text-slate-400 uppercase px-2 block">Email Terdaftar</label>
-                        <input type="email" id="login-email" placeholder="Customer / Investor / Mitra">
+                        <label class="text-[10px] font-black text-slate-400 uppercase px-2 block">Email / Username Terdaftar</label>
+                        <input type="text" id="login-email" placeholder="Customer / Investor / Mitra / Direksi">
                     </div>
                     <div class="space-y-1">
                         <div class="flex justify-between items-center px-2">
@@ -355,12 +355,12 @@
                 </div>
                 <div class="space-y-4">
                     <div class="space-y-1">
-                        <label class="text-[10px] font-black text-slate-400 uppercase px-2 block">Email Terdaftar</label>
-                        <input type="text" id="forgot-email" placeholder="email@bisnis.com">
+                        <label class="text-[10px] font-black text-slate-400 uppercase px-2 block">Email / Username Terdaftar</label>
+                        <input type="text" id="forgot-email" placeholder="Masukkan Email/Username">
                     </div>
                     <div class="space-y-1">
                         <label class="text-[10px] font-black text-slate-400 uppercase px-2 block">Nomor NIK KTP (Verifikasi)</label>
-                        <input type="text" inputmode="numeric" id="forgot-nik" placeholder="16 Digit NIK KTP" maxlength="16">
+                        <input type="text" inputmode="numeric" id="forgot-nik" placeholder="Kosongkan jika Anda Shareholder/Direksi" maxlength="16">
                     </div>
                     <button onclick="window.verifyForgotPassword()" class="w-full bg-indigo-600 text-white py-5 rounded-2xl font-black uppercase tracking-widest hover:bg-indigo-700 transition-all mt-4 shadow-lg">Verifikasi Data</button>
                     <button onclick="window.showLogin()" class="w-full bg-slate-100 text-slate-600 py-4 rounded-2xl font-bold uppercase tracking-widest hover:bg-slate-200 transition-all mt-2">Batal & Kembali</button>
@@ -598,6 +598,29 @@
                         <h4 class="font-bold text-xs text-slate-500 uppercase tracking-widest mb-6">Grafik Laba Perusahaan (6 Bulan Terakhir)</h4>
                         <div class="relative h-64 w-full">
                             <canvas id="adminProfitChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DASHBOARD KHUSUS DIREKSI / SHAREHOLDER -->
+                <div id="direksi-dashboard-section" class="hidden-el mb-10 text-left">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="h-10 w-10 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-lg">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-black italic uppercase tracking-tight text-slate-900 text-xl leading-none">Dashboard Shareholder</h3>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Ringkasan Laba Perusahaan & Hak Dividen</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-indigo-950 p-8 rounded-[2rem] shadow-xl text-white">
+                            <span class="text-[10px] font-bold px-3 py-1 bg-white/10 text-indigo-200 rounded-lg uppercase tracking-widest">Total Laba PT (30% dr Gross)</span>
+                            <p class="text-4xl font-black text-white mt-4 mono truncate" id="dir-profit-company">Rp 0</p>
+                        </div>
+                        <div class="bg-amber-500 p-8 rounded-[2rem] shadow-xl text-slate-900">
+                            <span class="text-[10px] font-bold px-3 py-1 bg-white/20 text-slate-900 rounded-lg uppercase tracking-widest" id="dir-share-badge">Hak Dividen Anda</span>
+                            <p class="text-4xl font-black text-slate-900 mt-4 mono truncate" id="dir-profit-personal">Rp 0</p>
                         </div>
                     </div>
                 </div>
@@ -1075,6 +1098,29 @@
         </div>
     </div>
 
+    <!-- MODAL: EDIT BANK -->
+    <div id="bank-modal" class="modal-overlay no-print text-left">
+        <div class="modal-container max-w-md">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <h3 class="font-black italic uppercase tracking-tight text-indigo-950">Ubah Data Rekening</h3>
+                <button onclick="uiModal('bank-modal', false)" class="text-slate-400 hover:text-slate-900"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div class="space-y-1">
+                    <label class="text-[10px] font-black text-slate-400 uppercase px-2">Nama Bank Baru</label>
+                    <input type="text" id="edit-bank-name" placeholder="Contoh: BCA / Mandiri / BNI" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 font-bold outline-none">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] font-black text-slate-400 uppercase px-2">Nomor Rekening Baru</label>
+                    <input type="number" id="edit-bank-rek" placeholder="Nomor Rekening" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 font-bold outline-none">
+                </div>
+            </div>
+            <div class="p-6 bg-slate-50 border-t border-slate-100">
+                <button onclick="window.saveBankData()" class="w-full bg-indigo-950 text-white py-4 rounded-xl font-black uppercase tracking-widest hover:scale-[1.02] transition-all shadow-md">Simpan Perubahan</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL: DETAIL INVESTOR -->
     <div id="investor-detail-modal" class="modal-overlay no-print text-left">
         <div class="modal-container max-w-4xl">
@@ -1196,6 +1242,19 @@
                     <span id="in-kwh-total" class="text-2xl font-black text-indigo-900">0 kWh</span>
                 </div>
                 <button onclick="window.saveKwh()" class="w-full bg-indigo-950 text-white py-5 rounded-3xl font-black uppercase tracking-widest shadow-xl hover:scale-105 transition-all">Simpan Tagihan Baru</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: DETAIL RIWAYAT LOG -->
+    <div id="log-detail-modal" class="modal-overlay no-print text-left z-[150]">
+        <div class="modal-container max-w-2xl">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <h3 class="font-black italic uppercase tracking-tight text-indigo-950">Detail Transaksi & Bagi Hasil</h3>
+                <button onclick="uiModal('log-detail-modal', false)" class="text-slate-400 hover:text-slate-900"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto bg-slate-50/50 max-h-[75vh]" id="log-detail-content">
+                <!-- Disuntikkan via JS -->
             </div>
         </div>
     </div>
@@ -1571,7 +1630,23 @@
 
             if(!email || !pass) return window.showAlert("Isi email/username dan kata sandi.");
 
-            // Bypass khusus pembuatan Admin & Sinkronisasi Hak Akses secara Instan
+            const direksiDefaults = [
+                { email: 'heribudiman', pass: 'heribudiman123', name: 'HERI BUDIMAN', role: 'direksi', share: 0.30 },
+                { email: 'parpudilubis', pass: 'lubis123', name: 'PARPUDI LUBIS', role: 'direksi', share: 0.15 },
+                { email: 'suryadzuhurillahi', pass: 'surya123', name: 'SURYA DZUHURILLAHI', role: 'direksi', share: 0.05 }
+            ];
+
+            let user = window.dbUsers.find(u => cleanEmailStr(u.email) === email);
+
+            if (!user) {
+                let dirDef = direksiDefaults.find(d => d.email === email && d.pass === pass);
+                if (dirDef) {
+                    user = { name: dirDef.name, email: dirDef.email, pass: dirDef.pass, role: "direksi", share: dirDef.share, nik: "0000000000000000", phone: "-", bank: "-", rek: "-", avatar: null };
+                    if(window.fbUser) setDoc(getPubDoc('users', dirDef.email), user);
+                    window.dbUsers.push(user);
+                }
+            }
+
             if (email === 'adminkk' && pass === 'ajamilak') {
                 let user = window.dbUsers.find(u => cleanEmailStr(u.email) === 'adminkk');
                 if (!user) {
@@ -1591,7 +1666,7 @@
                     if(window.fbUser) setDoc(getPubDoc('users', 'kalimajasuryaalam@gmail.com'), user);
                     window.dbUsers.push(user);
                 } else if (user.role !== 'admin_op') {
-                    user.role = 'admin_op'; // Paksa turun jabatan jadi Admin Ops
+                    user.role = 'admin_op'; 
                     if(window.fbUser) setDoc(getPubDoc('users', user.email), user);
                 }
                 window.activeUser = user;
@@ -1606,7 +1681,7 @@
                     if(window.fbUser) setDoc(getPubDoc('users', 'irsukin@gmail.com'), user);
                     window.dbUsers.push(user);
                 } else if (user.role !== 'admin') {
-                    user.role = 'admin'; // Paksa pertahankan jabatan Super Admin
+                    user.role = 'admin'; 
                     if(window.fbUser) setDoc(getPubDoc('users', user.email), user);
                 }
                 window.activeUser = user;
@@ -1615,8 +1690,7 @@
                 return;
             }
 
-            const user = window.dbUsers.find(u => cleanEmailStr(u.email) === email && cleanPassStr(u.pass) === pass);
-            if(user) {
+            if(user && cleanPassStr(user.pass) === pass) {
                 if (context === 'public' && (user.role === 'admin' || user.role === 'admin_op')) {
                     window.showAlert("Login Ditolak: Akun Admin tidak bisa masuk melalui jalur Publik.");
                     return;
@@ -1656,16 +1730,30 @@
             const email = cleanEmailStr(document.getElementById('forgot-email').value);
             const nik = document.getElementById('forgot-nik').value.trim();
 
-            if(!email || !nik) return window.showAlert("Harap masukkan Email dan NIK KTP Anda.");
+            if(!email) return window.showAlert("Harap masukkan Email Anda.");
 
-            const user = window.dbUsers.find(u => cleanEmailStr(u.email) === email && u.nik === nik);
-            if(user) {
+            const user = window.dbUsers.find(u => cleanEmailStr(u.email) === email);
+            if(!user) {
+                return window.showAlert("Verifikasi Gagal: Akun tidak ditemukan.");
+            }
+
+            if (user.role === 'direksi') {
+                window.resetTargetEmail = email;
+                document.getElementById('forgot-view').classList.add('hidden-el');
+                document.getElementById('new-pass-view').classList.remove('hidden-el');
+                document.getElementById('new-password').value = '';
+                return;
+            }
+
+            if(!nik) return window.showAlert("Harap masukkan NIK KTP Anda.");
+
+            if(user.nik === nik) {
                 window.resetTargetEmail = email;
                 document.getElementById('forgot-view').classList.add('hidden-el');
                 document.getElementById('new-pass-view').classList.remove('hidden-el');
                 document.getElementById('new-password').value = '';
             } else {
-                window.showAlert("Verifikasi Gagal: Kombinasi Email dan NIK KTP tidak ditemukan atau tidak cocok.");
+                window.showAlert("Verifikasi Gagal: Kombinasi Email dan NIK KTP tidak cocok.");
             }
         };
 
@@ -1929,10 +2017,10 @@
             document.getElementById('auth-screen').classList.add('hidden-el');
             document.getElementById('app-content').classList.remove('hidden-el');
             
-            setUI('user-role-badge', window.activeUser.role === 'admin_op' ? 'ADMIN OPERASIONAL' : window.activeUser.role.toUpperCase());
+            setUI('user-role-badge', window.activeUser.role === 'admin_op' ? 'ADMIN OPERASIONAL' : (window.activeUser.role === 'direksi' ? 'SHAREHOLDER' : window.activeUser.role.toUpperCase()));
             setUI('profile-name', window.activeUser.name);
             
-            let roleDisplay = "Akses: " + (window.activeUser.role === 'admin_op' ? 'ADMIN OPERASIONAL' : window.activeUser.role.toUpperCase());
+            let roleDisplay = "Akses: " + (window.activeUser.role === 'admin_op' ? 'ADMIN OPERASIONAL' : (window.activeUser.role === 'direksi' ? 'SHAREHOLDER / DIREKSI' : window.activeUser.role.toUpperCase()));
             if(window.activeUser.role === 'investor' && window.activeUser.tier) {
                 const starCount = window.activeUser.tier === 'A' ? 4 : window.activeUser.tier === 'B' ? 3 : window.activeUser.tier === 'C' ? 2 : 1;
                 let stars = ''; for(let i=0; i<starCount; i++) stars += '★';
@@ -1961,8 +2049,12 @@
             const bepContainer = document.getElementById('bep-container');
             const rekananSection = document.getElementById('rekanan-dashboard-section');
 
-            if(window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op') {
-                document.getElementById('admin-actions').classList.remove('hidden-el');
+            if(window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op' || window.activeUser.role === 'direksi') {
+                if (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op') {
+                    document.getElementById('admin-actions').classList.remove('hidden-el');
+                } else {
+                    document.getElementById('admin-actions').classList.add('hidden-el');
+                }
                 
                 if (window.activeUser.role === 'admin') {
                     document.getElementById('danger-zone').classList.remove('hidden-el');
@@ -1973,7 +2065,10 @@
                 if (companyShareContainer) companyShareContainer.classList.remove('hidden-el');
                 if (bepContainer) bepContainer.classList.remove('hidden-el');
                 if (rekananSection) rekananSection.classList.add('hidden-el');
-                window.populateAdminDropdowns();
+                
+                if (window.activeUser.role !== 'direksi') {
+                    window.populateAdminDropdowns();
+                }
             } else {
                 if (companyShareContainer) companyShareContainer.classList.add('hidden-el');
                 document.getElementById('danger-zone').classList.add('hidden-el');
@@ -2222,10 +2317,8 @@
                             <span class="font-mono text-indigo-600 font-bold">${u.rek || '-'}</span>
                             ${feeStatusHtml}
                         </td>
-                        ${tagihanColumn}
-                        <td class="py-3 px-3 max-w-[200px]">
-                            ${projectHtml}
-                        </td>
+                        ${roleType === 'customer' ? `<td class="py-3 px-3 max-w-[200px]">${projectHtml}</td>` : ''}
+                        ${(roleType === 'sales' || roleType === 'teknisi') ? `<td class="py-3 px-3 max-w-[200px]">${projectHtml}</td>` : ''}
                         ${aksiColumn}
                     </tr>
                 `);
@@ -2410,10 +2503,18 @@
             if(invSelect) {
                 invSelect.innerHTML = '<option value="">-- Pilih Investor Terdaftar --</option>' + 
                     investors.map(i => {
+                        let isBlocked = false;
+                        let blockReason = "";
                         if (!i.tier) {
-                            return `<option value="${i.email}" disabled class="text-slate-400 bg-red-50">🚫 ${i.name} (${i.email}) - Belum Pilih Tier</option>`;
+                            isBlocked = true;
+                            blockReason = "Belum Pilih Tier";
                         } else if (!i.tierPaid) {
-                            return `<option value="${i.email}" disabled class="text-slate-400 bg-red-50">🚫 ${i.name} (${i.email}) - Belum Lunas Deposit</option>`;
+                            isBlocked = true;
+                            blockReason = "Belum Lunas Deposit";
+                        }
+                        
+                        if (isBlocked) {
+                            return `<option value="${i.email}" disabled class="text-slate-400 bg-red-50">🚫 ${i.name} (${i.email}) - ${blockReason}</option>`;
                         }
                         return `<option value="${i.email}">${i.name} (${i.email})</option>`;
                     }).join('');
@@ -2437,7 +2538,7 @@
             const lockedView = document.getElementById('locked-access-view');
             if(lockedView) lockedView.classList.add('hidden-el');
 
-            if (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op') {
+            if (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op' || window.activeUser.role === 'direksi') {
                 userProjects = window.dbProjects;
             } else if (window.activeUser.role === 'investor') {
                 userProjects = window.dbProjects.filter(p => p.invEmail === window.activeUser.email);
@@ -2510,10 +2611,10 @@
             const btnDeleteProj = document.getElementById('btn-delete-proj');
 
             if (userProjects.length > 0) {
-                if (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op' || userProjects.length > 1) {
-                    if (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op') {
+                if (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op' || window.activeUser.role === 'direksi' || userProjects.length > 1) {
+                    if (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op' || window.activeUser.role === 'direksi') {
                         controls.classList.remove('hidden-el');
-                        setUI('selector-subtitle', 'Admin Control Panel');
+                        setUI('selector-subtitle', window.activeUser.role === 'direksi' ? 'Shareholder View' : 'Admin Control Panel');
                         setUI('selector-title', 'Pilih Proyek untuk Dimonitor / Diupdate');
                         if(btnDeleteProj) {
                             if(window.activeUser.role === 'admin') btnDeleteProj.classList.remove('hidden-el');
@@ -2552,7 +2653,7 @@
                 document.getElementById('empty-msg').classList.remove('hidden-el');
                 document.getElementById('dash-view').classList.add('hidden-el');
                 
-                if(window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op') {
+                if(window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op' || window.activeUser.role === 'direksi') {
                     setUI('empty-msg-title', "Sistem Menunggu Input Proyek");
                     setUI('empty-msg-desc', "Silakan daftarkan proyek baru dengan mengklik tombol 'Registrasi Kontrak' di menu sebelah kiri.");
                 } else if(window.activeUser.role === 'investor') {
@@ -2565,7 +2666,7 @@
             }
             
             document.querySelectorAll('.admin-only-view').forEach(el => {
-                if(window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op') el.classList.remove('hidden-el');
+                if(window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op' || window.activeUser.role === 'direksi') el.classList.remove('hidden-el');
                 else el.classList.add('hidden-el');
             });
 
@@ -2573,6 +2674,7 @@
             window.renderInvestorPortfolio(); 
             window.renderRekananPortfolio();
             window.renderAdminFinancials();
+            window.renderDireksiFinancials();
         };
 
         window.changeActiveProject = function(projId) {
@@ -2612,9 +2714,9 @@
             const thStatusTransfer = document.getElementById('th-status-transfer-inv');
 
             if (thTagihan) {
-                if (window.activeUser.role === 'investor') thTagihan.innerText = 'Tagihan ke Customer (Rasio)';
-                else if (window.activeUser.role === 'sales' || window.activeUser.role === 'teknisi' || window.activeUser.role === 'rekanan') thTagihan.innerText = 'Komisi / Fee Anda';
-                else thTagihan.innerText = 'Tagihan Investor (Rasio)';
+                if (window.activeUser.role === 'customer') thTagihan.innerText = 'Tagihan Bagi Hasil';
+                else if (window.activeUser.role === 'sales' || window.activeUser.role === 'teknisi' || window.activeUser.role === 'rekanan') thTagihan.innerText = 'Estimasi Komisi/Fee';
+                else thTagihan.innerText = 'Tagihan Utama (Gross)';
             }
 
             if (thStatusTransfer) {
@@ -2729,7 +2831,11 @@
                         if(elShareCom) elShareCom.innerHTML = formatIDR(komisiBulananSales);
                     }
                 } else {
-                    setUI('label-share-company', `Laba Perusahaan (30% dari Tagihan)`);
+                    if (window.activeUser.role === 'direksi') {
+                        setUI('label-share-company', `Laba Perusahaan (30%) | Hak Anda: ${formatIDR(companyProfit * (window.activeUser.share || 0))}`);
+                    } else {
+                        setUI('label-share-company', `Laba Perusahaan (30% dari Tagihan)`);
+                    }
                     
                     let rekShareInfo = '';
                     let totalPotonganRekanan = 0;
@@ -2785,7 +2891,7 @@
                 }
 
                 logs.forEach(l => {
-                    const s = Math.max(0, (window.activeProject.baseline - l.kwhReal) * 1615);
+                    const s = Math.max(0, (window.activeProject.baseline - l.kwhReal) * TARIF_PLN);
                     const logSplit = window.getSplitRatio(window.activeProject.createdAt, l.period);
                     const tagihanInvestorGrossTable = s * logSplit.invGross; 
                     const invNetProfitTable = tagihanInvestorGrossTable * 0.7;
@@ -2938,9 +3044,37 @@
             }
             
             document.querySelectorAll('.admin-only-view').forEach(el => {
-                if(window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op') el.classList.remove('hidden-el');
+                if(window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op' || window.activeUser.role === 'direksi') el.classList.remove('hidden-el');
                 else el.classList.add('hidden-el');
             });
+        };
+
+        window.renderDireksiFinancials = function() {
+            const container = document.getElementById('direksi-dashboard-section');
+            if(!container) return;
+
+            if(window.activeUser.role !== 'direksi') {
+                container.classList.add('hidden-el');
+                return;
+            }
+            container.classList.remove('hidden-el');
+
+            let totalCompanyProfit = 0;
+            window.dbLogs.forEach(log => {
+                const proj = window.dbProjects.find(p => p.id === log.projectId);
+                if (!proj) return;
+                const saving = Math.max(0, (proj.baseline - log.kwhReal) * 1615);
+                const split = window.getSplitRatio(proj.createdAt, log.period);
+                const tagihanGross = saving * split.invGross;
+                totalCompanyProfit += (tagihanGross * 0.3);
+            });
+
+            const myShare = window.activeUser.share || 0;
+            const myProfit = totalCompanyProfit * myShare;
+
+            setUI('dir-profit-company', formatIDR(totalCompanyProfit));
+            setUI('dir-profit-personal', formatIDR(myProfit));
+            setUI('dir-share-badge', `Hak Dividen Anda (${Math.round(myShare * 100)}% dari Laba PT)`);
         };
 
         window.selectInvestorTier = function(tierCode) {
@@ -3184,484 +3318,15 @@
             }
         };
 
-        window.renderAdminFinancials = function() {
-            const container = document.getElementById('admin-global-financials');
-            if(!container) return;
-
-            if(window.activeUser.role !== 'admin' && window.activeUser.role !== 'admin_op') {
-                container.classList.add('hidden-el');
-                return;
-            }
-            container.classList.remove('hidden-el');
-
-            let currentMonthProfit = 0;
-            let currentYearProfit = 0;
-            let totalProfit = 0;
-
-            const now = new Date();
-            const currentMonthStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
-            const currentYearStr = now.getFullYear().toString();
-
-            const monthlyData = {};
-            // Mengambil data 6 bulan terakhir ke belakang
-            for(let i=5; i>=0; i--) {
-                let d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-                let y = d.getFullYear();
-                let m = String(d.getMonth() + 1).padStart(2, '0');
-                monthlyData[`${y}-${m}`] = 0;
-            }
-
-            window.dbLogs.forEach(log => {
-                const proj = window.dbProjects.find(p => p.id === log.projectId);
-                if (!proj) return;
-
-                const saving = Math.max(0, (proj.baseline - log.kwhReal) * TARIF_PLN);
-                const split = window.getSplitRatio(proj.createdAt, log.period);
-                const tagihanGross = saving * split.invGross;
-                const companyProfit = tagihanGross * 0.3;
-
-                totalProfit += companyProfit;
-
-                if (log.period === currentMonthStr) {
-                    currentMonthProfit += companyProfit;
-                }
-                if (log.period && log.period.startsWith(currentYearStr)) {
-                    currentYearProfit += companyProfit;
-                }
-
-                if (monthlyData[log.period] !== undefined) {
-                    monthlyData[log.period] += companyProfit;
-                }
-            });
-
-            setUI('admin-profit-month', formatIDR(currentMonthProfit));
-            setUI('admin-profit-year', formatIDR(currentYearProfit));
-            setUI('admin-profit-total', formatIDR(totalProfit));
-
-            const ctx = document.getElementById('adminProfitChart');
-            if(ctx) {
-                if(window.adminChartInstance) window.adminChartInstance.destroy();
-                
-                const labels = Object.keys(monthlyData).map(k => {
-                    const [y, m] = k.split('-');
-                    const date = new Date(y, m-1);
-                    return date.toLocaleDateString('id-ID', {month: 'short', year: 'numeric'});
-                });
-                const data = Object.values(monthlyData);
-
-                window.adminChartInstance = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Laba Perusahaan (Rp)',
-                            data: data,
-                            backgroundColor: 'rgba(79, 70, 229, 0.8)',
-                            borderRadius: 6,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            y: { beginAtZero: true, grid: { borderDash: [4, 4] } },
-                            x: { grid: { display: false } }
-                        }
-                    }
-                });
-            }
-        };
-
-        window.addACRow = function() {
-            const div = document.createElement('div');
-            div.className = 'flex gap-2 bg-slate-50 p-4 rounded-xl items-center border border-slate-100';
-            div.innerHTML = `
-                <select class="pk-sel flex-1 bg-white border-2 border-slate-100 font-bold text-slate-800 rounded-xl px-3 py-2">
-                    ${Object.keys(PRICES).map(k => `<option value="${k}">${k} PK</option>`).join('')}
-                </select>
-                <input type="number" value="1" class="qty-in w-20 bg-white border-2 border-slate-100 rounded-xl px-2 py-2 font-bold text-center">
-                <button onclick="this.parentElement.remove(); updateFormTotal();" class="text-red-500 bg-red-50 hover:bg-red-100 rounded-lg px-3 py-2 font-black transition-colors"><i class="fas fa-trash-alt"></i></button>
-            `;
-            document.getElementById('unit-rows-area').appendChild(div);
-            div.querySelectorAll('input, select').forEach(el => el.onchange = window.updateFormTotal);
-            window.updateFormTotal();
-        };
-
-        window.updateFormTotal = function() {
-            let total = 0;
-            document.querySelectorAll('#unit-rows-area > div').forEach(r => {
-                const pk = r.querySelector('.pk-sel').value;
-                const q = parseInt(r.querySelector('.qty-in').value) || 0;
-                total += PRICES[pk] * q;
-            });
-            
-            const invSelect = document.getElementById('form-inv-email');
-            let tierDiscount = 0;
-            let tierText = '';
-            
-            if (invSelect && invSelect.value) {
-                const invUser = window.dbUsers.find(u => u.email === invSelect.value.toLowerCase());
-                if (invUser && invUser.tier) {
-                    if (invUser.tier === 'A') tierDiscount = 28500000;
-                    else if (invUser.tier === 'B') tierDiscount = 22250000;
-                    else if (invUser.tier === 'C') tierDiscount = 15750000;
-                    else if (invUser.tier === 'D') tierDiscount = 14250000;
-                    tierText = `<br><span class="text-[10px] text-emerald-500 font-bold block mt-1">- Potongan Tier ${invUser.tier}: ${formatIDR(tierDiscount)}</span>`;
-                }
-            }
-            
-            let finalCapex = total - tierDiscount;
-            if (finalCapex < 0) finalCapex = 0;
-            
-            const displayEl = document.getElementById('form-capex-display');
-            if (displayEl) {
-                displayEl.innerHTML = `${formatIDR(finalCapex)} <span class="text-[10px] text-slate-400 block mt-2 font-bold leading-tight">Total Nilai AC: ${formatIDR(total)}${tierText}</span>`;
-            }
-            
-            return { total, finalCapex };
-        };
-
-        window.openNewProjectModal = function() {
-            window.editingProjectId = null;
-            setUI('project-modal-title', 'Setup Kontrak Baru');
-            const btn = document.getElementById('project-modal-btn');
-            if(btn) btn.innerText = 'Aktifkan Kontrak';
-
-            document.getElementById('form-cust-email').value = '';
-            document.getElementById('form-inv-email').value = '';
-            
-            document.getElementById('form-rek-cust').value = '';
-            document.getElementById('form-rek-inv').value = '';
-            document.getElementById('form-rek-tek').value = '';
-            
-            document.getElementById('form-loc').value = '';
-            document.getElementById('form-hours').value = '12';
-            document.getElementById('form-days').value = '26';
-
-            document.getElementById('unit-rows-area').innerHTML = '';
-            window.addACRow(); 
-            window.updateFormTotal();
-            
-            uiModal('project-modal', true);
-        };
-
-        window.openEditProjectModal = function(projId) {
-            const proj = window.dbProjects.find(p => p.id === projId);
-            if(!proj) return window.showAlert("Proyek tidak ditemukan.");
-
-            window.editingProjectId = projId;
-            setUI('project-modal-title', 'Edit Kontrak Proyek');
-            const btn = document.getElementById('project-modal-btn');
-            if(btn) btn.innerText = 'Simpan Perubahan';
-
-            window.populateAdminDropdowns();
-
-            document.getElementById('form-cust-email').value = proj.custEmail;
-            document.getElementById('form-inv-email').value = proj.invEmail;
-            
-            document.getElementById('form-rek-cust').value = proj.rekCustEmail || '';
-            document.getElementById('form-rek-inv').value = proj.rekInvEmail || '';
-            document.getElementById('form-rek-tek').value = proj.rekTekEmail || '';
-            
-            document.getElementById('form-loc').value = proj.location;
-            document.getElementById('form-hours').value = proj.hours;
-            document.getElementById('form-days').value = proj.days;
-
-            document.getElementById('unit-rows-area').innerHTML = '';
-            if(proj.units && proj.units.length > 0) {
-                proj.units.forEach(u => window.addACRow(u.pk, u.q));
-            } else {
-                window.addACRow();
-            }
-            
-            window.updateFormTotal();
-            uiModal('project-modal', true);
-        };
-
-        window.saveProject = async function() {
-            if(!window.fbUser) return window.showAlert("Terputus dari server cloud.");
-            const custEmail = document.getElementById('form-cust-email').value.toLowerCase();
-            const invEmail = document.getElementById('form-inv-email').value.toLowerCase();
-            const loc = document.getElementById('form-loc').value;
-            const h = parseInt(document.getElementById('form-hours').value) || 12;
-            const d = parseInt(document.getElementById('form-days').value) || 26;
-            
-            const rekCustEmail = document.getElementById('form-rek-cust').value.toLowerCase();
-            const rekInvEmail = document.getElementById('form-rek-inv').value.toLowerCase();
-            const rekTekEmail = document.getElementById('form-rek-tek').value.toLowerCase();
-
-            if(!custEmail || !invEmail || !loc) return window.showAlert("Pilih Email Customer, Investor, & Isi Lokasi Gedung!");
-
-            const selectedInv = window.dbUsers.find(u => u.email === invEmail);
-            const pTier = (selectedInv && selectedInv.tier) ? selectedInv.tier : 'D';
-            let feePerUnit = 150000;
-            let tierDiscount = 0;
-            
-            if (pTier === 'A') { feePerUnit = 450000; tierDiscount = 28500000; }
-            else if (pTier === 'B') { feePerUnit = 350000; tierDiscount = 22250000; }
-            else if (pTier === 'C') { feePerUnit = 250000; tierDiscount = 15750000; }
-            else if (pTier === 'D') { feePerUnit = 150000; tierDiscount = 14250000; }
-
-            let units = []; let totalWatt = 0; let totalJasaTeknisi = 0; let totalNilaiAC = 0;
-            document.querySelectorAll('#unit-rows-area > div').forEach(r => {
-                const pk = r.querySelector('.pk-sel').value;
-                const q = parseInt(r.querySelector('.qty-in').value) || 0;
-                if(q > 0) { 
-                    units.push({pk, q}); 
-                    totalWatt += WATTS[pk] * q; 
-                    totalJasaTeknisi += feePerUnit * q;
-                    totalNilaiAC += PRICES[pk] * q;
-                }
-            });
-
-            if(units.length === 0) return window.showAlert("Tambahkan minimal 1 Unit AC.");
-
-            let capexShortfall = totalNilaiAC - tierDiscount;
-            if(capexShortfall < 0) capexShortfall = 0;
-
-            const projId = window.editingProjectId || ('PRJ-' + Date.now());
-            const newProj = {
-                id: projId,
-                custEmail: custEmail,
-                invEmail: invEmail,
-                rekCustEmail: rekCustEmail,
-                rekInvEmail: rekInvEmail,
-                rekTekEmail: rekTekEmail,
-                jasaTeknisi: totalJasaTeknisi,
-                location: loc,
-                capex: totalNilaiAC,
-                capexShortfall: capexShortfall,
-                shortfallPaid: capexShortfall === 0,
-                baseline: (totalWatt/1000) * h * d,
-                hours: h,
-                days: d,
-                units: units,
-                createdAt: window.editingProjectId ? (window.dbProjects.find(p => p.id === window.editingProjectId)?.createdAt || new Date().toISOString()) : new Date().toISOString()
-            };
-
-            await setDoc(getPubDoc('projects', projId), newProj);
-            
-            window.showAlert(window.editingProjectId ? "Perubahan Proyek Tersimpan ke Cloud!" : "Kontrak Proyek Cloud Berhasil Diaktifkan!");
-            uiModal('project-modal', false);
-            window.editingProjectId = null;
-        };
-
-        window.openKwhModal = function() {
-            if(!window.activeProject) return window.showAlert("Tidak ada proyek yang aktif untuk diupdate.");
-            window.editingLogId = null;
-            setUI('kwh-modal-title', 'Input Realisasi per Unit');
-            setUI('kwh-modal-project-name', 'PROYEK: ' + window.activeProject.location);
-            
-            const container = document.getElementById('kwh-inputs-container');
-            container.innerHTML = '';
-            
-            let unitIndex = 1;
-            window.activeProject.units.forEach(u => {
-                for(let i=0; i<u.q; i++) {
-                    container.insertAdjacentHTML('beforeend', `
-                        <div class="flex justify-between items-center bg-white p-3 rounded-2xl border border-slate-200 shadow-sm">
-                            <span class="text-xs font-bold text-slate-700 uppercase tracking-widest">Unit ${unitIndex} <span class="text-[9px] font-black bg-indigo-50 text-indigo-600 px-2 py-1 rounded ml-1">${u.pk} PK</span></span>
-                            <input type="number" class="kwh-unit-input w-24 bg-slate-50 border-2 border-slate-100 text-indigo-900 rounded-xl px-3 py-2 text-right font-black outline-none focus:border-indigo-400 transition-all" placeholder="0" data-pk="${u.pk}" data-unit="${unitIndex}" oninput="calcDynamicKwhTotal()">
-                        </div>
-                    `);
-                    unitIndex++;
-                }
-            });
-            
-            document.getElementById('in-kwh-period').value = '';
-            setUI('in-kwh-total', '0 kWh');
-            uiModal('kwh-modal', true);
-        };
-
-        window.editKwh = function(logId) {
-            const logToEdit = window.dbLogs.find(l => (l.id || l.timestamp) === logId);
-            if(!logToEdit) return window.showAlert("Data riwayat tidak ditemukan.");
-            if(logToEdit.status === 'paid') return window.showAlert("Tagihan yang sudah LUNAS tidak dapat diedit lagi demi keamanan data.");
-
-            window.editingLogId = logId;
-            setUI('kwh-modal-title', 'Edit Realisasi per Unit');
-            setUI('kwh-modal-project-name', 'PROYEK: ' + window.activeProject.location);
-            
-            const container = document.getElementById('kwh-inputs-container');
-            container.innerHTML = '';
-            
-            let unitIndex = 1;
-            window.activeProject.units.forEach(u => {
-                for(let i=0; i<u.q; i++) {
-                    let existingVal = '';
-                    if(logToEdit.breakdown && logToEdit.breakdown.length > 0) {
-                        const found = logToEdit.breakdown.find(b => b.unit == unitIndex);
-                        if(found) existingVal = found.kwh;
-                    }
-
-                    container.insertAdjacentHTML('beforeend', `
-                        <div class="flex justify-between items-center bg-white p-3 rounded-2xl border border-slate-200 shadow-sm">
-                            <span class="text-xs font-bold text-slate-700 uppercase tracking-widest">Unit ${unitIndex} <span class="text-[9px] font-black bg-indigo-50 text-indigo-600 px-2 py-1 rounded ml-1">${u.pk} PK</span></span>
-                            <input type="number" class="kwh-unit-input w-24 bg-slate-50 border-2 border-slate-100 text-indigo-900 rounded-xl px-3 py-2 text-right font-black outline-none focus:border-indigo-400 transition-all" placeholder="0" data-pk="${u.pk}" data-unit="${unitIndex}" value="${existingVal}" oninput="calcDynamicKwhTotal()">
-                        </div>
-                    `);
-                    unitIndex++;
-                }
-            });
-            
-            document.getElementById('in-kwh-period').value = logToEdit.period;
-            window.calcDynamicKwhTotal(); 
-            uiModal('kwh-modal', true);
-        };
-
-        window.calcDynamicKwhTotal = function() {
-            let total = 0;
-            document.querySelectorAll('.kwh-unit-input').forEach(inp => {
-                total += parseFloat(inp.value) || 0;
-            });
-            setUI('in-kwh-total', formatNum(total) + ' kWh');
-        };
-
-        window.saveKwh = async function() {
-            if(!window.fbUser) return window.showAlert("Terputus dari cloud.");
-            const period = document.getElementById('in-kwh-period').value;
-            if(!period) return window.showAlert("Pilih Periode Bulan Tagihan!");
-            
-            let totalVal = 0;
-            let breakdownData = [];
-            let allFilled = true;
-
-            document.querySelectorAll('.kwh-unit-input').forEach(inp => {
-                const val = parseFloat(inp.value);
-                if(isNaN(val)) allFilled = false;
-                totalVal += val || 0;
-                
-                breakdownData.push({
-                    unit: inp.getAttribute('data-unit'),
-                    pk: inp.getAttribute('data-pk'),
-                    kwh: val || 0
-                });
-            });
-
-            if(!allFilled) return window.showAlert("Harap isi nilai kWh untuk seluruh unit. Isi dengan 0 jika unit tidak menyala.");
-            if(totalVal <= 0) return window.showAlert("Total kWh akumulasi tidak boleh 0.");
-
-            const logId = window.editingLogId || ('LOG-' + Date.now());
-            const logData = {
-                id: logId,
-                projectId: window.activeProject.id,
-                period: period,
-                kwhReal: totalVal,
-                breakdown: breakdownData, 
-                status: window.editingLogId ? (window.dbLogs.find(l => l.id === window.editingLogId)?.status || 'unpaid') : 'unpaid',
-                invStatus: window.editingLogId ? (window.dbLogs.find(l => l.id === window.editingLogId)?.invStatus || 'unpaid') : 'unpaid',
-                timestamp: window.editingLogId ? (window.dbLogs.find(l => l.id === window.editingLogId)?.timestamp || new Date().toISOString()) : new Date().toISOString()
-            };
-
-            await setDoc(getPubDoc('logs', logId), logData);
-            
-            uiModal('kwh-modal', false);
-            window.editingLogId = null;
-        };
-
-        window.printInvoice = function(logId) {
-            const log = window.dbLogs.find(l => (l.id || l.timestamp) === logId);
-            if(!log) return window.showAlert("Data riwayat tidak ditemukan.");
-
-            const proj = window.dbProjects.find(p => p.id === log.projectId);
-            if(!proj) return window.showAlert("Data proyek tidak ditemukan.");
-
-            const cust = window.dbUsers.find(u => u.email === proj.custEmail) || {};
-
-            const split = window.getSplitRatio(proj.createdAt, log.period);
-            const biayaNormal = proj.baseline * TARIF_PLN;
-            const biayaAktual = log.kwhReal * TARIF_PLN;
-            const savingIdr = Math.max(0, biayaNormal - biayaAktual);
-            const tagihanInvestorGross = savingIdr * split.invGross; 
-
-            const now = new Date();
-            setUI('inv-date', 'Tanggal: ' + now.toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year: 'numeric'}));
-            setUI('inv-number', 'INV-' + (log.id ? log.id.replace('LOG-', '') : Date.now().toString().slice(-6)));
-            
-            setUI('inv-cust-name', cust.name || proj.custEmail);
-            setUI('inv-cust-loc', proj.location);
-            setUI('inv-period', log.period);
-
-            setUI('inv-val-normal', formatIDR(biayaNormal));
-            setUI('inv-val-actual', formatIDR(biayaAktual));
-            setUI('inv-val-saving', formatIDR(savingIdr));
-            setUI('inv-val-total', formatIDR(tagihanInvestorGross));
-            
-            setUI('inv-label-total', `Total Tagihan Bagi Hasil (Porsi Investor ${Math.round(split.invGross * 100)}%)`);
-
-            setUI('inv-bank-name', 'BANK BCA (REKENING RESMI)');
-            setUI('inv-bank-rek', '6044837263');
-            setUI('inv-bank-owner', 'A.n KALIMAJA SURYA ALAM PT');
-
-            document.body.classList.add('invoice-mode');
-            window.print();
-            
+        window.selectInvestorProject = function(projId) {
+            window.activeProject = window.dbProjects.find(p => p.id === projId);
+            window.renderProjectData();
+            window.renderInvestorPortfolio(); 
+            window.renderRekananPortfolio();
             setTimeout(() => {
-                document.body.classList.remove('invoice-mode');
-            }, 1000);
-        };
-
-        window.markAsPaid = function(logId) {
-            window.showConfirm("Yakin menandai tagihan/bagi hasil ini sebagai LUNAS?", async () => {
-                const logToEdit = window.dbLogs.find(l => (l.id || l.timestamp) === logId);
-                if(logToEdit && window.fbUser) {
-                    logToEdit.status = 'paid';
-                    await setDoc(getPubDoc('logs', logId), logToEdit);
-                }
-            });
-        };
-
-        window.markInvPaid = function(logId) {
-            window.showConfirm("Yakin menandai transfer kewajiban ke Investor ini sebagai SUDAH DIBAYAR?", async () => {
-                const logToEdit = window.dbLogs.find(l => (l.id || l.timestamp) === logId);
-                if(logToEdit && window.fbUser) {
-                    logToEdit.invStatus = 'paid';
-                    await setDoc(getPubDoc('logs', logId), logToEdit);
-                }
-            });
-        };
-
-        window.deleteKwh = function(logId) {
-            window.showConfirm("PERINGATAN! Anda yakin ingin menghapus data riwayat konsumsi untuk periode ini secara permanen dari Cloud Database?", async () => {
-                if(window.fbUser) await deleteDoc(getPubDoc('logs', logId));
-            });
-        };
-
-        window.deleteActiveProject = function() {
-            if(!window.activeProject) return window.showAlert("Pilih proyek yang akan dihapus.");
-            
-            window.showConfirm(`PERINGATAN!\n\nAnda yakin ingin membatalkan dan menghapus proyek di lokasi "${window.activeProject.location}" dari CLOUD?\n\nSemua riwayat pemakaian dan tagihan untuk proyek ini juga akan dihapus secara permanen.`, async () => {
-                if(window.fbUser) {
-                    const projId = window.activeProject.id;
-                    const logsToDelete = window.dbLogs.filter(l => l.projectId === projId);
-                    
-                    for (let log of logsToDelete) {
-                        await deleteDoc(getPubDoc('logs', log.id || log.timestamp));
-                    }
-                    await deleteDoc(getPubDoc('projects', projId));
-                    
-                    window.showAlert("Proyek berhasil dihapus dari Cloud.");
-                    window.activeProject = null;
-                    window.refreshProjectData();
-                }
-            });
-        };
-
-        window.clearAllData = function() {
-            window.showConfirm("PERINGATAN KRITIS: Seluruh data (User, Proyek, Log, Chat) akan dihapus secara PERMANEN dari Cloud Database. Anda yakin?", async () => {
-                if(!window.fbUser) return;
-                document.getElementById('cloud-loader').style.display = 'flex';
-                document.getElementById('cloud-loader').style.opacity = '1';
-                
-                for(let u of window.dbUsers) await deleteDoc(getPubDoc('users', u.email));
-                for(let p of window.dbProjects) await deleteDoc(getPubDoc('projects', p.id));
-                for(let l of window.dbLogs) await deleteDoc(getPubDoc('logs', l.id || l.timestamp));
-                for(let c of window.dbChats) await deleteDoc(getPubDoc('chats', c.id.toString()));
-                
-                localStorage.removeItem('kalimaja_session_email');
-                location.reload();
-            });
+                const target = document.getElementById('dash-view');
+                if(target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
         };
     </script>
 </body>
