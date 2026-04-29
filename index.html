@@ -14,17 +14,39 @@
         .sidebar-gradient { background: linear-gradient(180deg, #020617 0%, #1e1b4b 100%); }
         .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); }
         .status-pill { padding: 3px 8px; border-radius: 9999px; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; }
-        .modal-overlay { position: fixed; inset: 0; z-index: 100; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 1rem; opacity: 0; pointer-events: none; transition: all 0.3s ease; }
-        .modal-container { background: white; width: 100%; max-width: 56rem; border-radius: 1.5rem; transform: scale(0.95); transition: all 0.3s ease; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+        
+        .modal-overlay { 
+            position: fixed; inset: 0; z-index: 100; 
+            background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(8px); 
+            display: flex; align-items: center; justify-content: center; padding: 1rem; 
+            opacity: 0; pointer-events: none; transition: all 0.3s ease; 
+        }
+        .modal-container { 
+            background: white; width: 100%; max-width: 56rem; border-radius: 1.5rem; 
+            transform: scale(0.95); transition: all 0.3s ease; 
+            max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; 
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); 
+        }
         .modal-active { opacity: 1; pointer-events: auto; }
         .modal-active .modal-container { transform: scale(1); }
-        .auth-card { background: white; border-radius: 1.5rem; width: 100%; max-width: 28rem; padding: 2.5rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        
+        .auth-card { 
+            background: white; border-radius: 1.5rem; width: 100%; max-width: 28rem; 
+            padding: 2.5rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); 
+        }
         .hidden-el { display: none !important; }
-        input, select { border: 2px solid #f1f5f9 !important; border-radius: 0.75rem !important; padding: 0.75rem 1rem !important; font-weight: 600 !important; font-size: 0.875rem !important; outline: none !important; width: 100%; transition: all 0.2s ease;}
+        
+        input, select { 
+            border: 2px solid #f1f5f9 !important; border-radius: 0.75rem !important; 
+            padding: 0.75rem 1rem !important; font-weight: 600 !important; font-size: 0.875rem !important; 
+            outline: none !important; width: 100%; transition: all 0.2s ease;
+        }
         input:focus, select:focus { border-color: #4f46e5 !important; background: #f8fafc !important; }
+        
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
         @media print {
             .no-print { display: none !important; }
             body { background: white; padding: 0; margin: 0; }
@@ -32,18 +54,30 @@
             body.invoice-mode #invoice-print-template { display: block !important; }
         }
         #invoice-print-template { display: none; }
-        #cloud-loader { position: fixed; inset: 0; z-index: 999; background: #020617; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s ease; }
-        .spinner { width: 50px; height: 50px; border: 5px solid rgba(255,255,255,0.1); border-top-color: #4f46e5; border-radius: 50%; animation: spin 1s linear infinite; }
+        
+        #cloud-loader { 
+            position: fixed; inset: 0; z-index: 999; background: #020617; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            transition: opacity 0.5s ease; 
+        }
+        .spinner { 
+            width: 50px; height: 50px; border: 5px solid rgba(255,255,255,0.1); 
+            border-top-color: #4f46e5; border-radius: 50%; animation: spin 1s linear infinite; 
+        }
         @keyframes spin { to { transform: rotate(360deg); } }
+        
         #custom-alert-modal { z-index: 9999; }
         #custom-alert-modal .modal-container { max-width: 24rem; padding: 1.5rem; overflow: visible; border-radius: 1.5rem; }
     </style>
+
     <script>
+        // Custom Alert & Confirm Modals
         window.customAlertModal = function(msg, isConfirm = false, onConfirm = null) {
             const modal = document.getElementById('custom-alert-modal');
             document.getElementById('alert-msg').innerText = msg;
             const btnCancel = document.getElementById('alert-cancel-btn');
             const btnOk = document.getElementById('alert-ok-btn');
+
             if(isConfirm) {
                 btnCancel.classList.remove('hidden-el');
                 document.getElementById('alert-icon').innerHTML = '<i class="fas fa-question-circle text-blue-500"></i>';
@@ -55,14 +89,22 @@
                 document.getElementById('alert-title').innerText = 'Pemberitahuan';
                 btnOk.innerText = 'Mengerti';
             }
+
             modal.classList.add('modal-active');
-            btnOk.onclick = function() { modal.classList.remove('modal-active'); if(isConfirm && onConfirm) onConfirm(); };
-            btnCancel.onclick = function() { modal.classList.remove('modal-active'); };
+
+            btnOk.onclick = function() { 
+                modal.classList.remove('modal-active'); 
+                if(isConfirm && onConfirm) onConfirm(); 
+            };
+            btnCancel.onclick = function() { 
+                modal.classList.remove('modal-active'); 
+            };
         };
 
         window.showAlert = (msg) => window.customAlertModal(msg, false);
         window.showConfirm = (msg, onConfirm) => window.customAlertModal(msg, true, onConfirm);
 
+        // Fungsi UI Sederhana
         window.showRegister = function() {
             document.getElementById('login-view').classList.add('hidden-el');
             document.getElementById('forgot-view').classList.add('hidden-el');
@@ -79,6 +121,7 @@
             document.getElementById('login-view').classList.remove('hidden-el');
         };
 
+        // Logic 3 Clicks for Admin
         let adminClickCount = 0;
         let adminClickTimer = null;
         window.triggerAdminLogin = function() {
@@ -249,6 +292,7 @@
                             <input type="text" inputmode="numeric" id="reg-nik" placeholder="16 Digit NIK KTP" maxlength="16">
                         </div>
                     </div>
+                    
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div class="space-y-1">
                             <label class="text-[10px] font-black text-slate-400 uppercase px-1 block">Email / Username</label>
@@ -259,6 +303,7 @@
                             <input type="number" id="reg-phone" placeholder="08xxxxxxxxxx">
                         </div>
                     </div>
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3 border-t border-slate-100 pt-3 mt-1">
                         <div class="space-y-1">
                             <label class="text-[10px] font-black text-slate-400 uppercase px-1 block">Nama Bank</label>
@@ -269,6 +314,7 @@
                             <input type="number" id="reg-rek" placeholder="Untuk transfer laba">
                         </div>
                     </div>
+
                     <div class="grid grid-cols-2 gap-3 pt-1">
                         <div class="space-y-1">
                             <label class="text-[10px] font-black text-slate-400 uppercase px-1 block">Buat Sandi</label>
@@ -283,6 +329,7 @@
                             </select>
                         </div>
                     </div>
+                    
                     <button onclick="window.doRegister()" class="w-full bg-amber-500 text-slate-950 py-3.5 rounded-xl font-black uppercase tracking-widest hover:bg-amber-600 transition-all shadow-md mt-3 text-sm">Selesaikan Pendaftaran</button>
                 </div>
                 <div class="text-center pt-5 border-t border-slate-100 mt-5 w-full">
@@ -345,11 +392,15 @@
             <nav class="space-y-4 flex-1 overflow-y-auto pr-1">
                 <div class="space-y-1 text-left">
                     <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest px-2 italic mb-2">Akses Level: <span id="user-role-badge" class="text-amber-400">-</span></p>
+                    
                     <button onclick="window.switchView('dashboard')" class="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-white/10 rounded-xl text-xs font-bold border-l-4 border-amber-500 text-left text-white shadow-sm transition-all">
                         <i class="fas fa-th-large w-4 text-center"></i> Dashboard Utama
                     </button>
+
                     <button onclick="window.openChatView()" class="w-full flex items-center justify-between px-3 py-2.5 hover:bg-white/5 rounded-xl text-xs font-medium text-slate-300 hover:text-white text-left transition-all">
-                        <div class="flex items-center gap-3"><i class="fas fa-comments w-4 text-center"></i> Pusat Pesan</div>
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-comments w-4 text-center"></i> Pusat Pesan
+                        </div>
                         <span id="global-unread-badge" class="hidden-el bg-red-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-sm">0</span>
                     </button>
                     
@@ -451,7 +502,9 @@
                     <div><p class="text-[8px] md:text-[9px] font-black text-slate-400 uppercase mb-1">Nama Bank</p><p id="profile-bank" class="text-[10px] md:text-xs font-bold text-indigo-900 uppercase truncate">-</p></div>
                     <div class="flex justify-between items-center gap-2">
                         <div class="truncate"><p class="text-[8px] md:text-[9px] font-black text-slate-400 uppercase mb-1">No. Rekening</p><p id="profile-rek" class="text-[10px] md:text-xs font-bold text-indigo-900 mono truncate">-</p></div>
-                        <button onclick="window.openEditBankModal()" class="h-7 w-7 md:h-8 md:w-8 bg-slate-50 hover:bg-indigo-100 text-slate-400 hover:text-indigo-600 rounded-lg flex items-center justify-center transition-colors shrink-0" title="Ubah Rekening"><i class="fas fa-pencil-alt text-[10px] md:text-xs"></i></button>
+                        <button onclick="window.openEditBankModal()" class="h-7 w-7 md:h-8 md:w-8 bg-slate-50 hover:bg-indigo-100 text-slate-400 hover:text-indigo-600 rounded-lg flex items-center justify-center transition-colors shrink-0" title="Ubah Rekening">
+                            <i class="fas fa-pencil-alt text-[10px] md:text-xs"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -463,7 +516,9 @@
                         <h3 class="text-sm font-black italic uppercase tracking-tight text-indigo-950">Buku Kontak</h3>
                         <i class="fas fa-address-book text-slate-300"></i>
                     </div>
-                    <div id="contact-list" class="space-y-2 overflow-y-auto flex-1 pr-1"></div>
+                    <div id="contact-list" class="space-y-2 overflow-y-auto flex-1 pr-1">
+                        <!-- Disuntik via JS -->
+                    </div>
                 </div>
                 <div class="flex-1 bg-white rounded-2xl card-shadow border border-slate-200 flex flex-col overflow-hidden">
                     <div class="p-4 md:p-5 border-b border-slate-100 bg-slate-50/80 flex items-center gap-3 shrink-0">
@@ -473,7 +528,9 @@
                             <p id="chat-active-role" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">-</p>
                         </div>
                     </div>
-                    <div id="chat-messages" class="flex-1 p-4 md:p-5 overflow-y-auto bg-slate-50/30 space-y-3"></div>
+                    <div id="chat-messages" class="flex-1 p-4 md:p-5 overflow-y-auto bg-slate-50/30 space-y-3">
+                        <!-- Pesan disuntik via JS -->
+                    </div>
                     <div class="flex flex-col bg-white border-t border-slate-100 p-3 md:p-4 shrink-0">
                         <div id="attachment-preview" class="hidden-el flex items-center gap-2 mb-2 p-1.5 bg-indigo-50 rounded-lg border border-indigo-100 text-[10px] font-bold text-indigo-800 w-fit">
                             <i class="fas fa-file-alt ml-1"></i> <span id="attachment-name" class="truncate max-w-[150px] md:max-w-[200px]">filename.png</span>
@@ -497,7 +554,9 @@
                 <!-- GLOBAL FINANCIAL SUMMARY -->
                 <div id="admin-global-financials" class="hidden-el mb-8">
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="h-8 w-8 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center text-sm"><i class="fas fa-chart-line"></i></div>
+                        <div class="h-8 w-8 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center text-sm">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
                         <div>
                             <h3 class="font-black italic uppercase tracking-tight text-slate-900 text-lg leading-none">Global Financial Summary</h3>
                             <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Laba Perusahaan dari Seluruh Proyek</p>
@@ -520,38 +579,39 @@
                     </div>
 
                     <!-- BREAKDOWN SECTION FOR ALL DIRECTORS AND ADMIN -->
-                    <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-sm text-left mb-5">
-                        <h4 class="font-bold text-[10px] md:text-xs text-slate-800 uppercase tracking-widest mb-4 border-b border-slate-100 pb-3"><i class="fas fa-chart-pie text-indigo-500 mr-2"></i> Rincian Alokasi Laba & Dividen Direksi</h4>
+                    <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-sm text-left mb-5" id="admin-breakdown-section">
+                        <h4 class="font-bold text-[10px] md:text-xs text-slate-800 uppercase tracking-widest mb-4 border-b border-slate-100 pb-3"><i class="fas fa-chart-pie text-indigo-500 mr-2"></i> Rincian Alokasi Laba & Kas Perusahaan</h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
                             <div class="space-y-3">
                                 <div class="flex justify-between items-center p-3.5 bg-indigo-50 rounded-xl border border-indigo-100">
-                                    <span class="text-[10px] font-black text-indigo-800 uppercase">Total Dana Perusahaan</span>
+                                    <span class="text-[10px] font-black text-indigo-800 uppercase">Total Dana Terkumpul</span>
                                     <span class="text-sm md:text-base font-black text-indigo-900 mono" id="view-div-total">Rp 0</span>
                                 </div>
                                 <div class="flex justify-between items-center p-3.5 bg-emerald-50 rounded-xl border border-emerald-100">
-                                    <span class="text-[10px] font-black text-emerald-800 uppercase">Sisa Kas (20%)</span>
+                                    <span class="text-[10px] font-black text-emerald-800 uppercase">Sisa Kas Perusahaan (20%)</span>
                                     <span class="text-sm md:text-base font-black text-emerald-900 mono" id="view-div-sisa">Rp 0</span>
                                 </div>
                             </div>
-                            <div class="space-y-3 border-l-0 md:border-l-2 border-slate-100 pl-0 md:pl-6">
-                                <div class="flex justify-between items-center bg-amber-50 p-4 md:p-5 rounded-xl border border-amber-200 shadow-sm h-full">
-                                    <span class="text-[10px] md:text-xs font-black text-amber-700 uppercase" id="label-my-dividen">Hak Dividen Anda</span>
-                                    <span class="text-lg md:text-xl font-black text-amber-600 mono" id="val-my-dividen">Rp 0</span>
-                                </div>
+                            <div class="space-y-3 border-l-0 md:border-l-2 border-slate-100 pl-0 md:pl-6" id="admin-dividend-list">
+                                <!-- JS Injected Here -->
                             </div>
                         </div>
                     </div>
 
                     <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-sm text-left">
                         <h4 class="font-bold text-[10px] md:text-xs text-slate-500 uppercase tracking-widest mb-4">Grafik Laba Perusahaan (6 Bulan Terakhir)</h4>
-                        <div class="relative h-48 md:h-60 w-full"><canvas id="adminProfitChart"></canvas></div>
+                        <div class="relative h-48 md:h-60 w-full">
+                            <canvas id="adminProfitChart"></canvas>
+                        </div>
                     </div>
                 </div>
 
                 <!-- DASHBOARD KHUSUS MITRA / REKANAN -->
                 <div id="rekanan-dashboard-section" class="hidden-el space-y-5 text-left mb-8">
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="h-8 w-8 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center text-sm"><i class="fas fa-handshake"></i></div>
+                        <div class="h-8 w-8 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center text-sm">
+                            <i class="fas fa-handshake"></i>
+                        </div>
                         <div>
                             <h3 class="font-black italic uppercase tracking-tight text-slate-900 text-lg leading-none">Dashboard Kemitraan</h3>
                             <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Ringkasan Kinerja & Komisi Penjualan / Teknisi</p>
@@ -575,10 +635,11 @@
                             <p class="text-lg md:text-xl font-black text-emerald-400 mt-2 mono truncate" id="rek-total-komisi-tek">Rp 0</p>
                         </div>
                     </div>
-                    
                     <div class="mt-6 md:mt-8">
                         <h4 class="font-bold text-[10px] md:text-xs text-slate-500 uppercase tracking-widest mb-4">Proyek Kemitraan Anda</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5" id="rekanan-portfolio-grid"></div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5" id="rekanan-portfolio-grid">
+                            <!-- Disuntikkan via JS -->
+                        </div>
                     </div>
                 </div>
 
@@ -587,7 +648,9 @@
                     <div class="bg-white rounded-2xl p-5 md:p-6 card-shadow border border-slate-200">
                         <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-5 gap-4">
                             <div class="flex items-center gap-3">
-                                <div class="h-8 w-8 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center text-sm shrink-0"><i class="fas fa-award"></i></div>
+                                <div class="h-8 w-8 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center text-sm shrink-0">
+                                    <i class="fas fa-award"></i>
+                                </div>
                                 <div>
                                     <h3 class="font-black italic uppercase tracking-tight text-slate-900 text-lg leading-none">Verifikasi & Tier Investor</h3>
                                     <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Pilih komitmen pendanaan Anda</p>
@@ -597,24 +660,28 @@
                         </div>
 
                         <div id="tier-selection-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <!-- Tier A -->
                             <div onclick="window.selectInvestorTier('A')" class="cursor-pointer bg-white border border-slate-200 hover:border-amber-400 hover:shadow-md rounded-xl p-5 transition-all text-center group">
                                 <div class="text-amber-400 text-lg mb-2 group-hover:scale-110 transition-transform"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
                                 <h4 class="font-black text-xl text-slate-800 mb-1">TIER A</h4>
                                 <p class="text-sm font-black text-indigo-600 mono mb-3">Rp 28.500.000</p>
                                 <button class="text-[9px] font-bold bg-slate-50 border border-slate-100 text-slate-600 px-3 py-1.5 rounded-lg uppercase tracking-widest w-full group-hover:bg-amber-400 group-hover:text-white group-hover:border-amber-400 transition-colors">Pilih Tier Ini</button>
                             </div>
+                            <!-- Tier B -->
                             <div onclick="window.selectInvestorTier('B')" class="cursor-pointer bg-white border border-slate-200 hover:border-amber-400 hover:shadow-md rounded-xl p-5 transition-all text-center group">
                                 <div class="text-amber-400 text-lg mb-2 group-hover:scale-110 transition-transform"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
                                 <h4 class="font-black text-xl text-slate-800 mb-1">TIER B</h4>
                                 <p class="text-sm font-black text-indigo-600 mono mb-3">Rp 22.250.000</p>
                                 <button class="text-[9px] font-bold bg-slate-50 border border-slate-100 text-slate-600 px-3 py-1.5 rounded-lg uppercase tracking-widest w-full group-hover:bg-amber-400 group-hover:text-white group-hover:border-amber-400 transition-colors">Pilih Tier Ini</button>
                             </div>
+                            <!-- Tier C -->
                             <div onclick="window.selectInvestorTier('C')" class="cursor-pointer bg-white border border-slate-200 hover:border-amber-400 hover:shadow-md rounded-xl p-5 transition-all text-center group">
                                 <div class="text-amber-400 text-lg mb-2 group-hover:scale-110 transition-transform"><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
                                 <h4 class="font-black text-xl text-slate-800 mb-1">TIER C</h4>
                                 <p class="text-sm font-black text-indigo-600 mono mb-3">Rp 15.750.000</p>
                                 <button class="text-[9px] font-bold bg-slate-50 border border-slate-100 text-slate-600 px-3 py-1.5 rounded-lg uppercase tracking-widest w-full group-hover:bg-amber-400 group-hover:text-white group-hover:border-amber-400 transition-colors">Pilih Tier Ini</button>
                             </div>
+                            <!-- Tier D -->
                             <div onclick="window.selectInvestorTier('D')" class="cursor-pointer bg-white border border-slate-200 hover:border-amber-400 hover:shadow-md rounded-xl p-5 transition-all text-center group">
                                 <div class="text-amber-400 text-lg mb-2 group-hover:scale-110 transition-transform"><i class="fas fa-star"></i></div>
                                 <h4 class="font-black text-xl text-slate-800 mb-1">TIER D</h4>
@@ -648,13 +715,17 @@
                 <!-- LIST PORTOFOLIO INVESTOR -->
                 <div id="investor-portfolio-section" class="hidden-el mb-8 text-left">
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="h-8 w-8 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center text-sm"><i class="fas fa-briefcase"></i></div>
+                        <div class="h-8 w-8 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center text-sm">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
                         <div>
                             <h3 class="font-black italic uppercase tracking-tight text-slate-900 text-lg leading-none">Daftar Portofolio Proyek</h3>
                             <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Pilih kartu proyek untuk melihat performa detail</p>
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5" id="investor-portfolio-grid"></div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5" id="investor-portfolio-grid">
+                        <!-- Disuntikkan via JS -->
+                    </div>
                 </div>
 
                 <!-- PANEL MULTI-PROYEK -->
@@ -665,7 +736,9 @@
                     </div>
                     <div class="w-full md:w-1/2 flex items-center gap-2">
                         <select id="proj-select" onchange="window.changeActiveProject(this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 md:px-4 md:py-2.5 text-xs md:text-sm font-bold outline-none cursor-pointer focus:border-indigo-400 transition-all"></select>
-                        <button id="btn-delete-proj" onclick="window.deleteActiveProject()" class="hidden-el shrink-0 bg-red-50 text-red-600 px-3 py-2 md:px-4 md:py-2.5 rounded-xl border border-red-200 hover:bg-red-500 hover:text-white transition-all shadow-sm" title="Batalkan / Hapus Proyek"><i class="fas fa-trash-alt text-sm"></i></button>
+                        <button id="btn-delete-proj" onclick="window.deleteActiveProject()" class="hidden-el shrink-0 bg-red-50 text-red-600 px-3 py-2 md:px-4 md:py-2.5 rounded-xl border border-red-200 hover:bg-red-500 hover:text-white transition-all shadow-sm" title="Batalkan / Hapus Proyek">
+                            <i class="fas fa-trash-alt text-sm"></i>
+                        </button>
                     </div>
                 </div>
 
@@ -678,6 +751,7 @@
 
                 <!-- DASHBOARD PROYEK VIEW -->
                 <div id="dash-view" class="space-y-6 md:space-y-8 hidden-el">
+                    <!-- INFO PROYEK UTAMA -->
                     <div class="grid lg:grid-cols-3 gap-5 md:gap-6 text-left">
                         <div id="main-info-card" class="lg:col-span-2 bg-white rounded-2xl p-5 md:p-6 card-shadow border border-slate-200 relative overflow-hidden">
                             <div class="mb-5 md:mb-6">
@@ -765,13 +839,16 @@
                         </div>
                     </div>
 
+                    <!-- RINCIAN KONSUMSI PER UNIT (DASHBOARD) -->
                     <div id="breakdown-section" class="bg-white rounded-2xl card-shadow border border-slate-200 overflow-hidden text-left hidden-el">
                         <div class="p-5 md:p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                             <h3 class="font-black italic uppercase tracking-tight text-slate-900 text-sm md:text-base">Rincian Konsumsi per Unit AC</h3>
                             <span id="breakdown-period-badge" class="text-[9px] font-bold px-2.5 py-1 bg-indigo-100 text-indigo-700 rounded-md uppercase tracking-widest">Periode Terakhir</span>
                         </div>
                         <div class="p-5 md:p-6">
-                            <div id="breakdown-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4"></div>
+                            <div id="breakdown-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+                                <!-- Disuntikkan via JS -->
+                            </div>
                             <div class="mt-6 pt-5 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-3">
                                 <span class="text-[10px] md:text-xs font-black text-slate-500 uppercase tracking-widest text-center md:text-left">Total Konsumsi Kalkulasi</span>
                                 <span id="breakdown-total" class="text-2xl md:text-3xl font-black text-indigo-950">0 kWh</span>
@@ -827,7 +904,9 @@
                                     <th class="py-3 px-4 text-center">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="table-projects-body" class="divide-y divide-slate-100"></tbody>
+                            <tbody id="table-projects-body" class="divide-y divide-slate-100">
+                                <!-- Data diinjeksi via JS -->
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -855,7 +934,9 @@
                                     <th class="py-3 px-4 text-center">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="table-customers-body" class="divide-y divide-slate-100"></tbody>
+                            <tbody id="table-customers-body" class="divide-y divide-slate-100">
+                                <!-- Data diinjeksi via JS -->
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -880,7 +961,9 @@
                                     <th class="py-3 px-4 text-center">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="table-investors-body" class="divide-y divide-slate-100"></tbody>
+                            <tbody id="table-investors-body" class="divide-y divide-slate-100">
+                                <!-- Data diinjeksi via JS -->
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -908,7 +991,9 @@
                                     <th class="py-3 px-4 text-center">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="table-sales-body" class="divide-y divide-slate-100"></tbody>
+                            <tbody id="table-sales-body" class="divide-y divide-slate-100">
+                                <!-- Data diinjeksi via JS -->
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -936,11 +1021,14 @@
                                     <th class="py-3 px-4 text-center">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="table-teknisi-body" class="divide-y divide-slate-100"></tbody>
+                            <tbody id="table-teknisi-body" class="divide-y divide-slate-100">
+                                <!-- Data diinjeksi via JS -->
+                            </tbody>
                         </table>
                     </div>
                 </div>
             </div>
+
         </main>
     </div>
 
@@ -1019,7 +1107,9 @@
                 <h3 class="font-black italic uppercase tracking-tight text-indigo-950 text-sm md:text-base">Form Detail Keuangan Investor</h3>
                 <button onclick="window.uiModal('investor-detail-modal', false)" class="text-slate-400 hover:text-slate-900"><i class="fas fa-times"></i></button>
             </div>
-            <div class="p-5 md:p-6 overflow-y-auto bg-slate-50/50 max-h-[75vh]" id="investor-detail-content"></div>
+            <div class="p-5 md:p-6 overflow-y-auto bg-slate-50/50 max-h-[75vh]" id="investor-detail-content">
+                <!-- Disuntikkan via JS -->
+            </div>
         </div>
     </div>
 
@@ -1031,32 +1121,45 @@
                 <button onclick="window.uiModal('project-modal', false)" class="text-slate-400 hover:text-slate-900"><i class="fas fa-times"></i></button>
             </div>
             <div class="p-6 md:p-8 overflow-y-auto space-y-6 text-left max-h-[60vh]">
+                <!-- Data Pihak Utama -->
                 <div class="grid md:grid-cols-2 gap-4 md:gap-5 text-left">
                     <div class="space-y-1">
                         <label class="text-[9px] font-black text-slate-400 uppercase px-1">Akun Customer Terdaftar</label>
-                        <select id="form-cust-email" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 font-bold outline-none cursor-pointer focus:border-indigo-500 text-sm"><option value="">-- Menunggu Data --</option></select>
+                        <select id="form-cust-email" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 font-bold outline-none cursor-pointer focus:border-indigo-500 text-sm">
+                            <option value="">-- Menunggu Data --</option>
+                        </select>
                     </div>
                     <div class="space-y-1 text-left">
                         <label class="text-[9px] font-black text-slate-400 uppercase px-1">Akun Investor Terdaftar</label>
-                        <select id="form-inv-email" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 font-bold outline-none cursor-pointer focus:border-indigo-500 text-sm"><option value="">-- Menunggu Data --</option></select>
+                        <select id="form-inv-email" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 font-bold outline-none cursor-pointer focus:border-indigo-500 text-sm">
+                            <option value="">-- Menunggu Data --</option>
+                        </select>
                     </div>
                 </div>
 
+                <!-- Data Rekanan (Opsional) -->
                 <div class="grid md:grid-cols-3 gap-4 md:gap-5 text-left border-t border-slate-100 pt-5">
                     <div class="space-y-1 text-left">
                         <label class="text-[9px] font-black text-amber-500 uppercase px-1">Rekanan (Sales Customer)</label>
-                        <select id="form-rek-cust" class="w-full bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5 font-bold outline-none cursor-pointer focus:border-amber-500 text-xs"><option value="">-- Tidak Ada --</option></select>
+                        <select id="form-rek-cust" class="w-full bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5 font-bold outline-none cursor-pointer focus:border-amber-500 text-xs">
+                            <option value="">-- Tidak Ada --</option>
+                        </select>
                     </div>
                     <div class="space-y-1 text-left">
                         <label class="text-[9px] font-black text-amber-500 uppercase px-1">Rekanan (Sales Investor)</label>
-                        <select id="form-rek-inv" class="w-full bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5 font-bold outline-none cursor-pointer focus:border-amber-500 text-xs"><option value="">-- Tidak Ada --</option></select>
+                        <select id="form-rek-inv" class="w-full bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5 font-bold outline-none cursor-pointer focus:border-amber-500 text-xs">
+                            <option value="">-- Tidak Ada --</option>
+                        </select>
                     </div>
                     <div class="space-y-1 text-left">
                         <label class="text-[9px] font-black text-indigo-500 uppercase px-1">Teknisi Pemasangan</label>
-                        <select id="form-rek-tek" class="w-full bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-2.5 font-bold outline-none cursor-pointer focus:border-indigo-500 text-xs"><option value="">-- Tidak Ada --</option></select>
+                        <select id="form-rek-tek" class="w-full bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-2.5 font-bold outline-none cursor-pointer focus:border-indigo-500 text-xs">
+                            <option value="">-- Tidak Ada --</option>
+                        </select>
                     </div>
                 </div>
 
+                <!-- Detail Lokasi -->
                 <div class="grid md:grid-cols-2 gap-4 md:gap-5 text-left border-t border-slate-100 pt-5">
                     <div class="space-y-1">
                         <label class="text-[9px] font-black text-slate-400 uppercase px-1">Nama Gedung / Cabang</label>
@@ -1087,7 +1190,7 @@
         </div>
     </div>
 
-    <!-- MODAL: KWH UPDATE PER UNIT -->
+    <!-- MODAL: KWH UPDATE PER UNIT (ADMIN) -->
     <div id="kwh-modal" class="modal-overlay no-print text-left">
         <div class="modal-container max-w-2xl">
             <div class="p-5 md:p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50">
@@ -1097,16 +1200,21 @@
                 </div>
                 <button onclick="window.uiModal('kwh-modal', false)" class="text-slate-400 hover:text-slate-900"><i class="fas fa-times"></i></button>
             </div>
+            
             <div class="p-5 md:p-6 space-y-5 overflow-y-auto flex-1 max-h-[60vh]">
                 <div class="space-y-1">
                     <label class="text-[9px] font-black text-slate-400 uppercase px-1">Periode Bulan Tagihan</label>
                     <input type="month" id="in-kwh-period" class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm">
                 </div>
+                
                 <div class="pt-1">
                     <label class="text-[9px] font-black text-indigo-500 uppercase px-1 mb-2 block">Input kWh Meter Masing-Masing Unit</label>
-                    <div id="kwh-inputs-container" class="space-y-2"></div>
+                    <div id="kwh-inputs-container" class="space-y-2">
+                        <!-- Disuntikkan via JS -->
+                    </div>
                 </div>
             </div>
+
             <div class="p-5 md:p-6 bg-slate-50 border-t border-slate-100 shrink-0">
                 <div class="flex justify-between items-center mb-4">
                     <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Total Akumulasi</span>
@@ -1124,7 +1232,9 @@
                 <h3 class="font-black italic uppercase tracking-tight text-indigo-950 text-sm md:text-base">Detail Transaksi & Bagi Hasil</h3>
                 <button onclick="window.uiModal('log-detail-modal', false)" class="text-slate-400 hover:text-slate-900"><i class="fas fa-times"></i></button>
             </div>
-            <div class="p-5 md:p-6 overflow-y-auto bg-slate-50/50 max-h-[75vh]" id="log-detail-content"></div>
+            <div class="p-5 md:p-6 overflow-y-auto bg-slate-50/50 max-h-[75vh]" id="log-detail-content">
+                <!-- Disuntikkan via JS -->
+            </div>
         </div>
     </div>
 
@@ -1197,6 +1307,7 @@
         </div>
     </div>
 
+    <!-- SCRIPT FIREBASE CLOUD DATABASE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -1226,19 +1337,35 @@
         const WATTS = { 0.5:420, 0.75:630, 1:840, 1.5:1260, 2:1680, 2.5:2100, 3:2520, 3.5:2940, 4:3360, 4.5:3780, 5:4200, 6:5040, 7:5880, 8:6720, 10:8400, 12:10080, 15:12600, 18:15120, 20:16800 };
         const TARIF_PLN = 1615;
 
-        window.dbUsers = []; window.dbProjects = []; window.dbLogs = []; window.dbChats = [];
+        window.dbUsers = []; 
+        window.dbProjects = []; 
+        window.dbLogs = []; 
+        window.dbChats = [];
+        
         window.fbUser = null; 
+        
         let isReady = { users: false, projects: false, logs: false, chats: false };
         let unsubscribeList = [];
 
-        window.activeUser = null; window.activeProject = null; window.editingLogId = null; window.editingProjectId = null; window.activeChatContact = null; window.currentAttachment = null;
+        window.activeUser = null; 
+        window.activeProject = null; 
+        window.editingLogId = null; 
+        window.editingProjectId = null; 
+        window.activeChatContact = null; 
+        window.currentAttachment = null;
 
         const formatIDR = (v) => new Intl.NumberFormat('id-ID', {style:'currency', currency:'IDR', maximumFractionDigits:0}).format(v);
         const formatNum = (v) => new Intl.NumberFormat('id-ID').format(v);
         const setUI = (id, val) => { const el = document.getElementById(id); if(el) el.innerText = val; };
         
-        const getPubCol = (c) => { if(typeof __app_id !== 'undefined') return collection(db, 'artifacts', appId, 'public', 'data', c); return collection(db, c); };
-        const getPubDoc = (c, id) => { if(typeof __app_id !== 'undefined') return doc(db, 'artifacts', appId, 'public', 'data', c, id); return doc(db, c, id); };
+        const getPubCol = (c) => { 
+            if(typeof __app_id !== 'undefined') return collection(db, 'artifacts', appId, 'public', 'data', c); 
+            return collection(db, c); 
+        };
+        const getPubDoc = (c, id) => { 
+            if(typeof __app_id !== 'undefined') return doc(db, 'artifacts', appId, 'public', 'data', c, id); 
+            return doc(db, c, id); 
+        };
 
         let errorCount = 0;
         function handleSnapError(err) {
@@ -1266,9 +1393,15 @@
 
         async function initAuth() {
             try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
-                else await signInAnonymously(auth);
-            } catch (error) { console.error("Auth error", error); setupRealtime(); }
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Auth error", error);
+                setupRealtime();
+            }
         }
 
         onAuthStateChanged(auth, (user) => { window.fbUser = user; if(user) setupRealtime(); });
@@ -1279,7 +1412,8 @@
             if (loader && loader.style.display !== 'none' && (!isReady.users || !isReady.projects || !isReady.logs || !isReady.chats)) {
                 loader.style.display = 'none';
                 window.showAlert("Koneksi Cloud Timeout. Pastikan domain aplikasi ini sudah di-whitelist.");
-                isReady.users = isReady.projects = isReady.logs = isReady.chats = true; checkReady();
+                isReady.users = isReady.projects = isReady.logs = isReady.chats = true;
+                checkReady();
             }
         }, 7000);
 
@@ -1292,15 +1426,23 @@
                     const sessionEmail = localStorage.getItem('kalimaja_session_email');
                     if (sessionEmail) {
                         const found = window.dbUsers.find(u => cleanEmailStr(u.email) === cleanEmailStr(sessionEmail));
-                        if (found) { window.activeUser = found; window.loadDashboard(); } 
-                        else document.getElementById('auth-screen').classList.remove('hidden-el');
-                    } else document.getElementById('auth-screen').classList.remove('hidden-el');
+                        if (found) { 
+                            window.activeUser = found; 
+                            window.loadDashboard(); 
+                        } else { 
+                            document.getElementById('auth-screen').classList.remove('hidden-el'); 
+                        }
+                    } else {
+                        document.getElementById('auth-screen').classList.remove('hidden-el');
+                    }
                 } else {
                     const updatedMe = window.dbUsers.find(u => cleanEmailStr(u.email) === cleanEmailStr(window.activeUser.email));
                     if(updatedMe) window.activeUser = updatedMe;
                 }
 
-                if (window.activeProject) window.activeProject = window.dbProjects.find(p => p.id === window.activeProject.id) || null;
+                if (window.activeProject) {
+                    window.activeProject = window.dbProjects.find(p => p.id === window.activeProject.id) || null;
+                }
 
                 if(window.activeUser) {
                     if (!document.getElementById('view-dashboard').classList.contains('hidden-el')) window.refreshProjectData();
@@ -1321,7 +1463,8 @@
         window.getSplitRatio = function(projectDateStr, logPeriodStr) {
             if (!projectDateStr || !logPeriodStr) return { invGross: 0.7, cust: 0.3, year: 1 };
             const pDate = new Date(projectDateStr);
-            let lDate = new Date(logPeriodStr + '-01'); if (isNaN(lDate)) lDate = new Date(logPeriodStr); 
+            let lDate = new Date(logPeriodStr + '-01'); 
+            if (isNaN(lDate)) lDate = new Date(logPeriodStr); 
             let monthDiff = (lDate.getFullYear() - pDate.getFullYear()) * 12 + (lDate.getMonth() - pDate.getMonth());
             if(monthDiff < 0) monthDiff = 0;
             if (monthDiff < 12) return { invGross: 0.7, cust: 0.3, year: 1 };
@@ -1331,7 +1474,8 @@
 
         function validateNIK(nik) {
             if (!/^\d{16}$/.test(nik)) return "Format NIK tidak valid. Harus 16 digit angka.";
-            const day = parseInt(nik.substring(6, 8)); const month = parseInt(nik.substring(8, 10));
+            const day = parseInt(nik.substring(6, 8)); 
+            const month = parseInt(nik.substring(8, 10));
             if (month < 1 || month > 12) return "Format NIK tidak valid.";
             let actualDay = day > 40 ? day - 40 : day;
             if (actualDay < 1 || actualDay > 31) return "Format NIK tidak valid.";
@@ -1339,17 +1483,22 @@
         }
 
         window.doRegister = async function() {
-            const name = document.getElementById('reg-name').value.trim(); const email = cleanEmailStr(document.getElementById('reg-email').value);
-            const pass = cleanPassStr(document.getElementById('reg-password').value); const role = document.getElementById('reg-role').value;
-            const nik = document.getElementById('reg-nik').value.trim(); const phone = document.getElementById('reg-phone').value.trim();
-            const bank = document.getElementById('reg-bank').value.trim(); const rek = document.getElementById('reg-rek').value.trim();
+            const name = document.getElementById('reg-name').value.trim(); 
+            const email = cleanEmailStr(document.getElementById('reg-email').value);
+            const pass = cleanPassStr(document.getElementById('reg-password').value); 
+            const role = document.getElementById('reg-role').value;
+            const nik = document.getElementById('reg-nik').value.trim(); 
+            const phone = document.getElementById('reg-phone').value.trim();
+            const bank = document.getElementById('reg-bank').value.trim(); 
+            const rek = document.getElementById('reg-rek').value.trim();
 
             if(!name || !email || !pass || !phone || !bank || !rek) return window.showAlert("Harap lengkapi semua kolom pendaftaran.");
             if(pass.length < 6) return window.showAlert("Sandi minimal 6 karakter.");
             
             if(role !== 'admin' && role !== 'admin_op') {
                 if(!nik) return window.showAlert("Nomor NIK wajib diisi untuk keamanan data kemitraan.");
-                const nikError = validateNIK(nik); if(nikError) return window.showAlert(nikError);
+                const nikError = validateNIK(nik); 
+                if(nikError) return window.showAlert(nikError);
                 if(window.dbUsers.find(u => u.nik === nik && u.role !== 'admin' && u.role !== 'admin_op')) return window.showAlert("NIK KTP ini sudah digunakan oleh akun lain!");
             }
             if(window.dbUsers.find(u => cleanEmailStr(u.email) === email)) return window.showAlert("Email/Username sudah terdaftar!");
@@ -1359,7 +1508,8 @@
             await setDoc(getPubDoc('users', email), newUser);
             
             window.showAlert("Pendaftaran Berhasil! Silakan masuk dengan akun Anda.");
-            document.getElementById('login-email').value = email; document.getElementById('login-password').value = pass;
+            document.getElementById('login-email').value = email; 
+            document.getElementById('login-password').value = pass;
             window.showLogin();
         };
 
@@ -1371,12 +1521,17 @@
 
         window.saveNewTeknisi = async function() {
             if(!window.fbUser) return window.showAlert("Koneksi cloud gagal.");
-            const name = document.getElementById('tek-name').value.trim(); const email = cleanEmailStr(document.getElementById('tek-email').value);
-            const pass = cleanPassStr(document.getElementById('tek-pass').value); const nik = document.getElementById('tek-nik').value.trim();
-            const bank = document.getElementById('tek-bank').value.trim(); const rek = document.getElementById('tek-rek').value.trim(); const phone = document.getElementById('tek-phone').value.trim();
+            const name = document.getElementById('tek-name').value.trim(); 
+            const email = cleanEmailStr(document.getElementById('tek-email').value);
+            const pass = cleanPassStr(document.getElementById('tek-pass').value); 
+            const nik = document.getElementById('tek-nik').value.trim();
+            const bank = document.getElementById('tek-bank').value.trim(); 
+            const rek = document.getElementById('tek-rek').value.trim(); 
+            const phone = document.getElementById('tek-phone').value.trim();
 
             if(!name || !email || !pass || !nik || !bank || !rek || !phone) return window.showAlert("Harap lengkapi seluruh formulir pendaftaran Teknisi!");
             const nikError = validateNIK(nik); if(nikError) return window.showAlert(nikError);
+            
             if(window.dbUsers.find(u => cleanEmailStr(u.email) === email)) return window.showAlert("Email sudah terdaftar digunakan akun lain!");
             if(window.dbUsers.find(u => u.nik === nik)) return window.showAlert("NIK KTP sudah terdaftar digunakan akun lain!");
 
@@ -1386,13 +1541,20 @@
                 window.showAlert(`Berhasil! Akun Teknisi baru telah dikunci ke Cloud Database.\n\nEmail: ${email}\nSandi: ${pass}`);
                 window.uiModal('teknisi-modal', false);
                 setTimeout(() => { window.renderUserTable('teknisi'); window.populateAdminDropdowns(); }, 1000);
-            } catch (error) { window.showAlert(`GAGAL menyimpan ke Cloud! Pesan Error: ${error.message}`); }
+            } catch (error) { 
+                window.showAlert(`GAGAL menyimpan ke Cloud! Pesan Error: ${error.message}`); 
+            }
         };
 
         window.doLogin = function(context) {
             let email, pass;
-            if (context === 'admin') { email = cleanEmailStr(document.getElementById('admin-login-username').value); pass = cleanPassStr(document.getElementById('admin-login-password').value); } 
-            else { email = cleanEmailStr(document.getElementById('login-email').value); pass = cleanPassStr(document.getElementById('login-password').value); }
+            if (context === 'admin') { 
+                email = cleanEmailStr(document.getElementById('admin-login-username').value); 
+                pass = cleanPassStr(document.getElementById('admin-login-password').value); 
+            } else { 
+                email = cleanEmailStr(document.getElementById('login-email').value); 
+                pass = cleanPassStr(document.getElementById('login-password').value); 
+            }
             if(!email || !pass) return window.showAlert("Isi email/username dan kata sandi.");
 
             const direksiDefaults = [
@@ -1407,7 +1569,8 @@
                 let dirDef = direksiDefaults.find(d => d.email === email && d.pass === pass);
                 if (dirDef) {
                     user = { name: dirDef.name, email: dirDef.email, pass: dirDef.pass, role: "direksi", share: dirDef.share, nik: "0000000000000000", phone: "-", bank: "-", rek: "-", avatar: null };
-                    if(window.fbUser) setDoc(getPubDoc('users', dirDef.email), user); window.dbUsers.push(user);
+                    if(window.fbUser) setDoc(getPubDoc('users', dirDef.email), user); 
+                    window.dbUsers.push(user);
                 }
             }
 
@@ -1415,30 +1578,55 @@
                 let user = window.dbUsers.find(u => cleanEmailStr(u.email) === 'adminkk');
                 if (!user) {
                     user = { name: "Admin Operasional", email: "adminkk", pass: "ajamilak", role: "admin_op", nik: "-", phone: "-", bank: "-", rek: "-", avatar: null };
-                    if(window.fbUser) setDoc(getPubDoc('users', 'adminkk'), user); window.dbUsers.push(user);
+                    if(window.fbUser) setDoc(getPubDoc('users', 'adminkk'), user); 
+                    window.dbUsers.push(user);
                 }
-                window.activeUser = user; localStorage.setItem('kalimaja_session_email', user.email); window.loadDashboard(); return;
+                window.activeUser = user; 
+                localStorage.setItem('kalimaja_session_email', user.email); 
+                window.loadDashboard(); 
+                return;
             }
+            
             if (email === 'kalimajasuryaalam@gmail.com' && pass === 'Yakin537@') {
                 let user = window.dbUsers.find(u => cleanEmailStr(u.email) === 'kalimajasuryaalam@gmail.com');
                 if (!user) {
                     user = { name: "Admin Operasional", email: "kalimajasuryaalam@gmail.com", pass: "Yakin537@", role: "admin_op", nik: "-", phone: "-", bank: "-", rek: "-", avatar: null };
-                    if(window.fbUser) setDoc(getPubDoc('users', 'kalimajasuryaalam@gmail.com'), user); window.dbUsers.push(user);
-                } else if (user.role !== 'admin_op') { user.role = 'admin_op'; if(window.fbUser) setDoc(getPubDoc('users', user.email), user); }
-                window.activeUser = user; localStorage.setItem('kalimaja_session_email', user.email); window.loadDashboard(); return;
+                    if(window.fbUser) setDoc(getPubDoc('users', 'kalimajasuryaalam@gmail.com'), user); 
+                    window.dbUsers.push(user);
+                } else if (user.role !== 'admin_op') { 
+                    user.role = 'admin_op'; 
+                    if(window.fbUser) setDoc(getPubDoc('users', user.email), user); 
+                }
+                window.activeUser = user; 
+                localStorage.setItem('kalimaja_session_email', user.email); 
+                window.loadDashboard(); 
+                return;
             }
+            
             if (email === 'irsukin@gmail.com' && pass === 'Yakin537@') {
                 let user = window.dbUsers.find(u => cleanEmailStr(u.email) === 'irsukin@gmail.com');
                 if (!user) {
                     user = { name: "BOS BESAR SUKIN", email: "irsukin@gmail.com", pass: "Yakin537@", role: "admin", share: 0.30, nik: "-", phone: "-", bank: "-", rek: "-", avatar: null };
-                    if(window.fbUser) setDoc(getPubDoc('users', 'irsukin@gmail.com'), user); window.dbUsers.push(user);
-                } else { user.role = 'admin'; user.share = 0.30; if(window.fbUser) setDoc(getPubDoc('users', user.email), user); }
-                window.activeUser = user; localStorage.setItem('kalimaja_session_email', user.email); window.loadDashboard(); return;
+                    if(window.fbUser) setDoc(getPubDoc('users', 'irsukin@gmail.com'), user); 
+                    window.dbUsers.push(user);
+                } else { 
+                    user.role = 'admin'; 
+                    user.share = 0.30; 
+                    if(window.fbUser) setDoc(getPubDoc('users', user.email), user); 
+                }
+                window.activeUser = user; 
+                localStorage.setItem('kalimaja_session_email', user.email); 
+                window.loadDashboard(); 
+                return;
             }
 
             if(user && cleanPassStr(user.pass) === pass) {
-                if (context === 'public' && (user.role === 'admin' || user.role === 'admin_op')) return window.showAlert("Login Ditolak: Akun Admin tidak bisa masuk melalui jalur Publik.");
-                window.activeUser = user; localStorage.setItem('kalimaja_session_email', user.email); window.loadDashboard();
+                if (context === 'public' && (user.role === 'admin' || user.role === 'admin_op')) {
+                    return window.showAlert("Login Ditolak: Akun Admin tidak bisa masuk melalui jalur Publik.");
+                }
+                window.activeUser = user; 
+                localStorage.setItem('kalimaja_session_email', user.email); 
+                window.loadDashboard();
             } else {
                 const emailExist = window.dbUsers.find(u => cleanEmailStr(u.email) === email);
                 if (emailExist) window.showAlert(`Login Gagal: Kata sandi salah untuk akun ${email}`);
@@ -1446,30 +1634,47 @@
             }
         };
 
-        window.doLogout = function() { localStorage.removeItem('kalimaja_session_email'); window.activeUser = null; location.reload(); };
+        window.doLogout = function() { 
+            localStorage.removeItem('kalimaja_session_email'); 
+            window.activeUser = null; 
+            location.reload(); 
+        };
 
         window.resetTargetEmail = null;
+
         window.showForgotPassword = function() {
-            document.getElementById('login-view').classList.add('hidden-el'); document.getElementById('register-view').classList.add('hidden-el');
-            document.getElementById('new-pass-view').classList.add('hidden-el'); document.getElementById('admin-login-view').classList.add('hidden-el');
-            document.getElementById('forgot-view').classList.remove('hidden-el'); document.getElementById('forgot-email').value = ''; document.getElementById('forgot-nik').value = '';
+            document.getElementById('login-view').classList.add('hidden-el'); 
+            document.getElementById('register-view').classList.add('hidden-el');
+            document.getElementById('new-pass-view').classList.add('hidden-el'); 
+            document.getElementById('admin-login-view').classList.add('hidden-el');
+            document.getElementById('forgot-view').classList.remove('hidden-el'); 
+            document.getElementById('forgot-email').value = ''; 
+            document.getElementById('forgot-nik').value = '';
         };
 
         window.verifyForgotPassword = function() {
-            const email = cleanEmailStr(document.getElementById('forgot-email').value); const nik = document.getElementById('forgot-nik').value.trim();
+            const email = cleanEmailStr(document.getElementById('forgot-email').value); 
+            const nik = document.getElementById('forgot-nik').value.trim();
             if(!email) return window.showAlert("Harap masukkan Email Anda.");
             const user = window.dbUsers.find(u => cleanEmailStr(u.email) === email);
             if(!user) return window.showAlert("Verifikasi Gagal: Akun tidak ditemukan.");
 
             if (user.role === 'direksi' || user.role === 'admin' || user.role === 'admin_op') {
-                window.resetTargetEmail = email; document.getElementById('forgot-view').classList.add('hidden-el');
-                document.getElementById('new-pass-view').classList.remove('hidden-el'); document.getElementById('new-password').value = ''; return;
+                window.resetTargetEmail = email; 
+                document.getElementById('forgot-view').classList.add('hidden-el');
+                document.getElementById('new-pass-view').classList.remove('hidden-el'); 
+                document.getElementById('new-password').value = ''; 
+                return;
             }
             if(!nik) return window.showAlert("Harap masukkan NIK KTP Anda.");
             if(user.nik === nik) {
-                window.resetTargetEmail = email; document.getElementById('forgot-view').classList.add('hidden-el');
-                document.getElementById('new-pass-view').classList.remove('hidden-el'); document.getElementById('new-password').value = '';
-            } else window.showAlert("Verifikasi Gagal: Kombinasi Email dan NIK KTP tidak cocok.");
+                window.resetTargetEmail = email; 
+                document.getElementById('forgot-view').classList.add('hidden-el');
+                document.getElementById('new-pass-view').classList.remove('hidden-el'); 
+                document.getElementById('new-password').value = '';
+            } else {
+                window.showAlert("Verifikasi Gagal: Kombinasi Email dan NIK KTP tidak cocok.");
+            }
         };
 
         window.saveNewPassword = async function() {
@@ -1484,22 +1689,29 @@
                     await setDoc(getPubDoc('users', window.resetTargetEmail), updatedUser);
                     window.dbUsers[userIndex] = updatedUser; 
                     window.showAlert("Kata sandi berhasil diubah! Silakan masuk dengan sandi baru Anda.");
-                    document.getElementById('login-email').value = window.resetTargetEmail; document.getElementById('login-password').value = newPass; window.showLogin();
+                    document.getElementById('login-email').value = window.resetTargetEmail; 
+                    document.getElementById('login-password').value = newPass; 
+                    window.showLogin();
                 } catch(e) { window.showAlert("Gagal mereset sandi: " + e.message); }
             }
         };
 
         window.uploadProfilePic = async function(event) {
             const file = event.target.files[0];
-            if (!file) return; if (!file.type.startsWith('image/')) return window.showAlert('Harap pilih file berformat gambar.');
+            if (!file) return; 
+            if (!file.type.startsWith('image/')) return window.showAlert('Harap pilih file berformat gambar.');
             const reader = new FileReader();
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = async function() {
                     const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
-                    const MAX_WIDTH = 250; const MAX_HEIGHT = 250; let width = img.width; let height = img.height;
-                    if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } } 
-                    else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
+                    const MAX_WIDTH = 250; const MAX_HEIGHT = 250; 
+                    let width = img.width; let height = img.height;
+                    if (width > height) { 
+                        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } 
+                    } else { 
+                        if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } 
+                    }
                     canvas.width = width; canvas.height = height; ctx.drawImage(img, 0, 0, width, height);
                     const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
                     if(window.fbUser && window.activeUser) {
@@ -1519,7 +1731,7 @@
             const badge = document.getElementById('global-unread-badge');
             if(badge) {
                 if(unreadCount > 0) { badge.innerText = unreadCount; badge.classList.remove('hidden-el'); } 
-                else badge.classList.add('hidden-el'); 
+                else { badge.classList.add('hidden-el'); }
             }
         };
 
@@ -1527,7 +1739,10 @@
             if(!window.activeUser || !contactId || !window.fbUser) return;
             const myId = (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op') ? 'admin' : window.activeUser.email;
             const unreadMsgs = window.dbChats.filter(m => m.receiver === myId && m.sender === contactId && !m.read);
-            for (let m of unreadMsgs) { m.read = true; await setDoc(getPubDoc('chats', m.id.toString()), m); }
+            for (let m of unreadMsgs) { 
+                m.read = true; 
+                await setDoc(getPubDoc('chats', m.id.toString()), m); 
+            }
         };
 
         window.openChatView = function() {
@@ -1545,11 +1760,15 @@
         window.handleFileSelect = function(event) {
             const file = event.target.files[0];
             if(!file) return;
-            if(file.size > 2 * 1024 * 1024) { window.showAlert("Mohon maaf, demi kecepatan sistem, ukuran berkas maksimal dibatasi 2MB per unggahan."); event.target.value = ''; return; }
+            if(file.size > 2 * 1024 * 1024) { 
+                window.showAlert("Mohon maaf, demi kecepatan sistem, ukuran berkas maksimal dibatasi 2MB per unggahan."); 
+                event.target.value = ''; return; 
+            }
             const reader = new FileReader();
             reader.onload = function(e) {
                 window.currentAttachment = { name: file.name, type: file.type, data: e.target.result };
-                document.getElementById('attachment-preview').classList.remove('hidden-el'); document.getElementById('attachment-name').innerText = file.name;
+                document.getElementById('attachment-preview').classList.remove('hidden-el'); 
+                document.getElementById('attachment-name').innerText = file.name;
             };
             reader.readAsDataURL(file);
         };
@@ -1564,11 +1783,13 @@
         window.renderChatContacts = function(isRefresh = false) {
             const nonAdmins = window.dbUsers.filter(u => u.role !== 'admin' && u.role !== 'admin_op');
             const list = document.getElementById('contact-list'); list.innerHTML = '';
+            
             nonAdmins.forEach(u => {
                 const isActive = window.activeChatContact === u.email;
                 const unreadCount = window.dbChats.filter(m => m.sender === u.email && m.receiver === 'admin' && !m.read).length;
                 const badgeHtml = unreadCount > 0 ? `<span class="bg-red-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full ml-auto shadow-sm">${unreadCount}</span>` : '';
                 const avatarHtml = u.avatar ? `<img src="${u.avatar}" class="w-10 h-10 rounded-full object-cover border border-slate-200 shrink-0">` : `<div class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-sm border border-indigo-100 shrink-0"><i class="fas fa-user"></i></div>`;
+                
                 list.insertAdjacentHTML('beforeend', `
                     <div onclick="window.selectChatContact('${u.email}', '${u.name}', '${u.role}')" class="flex items-center gap-3 p-4 rounded-xl cursor-pointer transition-all mb-2 ${isActive ? 'bg-indigo-50 border border-indigo-200 shadow-sm' : 'bg-slate-50 border border-transparent hover:bg-slate-100'}">
                         ${avatarHtml}
@@ -1584,7 +1805,8 @@
         };
 
         window.selectChatContact = function(email, name, role) {
-            window.activeChatContact = email; setUI('chat-active-name', name); setUI('chat-active-role', role); window.markAsRead(email); window.clearAttachment(); 
+            window.activeChatContact = email; setUI('chat-active-name', name); setUI('chat-active-role', role); 
+            window.markAsRead(email); window.clearAttachment(); 
             if(window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op' || window.activeUser.role === 'direksi') window.renderChatContacts(true); 
             window.renderChatMessages();
         };
@@ -1608,6 +1830,7 @@
                 const isMe = ((window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op' || window.activeUser.role === 'direksi') && m.sender === 'admin') || (window.activeUser.role !== 'admin' && window.activeUser.role !== 'admin_op' && window.activeUser.role !== 'direksi' && m.sender === window.activeUser.email);
                 const time = new Date(m.timestamp).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
                 let attachmentHtml = '';
+                
                 if(m.attachment) {
                     if(m.attachment.type.startsWith('image/')) {
                         attachmentHtml = `<img src="${m.attachment.data}" alt="attachment" class="max-w-full rounded-lg mt-2 cursor-pointer border ${isMe ? 'border-indigo-400' : 'border-slate-200'} shadow-sm" style="max-height: 200px; object-fit: contain;" onclick="window.open('${m.attachment.data}', '_blank')">`;
@@ -1629,9 +1852,20 @@
         window.sendChatMessage = async function() {
             const input = document.getElementById('chat-input'); const text = input.value.trim();
             if(!text && !window.currentAttachment) return; if(!window.activeChatContact || !window.fbUser) return;
+            
             const msgId = 'MSG-' + Date.now();
-            const newMsg = { id: msgId, sender: (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op' || window.activeUser.role === 'direksi') ? 'admin' : window.activeUser.email, receiver: (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op' || window.activeUser.role === 'direksi') ? window.activeChatContact : 'admin', text: text, attachment: window.currentAttachment, timestamp: new Date().toISOString(), read: false };
-            window.dbChats.push(newMsg); input.value = ''; window.clearAttachment(); window.renderChatMessages(); await setDoc(getPubDoc('chats', msgId), newMsg);
+            const newMsg = { 
+                id: msgId, 
+                sender: (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op' || window.activeUser.role === 'direksi') ? 'admin' : window.activeUser.email, 
+                receiver: (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op' || window.activeUser.role === 'direksi') ? window.activeChatContact : 'admin', 
+                text: text, 
+                attachment: window.currentAttachment, 
+                timestamp: new Date().toISOString(), 
+                read: false 
+            };
+            
+            window.dbChats.push(newMsg); input.value = ''; window.clearAttachment(); window.renderChatMessages(); 
+            await setDoc(getPubDoc('chats', msgId), newMsg);
         };
 
         window.loadDashboard = function() {
@@ -1645,268 +1879,40 @@
                 const starCount = window.activeUser.tier === 'A' ? 4 : window.activeUser.tier === 'B' ? 3 : window.activeUser.tier === 'C' ? 2 : 1;
                 let stars = ''; for(let i=0; i<starCount; i++) stars += '★'; roleDisplay += ` | TIER ${window.activeUser.tier} ${stars}`;
             }
+            
             setUI('profile-role', roleDisplay); setUI('profile-nik', window.activeUser.nik || "-"); setUI('profile-phone', window.activeUser.phone || "-"); setUI('profile-bank', window.activeUser.bank || "-"); setUI('profile-rek', window.activeUser.rek || "-");
 
             const profileImg = document.getElementById('profile-image'); const defaultIcon = document.getElementById('profile-default-icon');
-            if (window.activeUser.avatar) { profileImg.src = window.activeUser.avatar; profileImg.classList.remove('hidden-el'); defaultIcon.classList.add('hidden-el'); } 
-            else { profileImg.src = ''; profileImg.classList.add('hidden-el'); defaultIcon.classList.remove('hidden-el'); }
+            if (window.activeUser.avatar) { 
+                profileImg.src = window.activeUser.avatar; profileImg.classList.remove('hidden-el'); defaultIcon.classList.add('hidden-el'); 
+            } else { 
+                profileImg.src = ''; profileImg.classList.add('hidden-el'); defaultIcon.classList.remove('hidden-el'); 
+            }
 
             const companyShareContainer = document.getElementById('company-share-container'); const bepContainer = document.getElementById('bep-container'); const rekananSection = document.getElementById('rekanan-dashboard-section');
 
             if(window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op' || window.activeUser.role === 'direksi') {
-                if (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op') document.getElementById('admin-actions').classList.remove('hidden-el'); else document.getElementById('admin-actions').classList.add('hidden-el');
-                if (window.activeUser.role === 'admin') document.getElementById('danger-zone').classList.remove('hidden-el'); else document.getElementById('danger-zone').classList.add('hidden-el');
-                if (companyShareContainer) companyShareContainer.classList.remove('hidden-el'); if (bepContainer) bepContainer.classList.remove('hidden-el'); if (rekananSection) rekananSection.classList.add('hidden-el');
+                if (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op') document.getElementById('admin-actions').classList.remove('hidden-el'); 
+                else document.getElementById('admin-actions').classList.add('hidden-el');
+                
+                if (window.activeUser.role === 'admin') document.getElementById('danger-zone').classList.remove('hidden-el'); 
+                else document.getElementById('danger-zone').classList.add('hidden-el');
+                
+                if (companyShareContainer) companyShareContainer.classList.remove('hidden-el'); 
+                if (bepContainer) bepContainer.classList.remove('hidden-el'); 
+                if (rekananSection) rekananSection.classList.add('hidden-el');
                 if (window.activeUser.role !== 'direksi') window.populateAdminDropdowns();
             } else {
                 if (companyShareContainer) companyShareContainer.classList.add('hidden-el'); document.getElementById('danger-zone').classList.add('hidden-el');
-                if (window.activeUser.role === 'customer') { if (bepContainer) bepContainer.classList.add('hidden-el'); if (rekananSection) rekananSection.classList.add('hidden-el'); } 
-                else if (window.activeUser.role === 'investor') { if (bepContainer) bepContainer.classList.remove('hidden-el'); if (rekananSection) rekananSection.classList.add('hidden-el'); } 
-                else if (window.activeUser.role === 'sales' || window.activeUser.role === 'teknisi' || window.activeUser.role === 'rekanan') { if (rekananSection) rekananSection.classList.remove('hidden-el'); }
+                if (window.activeUser.role === 'customer') { 
+                    if (bepContainer) bepContainer.classList.add('hidden-el'); if (rekananSection) rekananSection.classList.add('hidden-el'); 
+                } else if (window.activeUser.role === 'investor') { 
+                    if (bepContainer) bepContainer.classList.remove('hidden-el'); if (rekananSection) rekananSection.classList.add('hidden-el'); 
+                } else if (window.activeUser.role === 'sales' || window.activeUser.role === 'teknisi' || window.activeUser.role === 'rekanan') { 
+                    if (rekananSection) rekananSection.classList.remove('hidden-el'); 
+                }
             }
             window.updateUnreadBadge(); window.switchView('dashboard'); 
-        };
-
-        window.renderProjectTable = function() {
-            let tbody = document.getElementById('table-projects-body'); if(!tbody) return; tbody.innerHTML = '';
-            if(window.dbProjects.length === 0) { tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-400 italic text-sm">Belum ada proyek terdaftar.</td></tr>`; return; }
-            let sortedProj = [...window.dbProjects].sort((a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0));
-
-            sortedProj.forEach((p, index) => {
-                const cust = window.dbUsers.find(u => u.email === p.custEmail) || {}; const inv = window.dbUsers.find(u => u.email === p.invEmail) || {};
-                const totalUnits = p.units ? p.units.reduce((acc, curr) => acc + curr.q, 0) : 0;
-                
-                let pLogs = window.dbLogs.filter(l => l.projectId === p.id); let latestPayout = 0;
-                if(pLogs.length > 0) {
-                    pLogs.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
-                    const s = Math.max(0, (p.baseline - pLogs[0].kwhReal) * TARIF_PLN);
-                    const split = window.getSplitRatio(p.createdAt, pLogs[0].period);
-                    latestPayout = (s * split.invGross) * 0.7; 
-                }
-                
-                let shortfallText = '';
-                if (p.capexShortfall && p.capexShortfall > 0) shortfallText = `<br><span class="text-[8px] md:text-[9px] font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded mt-1 inline-block border border-red-100">Kekurangan: ${formatIDR(p.capexShortfall)}</span>`;
-
-                tbody.insertAdjacentHTML('beforeend', `
-                    <tr class="text-xs border-b border-slate-50 hover:bg-slate-50 transition-colors">
-                        <td class="py-3 px-4 font-bold text-slate-500">${index + 1}</td>
-                        <td class="py-3 px-4 font-black text-indigo-900 uppercase">${p.location}</td>
-                        <td class="py-3 px-4 text-slate-600"><span class="font-bold block">${cust.name || '-'}</span><span class="italic text-[9px] md:text-[10px]">${p.custEmail}</span></td>
-                        <td class="py-3 px-4 text-slate-600"><span class="font-bold block">${inv.name || '-'}</span><span class="italic text-[9px] md:text-[10px]">${p.invEmail}</span></td>
-                        <td class="py-3 px-4 text-right font-bold text-indigo-600">${totalUnits} Unit</td>
-                        <td class="py-3 px-4 text-right"><span class="font-mono text-slate-800 font-bold">${formatIDR(p.capex)}</span>${shortfallText}</td>
-                        <td class="py-3 px-4 text-right font-mono text-emerald-600 font-bold">${formatIDR(latestPayout)}</td>
-                        <td class="py-3 px-4 text-center whitespace-nowrap">
-                            <button onclick="window.goToProjectFromAdmin('${p.id}')" class="px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-[9px] md:text-[10px] font-bold uppercase tracking-widest transition-colors inline-flex items-center gap-1 mr-1" title="Lihat Detail"><i class="fas fa-eye"></i> Detail</button>
-                            <button onclick="window.openEditProjectModal('${p.id}')" class="px-3 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg text-[9px] md:text-[10px] font-bold uppercase tracking-widest transition-colors inline-flex items-center gap-1" title="Edit Proyek"><i class="fas fa-edit"></i> Edit</button>
-                            ${window.activeUser.role === 'admin' ? `<button onclick="window.deleteSpecificProject('${p.id}', '${p.location.replace(/'/g, "\\'")}')" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg text-[9px] md:text-[10px] font-bold uppercase tracking-widest transition-colors inline-flex items-center gap-1 ml-1" title="Hapus Proyek"><i class="fas fa-trash-alt"></i> Hapus</button>` : ''}
-                        </td>
-                    </tr>
-                `);
-            });
-        };
-
-        window.deleteSpecificProject = function(projId, locName) {
-            window.showConfirm(`PERINGATAN!\n\nAnda yakin ingin membatalkan dan menghapus proyek di lokasi "${locName}" dari CLOUD?\n\nSemua riwayat pemakaian dan tagihan untuk proyek ini juga akan dihapus secara permanen.`, async () => {
-                if(window.fbUser) {
-                    const logsToDelete = window.dbLogs.filter(l => l.projectId === projId);
-                    for (let log of logsToDelete) await deleteDoc(getPubDoc('logs', log.id || log.timestamp));
-                    await deleteDoc(getPubDoc('projects', projId));
-                    window.showAlert("Proyek berhasil dihapus dari Cloud.");
-                    if (window.activeProject && window.activeProject.id === projId) { window.activeProject = null; window.refreshProjectData(); } 
-                    else window.renderProjectTable();
-                }
-            });
-        };
-
-        window.renderUserTable = function(roleType) {
-            let filtered = window.dbUsers.filter(u => u.role === roleType || (roleType === 'sales' && u.role === 'rekanan'));
-            let tbodyId = '';
-            if (roleType === 'customer') tbodyId = 'table-customers-body'; else if (roleType === 'investor') tbodyId = 'table-investors-body'; else if (roleType === 'sales') tbodyId = 'table-sales-body'; else if (roleType === 'teknisi') tbodyId = 'table-teknisi-body';
-            let tbody = document.getElementById(tbodyId); if (!tbody) return; tbody.innerHTML = '';
-
-            if(filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-400 italic text-sm">Belum ada data terdaftar.</td></tr>`; return; }
-
-            filtered.forEach((u, index) => {
-                let userProjs = [];
-                if (roleType === 'customer') userProjs = window.dbProjects.filter(p => p.custEmail === u.email);
-                else if (roleType === 'investor') userProjs = window.dbProjects.filter(p => p.invEmail === u.email);
-                else if (roleType === 'sales' || roleType === 'teknisi') userProjs = window.dbProjects.filter(p => p.rekCustEmail === u.email || p.rekInvEmail === u.email || p.rekTekEmail === u.email);
-
-                let projectHtml = '';
-                if (userProjs.length > 0) {
-                    projectHtml = userProjs.map(p => `<button onclick="window.goToProjectFromAdmin('${p.id}')" class="block w-full text-left mb-1 px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-[9px] md:text-[10px] font-bold uppercase tracking-widest transition-colors truncate" title="${p.location}"><i class="fas fa-external-link-alt mr-1"></i> ${p.location}</button>`).join('');
-                } else {
-                    projectHtml = `<span class="text-[9px] md:text-[10px] text-slate-400 italic">${(roleType === 'sales' || roleType === 'teknisi') ? 'Menunggu Penugasan' : 'Belum ada proyek'}</span>`;
-                }
-
-                const avatarHtml = u.avatar ? `<img src="${u.avatar}" class="w-8 h-8 rounded-full object-cover border border-slate-200 shrink-0">` : `<div class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs border border-indigo-100 shrink-0"><i class="fas fa-user"></i></div>`;
-
-                let tierBadge = '';
-                if(roleType === 'investor' && u.tier) {
-                    const starCount = u.tier === 'A' ? 4 : u.tier === 'B' ? 3 : u.tier === 'C' ? 2 : 1;
-                    let stars = ''; for(let i=0; i<starCount; i++) stars += '<i class="fas fa-star"></i>';
-                    tierBadge = `<span class="text-[8px] md:text-[9px] text-amber-500 tracking-widest uppercase mt-1 block">${stars} TIER ${u.tier}</span>`;
-                }
-
-                if (roleType === 'investor') {
-                    tbody.insertAdjacentHTML('beforeend', `
-                        <tr class="text-xs border-b border-slate-50 hover:bg-slate-50 transition-colors">
-                            <td class="py-3 px-4 font-bold text-slate-500">${index + 1}</td>
-                            <td class="py-3 px-4 font-black text-indigo-900"><div class="flex items-center gap-3">${avatarHtml}<div>${u.name}${tierBadge}</div></div></td>
-                            <td class="py-3 px-4"><span class="text-slate-600 italic block mb-1">${u.email}</span><span class="text-[8px] md:text-[9px] font-black text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100 uppercase tracking-widest"><i class="fas fa-key"></i> Sandi: ${u.pass}</span></td>
-                            <td class="py-3 px-4"><span class="font-mono text-slate-600 block"><i class="fas fa-phone"></i> ${u.phone || '-'}</span><span class="text-slate-500 uppercase text-[9px] md:text-[10px] mt-1 block"><i class="fas fa-university"></i> ${u.bank || '-'} : ${u.rek || '-'}</span></td>
-                            <td class="py-3 px-4 text-center whitespace-nowrap align-top">
-                                <button onclick="window.openInvestorDetail('${u.email}')" class="px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-[9px] md:text-[10px] font-bold uppercase tracking-widest transition-colors inline-flex items-center gap-1 mb-1 w-full justify-center shadow-sm" title="Lihat Form Portofolio"><i class="fas fa-folder-open"></i> Buka Form</button>
-                                ${window.activeUser.role === 'admin' ? `<br><button onclick="window.deleteUserAccount('${u.email}')" class="px-3 py-2 mt-1 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg text-[9px] md:text-[10px] font-bold uppercase tracking-widest transition-colors inline-flex items-center gap-1 w-full justify-center" title="Hapus Akun"><i class="fas fa-trash-alt"></i> Hapus</button>` : ''}
-                            </td>
-                        </tr>
-                    `); return; 
-                }
-
-                let tagihanColumn = ''; let feeStatusHtml = '';
-                if (roleType === 'sales' || roleType === 'teknisi') {
-                    if (u.lastFeePaidAt) {
-                        const paidDate = new Date(u.lastFeePaidAt).toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year: 'numeric'});
-                        feeStatusHtml = `<span class="block mt-2 text-[8px] bg-emerald-100 text-emerald-700 px-2 py-1 rounded font-bold uppercase tracking-widest border border-emerald-200 w-fit">Terakhir Bayar: ${paidDate}</span>`;
-                    } else feeStatusHtml = `<span class="block mt-2 text-[8px] bg-amber-100 text-amber-700 px-2 py-1 rounded font-bold uppercase tracking-widest border border-amber-200 w-fit">Belum Ada Pembayaran</span>`;
-                }
-
-                let aksiColumn = `<td class="py-3 px-4 text-center whitespace-nowrap align-top">`;
-                if ((roleType === 'sales' || roleType === 'teknisi') && window.activeUser.role === 'admin') aksiColumn += `<button onclick="window.payUserFee('${u.email}')" class="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg text-[9px] md:text-[10px] font-bold uppercase tracking-widest transition-colors inline-flex items-center gap-1 mb-1 w-full justify-center" title="Proses Bayar Fee"><i class="fas fa-money-check-alt"></i> Bayar Fee</button>`;
-                if (window.activeUser.role === 'admin') {
-                    if (roleType === 'sales' || roleType === 'teknisi') aksiColumn += `<br>`;
-                    aksiColumn += `<button onclick="window.deleteUserAccount('${u.email}')" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg text-[9px] md:text-[10px] font-bold uppercase tracking-widest transition-colors inline-flex items-center gap-1 w-full justify-center" title="Hapus Akun"><i class="fas fa-trash-alt"></i> Hapus</button>`;
-                }
-                aksiColumn += `</td>`;
-
-                tbody.insertAdjacentHTML('beforeend', `
-                    <tr class="text-xs border-b border-slate-50 hover:bg-slate-50 transition-colors">
-                        <td class="py-3 px-4 font-bold text-slate-500">${index + 1}</td>
-                        <td class="py-3 px-4 font-black text-indigo-900"><div class="flex items-center gap-3">${avatarHtml}<div>${u.name}${tierBadge}</div></div></td>
-                        <td class="py-3 px-4"><span class="text-slate-600 italic block mb-1">${u.email}</span><span class="text-[8px] md:text-[9px] font-black text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100 uppercase tracking-widest"><i class="fas fa-key"></i> Sandi: ${u.pass}</span></td>
-                        <td class="py-3 px-4 font-mono text-slate-600">${u.nik || '-'}</td>
-                        <td class="py-3 px-4 font-mono text-slate-600">${u.phone || '-'}</td>
-                        <td class="py-3 px-4"><span class="text-slate-500 uppercase">${u.bank || '-'}</span> <br> <span class="font-mono text-indigo-600 font-bold">${u.rek || '-'}</span>${feeStatusHtml}</td>
-                        ${roleType === 'customer' || roleType === 'sales' || roleType === 'teknisi' ? `<td class="py-3 px-4 max-w-[200px]">${projectHtml}</td>` : ''}
-                        ${aksiColumn}
-                    </tr>
-                `);
-            });
-        };
-
-        window.payUserFee = function(email) {
-            window.showConfirm("Yakin menandai seluruh komisi/fee untuk mitra ini sebagai LUNAS DIBAYAR?", async () => {
-                const user = window.dbUsers.find(u => u.email === email);
-                if(user && window.fbUser) {
-                    user.lastFeePaidAt = new Date().toISOString(); await setDoc(getPubDoc('users', email), user);
-                    window.showAlert(`Pembayaran fee berhasil diproses dan dicatat di sistem.`);
-                }
-            });
-        };
-
-        window.openInvestorDetail = function(email) {
-            const u = window.dbUsers.find(user => user.email === email); if(!u) return;
-            const userProjs = window.dbProjects.filter(p => p.invEmail === u.email);
-            
-            let nominalTagihan = 0;
-            if (u.tier === 'A') nominalTagihan = 28500000; else if (u.tier === 'B') nominalTagihan = 22250000;
-            else if (u.tier === 'C') nominalTagihan = 15750000; else if (u.tier === 'D') nominalTagihan = 14250000;
-
-            let totalCapex = 0; let projListHtml = '';
-
-            if(userProjs.length > 0) {
-                userProjs.forEach(p => {
-                    totalCapex += (p.capex || 0);
-                    let sfStatus = '';
-                    if (p.capexShortfall && p.capexShortfall > 0) {
-                        if(!p.shortfallPaid) {
-                            sfStatus = `<span class="text-[9px] font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded border border-red-100 mt-2 block w-fit">Kekurangan: ${formatIDR(p.capexShortfall)} (BELUM LUNAS)</span>`;
-                            if (window.activeUser.role === 'admin') sfStatus += `<button onclick="window.markShortfallPaid('${p.id}'); window.uiModal('investor-detail-modal', false);" class="text-[9px] mt-2 font-bold text-white bg-amber-500 hover:bg-amber-600 px-3 py-1.5 rounded transition-colors shadow-sm w-full block text-center"><i class="fas fa-check-circle"></i> Tandai Kekurangan Lunas</button>`;
-                        } else sfStatus = `<span class="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100 mt-2 block w-fit">Kekurangan CAPEX LUNAS</span>`;
-                    }
-                    projListHtml += `
-                        <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm mb-3">
-                            <div class="flex justify-between items-start mb-2"><span class="font-black text-indigo-900 uppercase leading-tight">${p.location}</span><button onclick="window.goToProjectFromAdmin('${p.id}'); window.uiModal('investor-detail-modal', false);" class="text-[9px] text-indigo-600 font-bold bg-indigo-50 px-2 py-1 rounded hover:bg-indigo-100 shrink-0 ml-2"><i class="fas fa-external-link-alt"></i> Detail Proyek</button></div>
-                            <p class="text-[10px] text-slate-500 mb-1">Total Unit: <b>${p.units ? p.units.reduce((a,b)=>a+b.q,0) : 0} Unit</b> | Nilai CAPEX: <b>${formatIDR(p.capex)}</b></p>
-                            ${sfStatus}
-                        </div>
-                    `;
-                });
-            } else projListHtml = `<p class="text-sm text-slate-400 italic bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-center">Belum ada proyek yang terhubung ke investor ini.</p>`;
-
-            let sisaDeposit = nominalTagihan - totalCapex; if (sisaDeposit < 0) sisaDeposit = 0;
-
-            let depositInfoHtml = '';
-            if(u.tier) {
-                let depositStatus = u.tierPaid ? '<span class="text-[10px] text-emerald-600 bg-emerald-50 px-2 py-1 rounded border border-emerald-100 font-black uppercase"><i class="fas fa-check-circle"></i> Lunas</span>' : '<span class="text-[10px] text-red-500 bg-red-50 px-2 py-1 rounded border border-red-100 font-black uppercase"><i class="fas fa-times-circle"></i> Belum Lunas</span>';
-                depositInfoHtml += `
-                    <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-sm mb-4">
-                        <div class="flex justify-between items-center mb-4"><span class="text-xs font-black text-slate-500 uppercase tracking-widest">Deposit Awal (Tier ${u.tier})</span>${depositStatus}</div>
-                        <p class="text-2xl md:text-3xl font-black text-slate-800 mono mb-4">${formatIDR(nominalTagihan)}</p>
-                `;
-                if(!u.tierPaid && window.activeUser.role === 'admin') depositInfoHtml += `<button onclick="window.markTierPaid('${u.email}'); window.uiModal('investor-detail-modal', false);" class="w-full text-xs font-bold text-white bg-red-500 hover:bg-red-600 py-3 rounded-xl transition-colors shadow-sm uppercase tracking-widest mb-2"><i class="fas fa-check-circle mr-1"></i> Konfirmasi Deposit Lunas</button>`;
-                if (u.tierPaid) depositInfoHtml += `<div class="mt-4 pt-4 border-t border-slate-100"><span class="text-[9px] md:text-[10px] font-black text-blue-600 uppercase tracking-widest block mb-1">Sisa Dana (Belum Terpakai)</span><span class="text-xl md:text-2xl font-black text-blue-900 mono">${formatIDR(sisaDeposit)}</span></div>`;
-                depositInfoHtml += `</div>`;
-            } else depositInfoHtml = `<div class="bg-amber-50 p-5 rounded-2xl border border-amber-200 shadow-sm mb-4 text-center"><i class="fas fa-exclamation-triangle text-amber-500 text-3xl mb-3 block"></i><p class="text-sm font-bold text-amber-800">Investor belum memilih Tier Pendanaan.</p></div>`;
-
-            document.getElementById('investor-detail-content').innerHTML = `
-                <div class="flex items-center gap-4 mb-5 bg-white p-4 md:p-5 rounded-2xl border border-slate-200 shadow-sm">
-                    ${u.avatar ? `<img src="${u.avatar}" class="w-14 h-14 rounded-full object-cover border-2 border-slate-100 shadow-sm">` : `<div class="w-14 h-14 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl border-2 border-white shadow-sm"><i class="fas fa-user-tie"></i></div>`}
-                    <div>
-                        <h4 class="text-xl font-black text-slate-900 uppercase leading-none mb-1">${u.name}</h4><p class="text-[10px] md:text-xs font-bold text-slate-500 mb-2">${u.email}</p>
-                        <p class="text-[9px] md:text-[10px] text-slate-400 font-mono"><i class="fas fa-phone"></i> ${u.phone || '-'} <span class="mx-2">|</span> <i class="fas fa-university"></i> ${u.bank || '-'} ${u.rek || '-'}</p>
-                    </div>
-                </div>
-                <div class="grid md:grid-cols-2 gap-5 md:gap-6">
-                    <div><h5 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3"><i class="fas fa-wallet mr-1"></i> Informasi Keuangan</h5>${depositInfoHtml}</div>
-                    <div><h5 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3"><i class="fas fa-briefcase mr-1"></i> Daftar Proyek Didanai</h5><div class="space-y-3">${projListHtml}</div></div>
-                </div>
-            `;
-            window.uiModal('investor-detail-modal', true);
-        };
-
-        window.deleteUserAccount = function(email) {
-            window.showConfirm("Yakin ingin menghapus akun ini secara permanen?", async () => {
-                if(window.fbUser) { await deleteDoc(getPubDoc('users', email)); window.showAlert("Akun berhasil dihapus."); }
-            });
-        };
-
-        window.markTierPaid = function(email) {
-            window.showConfirm("Yakin menandai Deposit Tier investor ini sebagai LUNAS? Akses dashboard investor akan terbuka.", async () => {
-                const user = window.dbUsers.find(u => u.email === email);
-                if(user && window.fbUser) { user.tierPaid = true; await setDoc(getPubDoc('users', email), user); window.showAlert("Deposit Tier berhasil ditandai lunas."); }
-            });
-        };
-
-        window.markShortfallPaid = function(projectId) {
-            window.showConfirm("Yakin menandai Kekurangan CAPEX proyek ini sebagai LUNAS?", async () => {
-                const proj = window.dbProjects.find(p => p.id === projectId);
-                if(proj && window.fbUser) { proj.shortfallPaid = true; await setDoc(getPubDoc('projects', projectId), proj); window.showAlert("Kekurangan CAPEX berhasil ditandai lunas."); }
-            });
-        };
-
-        window.populateAdminDropdowns = function() {
-            let customers = window.dbUsers.filter(u => u.role === 'customer'); let investors = window.dbUsers.filter(u => u.role === 'investor');
-            let salesUsers = window.dbUsers.filter(u => u.role === 'sales' || u.role === 'rekanan'); let teknisiUsers = window.dbUsers.filter(u => u.role === 'teknisi');
-            
-            const custSelect = document.getElementById('form-cust-email'); const invSelect = document.getElementById('form-inv-email');
-            const rekCustSelect = document.getElementById('form-rek-cust'); const rekInvSelect = document.getElementById('form-rek-inv'); const rekTekSelect = document.getElementById('form-rek-tek');
-
-            if(custSelect) custSelect.innerHTML = '<option value="">-- Pilih Customer Terdaftar --</option>' + customers.map(c => `<option value="${c.email}">${c.name} (${c.email})</option>`).join('');
-            if(invSelect) {
-                invSelect.innerHTML = '<option value="">-- Pilih Investor Terdaftar --</option>' + investors.map(i => {
-                    let isBlocked = false; let blockReason = "";
-                    if (!i.tier) { isBlocked = true; blockReason = "Belum Pilih Tier"; } else if (!i.tierPaid) { isBlocked = true; blockReason = "Belum Lunas Deposit"; }
-                    if (isBlocked) return `<option value="${i.email}" disabled class="text-slate-400 bg-red-50">🚫 ${i.name} (${i.email}) - ${blockReason}</option>`;
-                    return `<option value="${i.email}">${i.name} (${i.email})</option>`;
-                }).join('');
-                invSelect.onchange = window.updateFormTotal;
-            }
-            const salesOptions = '<option value="">-- Tidak Ada / Opsional --</option>' + salesUsers.map(r => `<option value="${r.email}">${r.name} (${r.email})</option>`).join('');
-            const teknisiOptions = '<option value="">-- Tidak Ada / Opsional --</option>' + teknisiUsers.map(r => `<option value="${r.email}">${r.name} (${r.email})</option>`).join('');
-
-            if(rekCustSelect) rekCustSelect.innerHTML = salesOptions; if(rekInvSelect) rekInvSelect.innerHTML = salesOptions; if(rekTekSelect) rekTekSelect.innerHTML = teknisiOptions;
         };
 
         window.refreshProjectData = function() {
@@ -2035,7 +2041,7 @@
             if (thDividenDireksi) {
                 if (window.activeUser.role === 'direksi' || window.activeUser.email === 'irsukin@gmail.com') {
                     thDividenDireksi.classList.remove('hidden-el');
-                    if (window.activeUser.email === 'irsukin@gmail.com') { thDividenDireksi.innerText = 'Rincian Dividen Direksi'; thDividenDireksi.className = 'py-3 px-4 text-left text-amber-600 min-w-[150px]'; } 
+                    if (window.activeUser.email === 'irsukin@gmail.com' || window.activeUser.role === 'admin') { thDividenDireksi.innerText = 'Rincian Dividen Direksi'; thDividenDireksi.className = 'py-3 px-4 text-left text-amber-600 min-w-[150px]'; } 
                     else { thDividenDireksi.innerText = 'Dividen Anda'; thDividenDireksi.className = 'py-3 px-4 text-right text-amber-600'; }
                 } else thDividenDireksi.classList.add('hidden-el');
             }
@@ -2095,7 +2101,7 @@
                     else if (pendapatanTeknisi > 0) { setUI('label-share-company', `Fee Jasa Teknisi (Proyek Ini)`); if(elShareCom) elShareCom.innerHTML = formatIDR(pendapatanTeknisi); } 
                     else { setUI('label-share-company', `Komisi Sales (Bulan Ini)`); if(elShareCom) elShareCom.innerHTML = formatIDR(komisiBulananSales); }
                 } else {
-                    if (window.activeUser.role === 'direksi' || window.activeUser.email === 'irsukin@gmail.com') setUI('label-share-company', `Laba Perusahaan (30%)`); else setUI('label-share-company', `Laba Perusahaan (30% dari Tagihan)`);
+                    if (window.activeUser.role === 'direksi' || window.activeUser.email === 'irsukin@gmail.com' || window.activeUser.role === 'admin') setUI('label-share-company', `Laba Perusahaan (30%)`); else setUI('label-share-company', `Laba Perusahaan (30% dari Tagihan)`);
                     let rekShareInfo = ''; let totalPotonganRekanan = 0;
                     if (window.activeProject.rekCustEmail) totalPotonganRekanan += companyProfit * 0.25; if (window.activeProject.rekInvEmail) totalPotonganRekanan += companyProfit * 0.15;
                     if(totalPotonganRekanan > 0 && (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op')) rekShareInfo = `<span class="text-[9px] text-amber-600 block font-bold mt-1">(Potongan Komisi Mitra: ${formatIDR(totalPotonganRekanan)})</span>`;
@@ -2170,16 +2176,16 @@
                         }
                     }
                     
-                    if (window.activeUser.role === 'direksi' || window.activeUser.email === 'irsukin@gmail.com') {
+                    if (window.activeUser.role === 'direksi' || window.activeUser.email === 'irsukin@gmail.com' || window.activeUser.role === 'admin') {
                         const dirPaid = l.dirPaid || {};
-                        if (window.activeUser.email === 'irsukin@gmail.com') {
+                        if (window.activeUser.email === 'irsukin@gmail.com' || window.activeUser.role === 'admin') {
                             const direksiList = [{ email: 'irsukin@gmail.com', name: 'Bos Sukin', share: 0.30 }, { email: 'heribudiman', name: 'Heri Budiman', share: 0.30 }, { email: 'parpudilubis', name: 'Parpudi Lubis', share: 0.15 }, { email: 'suryadzuhurillahi', name: 'Surya D.', share: 0.05 }];
                             let divDetails = '';
                             direksiList.forEach(d => {
                                 const val = totalLabaPt * d.share; const isPaid = dirPaid[d.email] === true;
                                 const badgeClass = isPaid ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700 cursor-pointer hover:bg-red-200 shadow-sm';
                                 const badgeText = isPaid ? '<i class="fas fa-check"></i> LUNAS' : 'PENDING (Klik)';
-                                const onClick = !isPaid ? `onclick="window.payDividen('${l.id || l.timestamp}', '${d.email}')"` : '';
+                                const onClick = (!isPaid && window.activeUser.role === 'admin') ? `onclick="window.payDividen('${l.id || l.timestamp}', '${d.email}')"` : '';
                                 divDetails += `<div class="flex justify-between items-center mb-1.5 border-b border-slate-100 pb-1.5 last:border-0 last:mb-0 last:pb-0"><span class="text-[9px] font-bold text-slate-600">${d.name}</span><div class="text-right pl-2"><span class="block text-[10px] font-black text-amber-600">${formatIDR(val)}</span><span class="status-pill inline-block mt-0.5 ${badgeClass}" ${onClick}>${badgeText}</span></div></div>`;
                             });
                             colDividenHtml = `<td class="py-2 px-4 align-top">${divDetails}</td>`;
@@ -2263,16 +2269,40 @@
             });
 
             setUI('admin-profit-month', formatIDR(currentMonthProfit)); setUI('admin-profit-year', formatIDR(currentYearProfit)); setUI('admin-profit-total', formatIDR(totalProfit));
-            setUI('view-div-total', formatIDR(totalProfit)); setUI('view-div-sisa', formatIDR(totalProfit * 0.20));
 
-            let myShareName = "Hak Dividen Anda"; let myShareValue = window.activeUser.share || 0;
-            if (window.activeUser.email === 'irsukin@gmail.com') { myShareName = "Dividen BOS BESAR SUKIN (30%)"; myShareValue = 0.30; } 
-            else if (window.activeUser.email === 'heribudiman') { myShareName = "Dividen Heri Budiman (30%)"; myShareValue = 0.30; } 
-            else if (window.activeUser.email === 'parpudilubis') { myShareName = "Dividen Parpudi Lubis (15%)"; myShareValue = 0.15; } 
-            else if (window.activeUser.email === 'suryadzuhurillahi') { myShareName = "Dividen Surya Dzuhurillahi (5%)"; myShareValue = 0.05; } 
-            else if (window.activeUser.role === 'admin_op') { myShareName = "Bukan Hak Akses Operasional"; myShareValue = 0; }
-            
-            setUI('label-my-dividen', myShareName); setUI('val-my-dividen', formatIDR(totalProfit * myShareValue));
+            const divListContainer = document.getElementById('admin-dividend-list');
+            if (divListContainer) {
+                divListContainer.innerHTML = '';
+                if (window.activeUser.role === 'admin' || window.activeUser.email === 'irsukin@gmail.com') {
+                    divListContainer.innerHTML = `
+                        <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                            <span class="text-[9px] font-bold text-slate-600 uppercase">Bos Besar Sukin (30%)</span><span class="text-xs font-black text-amber-600 mono">${formatIDR(totalProfit * 0.30)}</span>
+                        </div>
+                        <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-lg border border-slate-100 mt-2">
+                            <span class="text-[9px] font-bold text-slate-600 uppercase">Heri Budiman (30%)</span><span class="text-xs font-black text-amber-600 mono">${formatIDR(totalProfit * 0.30)}</span>
+                        </div>
+                        <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-lg border border-slate-100 mt-2">
+                            <span class="text-[9px] font-bold text-slate-600 uppercase">Parpudi Lubis (15%)</span><span class="text-xs font-black text-amber-600 mono">${formatIDR(totalProfit * 0.15)}</span>
+                        </div>
+                        <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-lg border border-slate-100 mt-2">
+                            <span class="text-[9px] font-bold text-slate-600 uppercase">Surya Dzuhurillahi (5%)</span><span class="text-xs font-black text-amber-600 mono">${formatIDR(totalProfit * 0.05)}</span>
+                        </div>
+                    `;
+                } else if (window.activeUser.role === 'direksi') {
+                    let myShareName = "Hak Dividen Anda"; let myShareValue = window.activeUser.share || 0;
+                    if (window.activeUser.email === 'heribudiman') myShareName = "Dividen Heri Budiman (30%)";
+                    else if (window.activeUser.email === 'parpudilubis') myShareName = "Dividen Parpudi Lubis (15%)";
+                    else if (window.activeUser.email === 'suryadzuhurillahi') myShareName = "Dividen Surya Dzuhurillahi (5%)";
+                    
+                    divListContainer.innerHTML = `
+                        <div class="flex justify-between items-center bg-amber-50 p-4 md:p-5 rounded-xl border border-amber-200 shadow-sm h-full">
+                            <span class="text-[10px] md:text-xs font-black text-amber-700 uppercase">${myShareName}</span><span class="text-lg md:text-xl font-black text-amber-600 mono">${formatIDR(totalProfit * myShareValue)}</span>
+                        </div>
+                    `;
+                }
+            }
+
+            setUI('view-div-total', formatIDR(totalProfit)); setUI('view-div-sisa', formatIDR(totalProfit * 0.20));
 
             const ctx = document.getElementById('adminProfitChart');
             if(ctx) {
