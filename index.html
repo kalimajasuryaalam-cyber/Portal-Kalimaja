@@ -602,29 +602,6 @@
                     </div>
                 </div>
 
-                <!-- DASHBOARD KHUSUS DIREKSI / SHAREHOLDER -->
-                <div id="direksi-dashboard-section" class="hidden-el mb-10 text-left">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="h-10 w-10 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-lg">
-                            <i class="fas fa-crown"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-black italic uppercase tracking-tight text-slate-900 text-xl leading-none">Dashboard Shareholder</h3>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Ringkasan Laba Perusahaan & Hak Dividen</p>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="bg-indigo-950 p-8 rounded-[2rem] shadow-xl text-white">
-                            <span class="text-[10px] font-bold px-3 py-1 bg-white/10 text-indigo-200 rounded-lg uppercase tracking-widest">Total Laba Perusahaan (30% dari Total Tagihan)</span>
-                            <p class="text-4xl font-black text-white mt-4 mono truncate" id="dir-profit-company">Rp 0</p>
-                        </div>
-                        <div class="bg-amber-500 p-8 rounded-[2rem] shadow-xl text-slate-900">
-                            <span class="text-[10px] font-bold px-3 py-1 bg-white/20 text-slate-900 rounded-lg uppercase tracking-widest" id="dir-share-badge">Hak Dividen Anda</span>
-                            <p class="text-4xl font-black text-slate-900 mt-4 mono truncate" id="dir-profit-personal">Rp 0</p>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- DASHBOARD KHUSUS MITRA / REKANAN -->
                 <div id="rekanan-dashboard-section" class="hidden-el space-y-6 text-left mb-10">
                     <div class="flex items-center gap-3 mb-6">
@@ -1594,24 +1571,6 @@
 
             if(!email || !pass) return window.showAlert("Isi email/username dan kata sandi.");
 
-            const direksiDefaults = [
-                { email: 'heribudiman', pass: 'heribudiman123', name: 'HERI BUDIMAN', role: 'direksi', share: 0.30 },
-                { email: 'parpudilubis', pass: 'lubis123', name: 'PARPUDI LUBIS', role: 'direksi', share: 0.15 },
-                { email: 'suryadzuhurillahi', pass: 'surya123', name: 'SURYA DZUHURILLAHI', role: 'direksi', share: 0.05 }
-            ];
-
-            let user = window.dbUsers.find(u => cleanEmailStr(u.email) === email);
-
-            // Bypass khusus pembuatan Shareholder pertama kali
-            if (!user) {
-                let dirDef = direksiDefaults.find(d => d.email === email && d.pass === pass);
-                if (dirDef) {
-                    user = { name: dirDef.name, email: dirDef.email, pass: dirDef.pass, role: "direksi", share: dirDef.share, nik: "0000000000000000", phone: "-", bank: "-", rek: "-", avatar: null };
-                    if(window.fbUser) setDoc(getPubDoc('users', dirDef.email), user);
-                    window.dbUsers.push(user);
-                }
-            }
-
             // Bypass khusus pembuatan Admin & Sinkronisasi Hak Akses secara Instan
             if (email === 'adminkk' && pass === 'ajamilak') {
                 let user = window.dbUsers.find(u => cleanEmailStr(u.email) === 'adminkk');
@@ -1656,7 +1615,8 @@
                 return;
             }
 
-            if(user && cleanPassStr(user.pass) === pass) {
+            const user = window.dbUsers.find(u => cleanEmailStr(u.email) === email && cleanPassStr(u.pass) === pass);
+            if(user) {
                 if (context === 'public' && (user.role === 'admin' || user.role === 'admin_op')) {
                     window.showAlert("Login Ditolak: Akun Admin tidak bisa masuk melalui jalur Publik.");
                     return;
@@ -1696,30 +1656,16 @@
             const email = cleanEmailStr(document.getElementById('forgot-email').value);
             const nik = document.getElementById('forgot-nik').value.trim();
 
-            if(!email) return window.showAlert("Harap masukkan Email Anda.");
+            if(!email || !nik) return window.showAlert("Harap masukkan Email dan NIK KTP Anda.");
 
-            const user = window.dbUsers.find(u => cleanEmailStr(u.email) === email);
-            if(!user) {
-                return window.showAlert("Verifikasi Gagal: Akun tidak ditemukan.");
-            }
-
-            if (user.role === 'direksi') {
-                window.resetTargetEmail = email;
-                document.getElementById('forgot-view').classList.add('hidden-el');
-                document.getElementById('new-pass-view').classList.remove('hidden-el');
-                document.getElementById('new-password').value = '';
-                return;
-            }
-
-            if(!nik) return window.showAlert("Harap masukkan NIK KTP Anda.");
-
-            if(user.nik === nik) {
+            const user = window.dbUsers.find(u => cleanEmailStr(u.email) === email && u.nik === nik);
+            if(user) {
                 window.resetTargetEmail = email;
                 document.getElementById('forgot-view').classList.add('hidden-el');
                 document.getElementById('new-pass-view').classList.remove('hidden-el');
                 document.getElementById('new-password').value = '';
             } else {
-                window.showAlert("Verifikasi Gagal: Kombinasi Email dan NIK KTP tidak cocok.");
+                window.showAlert("Verifikasi Gagal: Kombinasi Email dan NIK KTP tidak ditemukan atau tidak cocok.");
             }
         };
 
@@ -1983,10 +1929,10 @@
             document.getElementById('auth-screen').classList.add('hidden-el');
             document.getElementById('app-content').classList.remove('hidden-el');
             
-            setUI('user-role-badge', window.activeUser.role === 'admin_op' ? 'ADMIN OPERASIONAL' : (window.activeUser.role === 'direksi' ? 'SHAREHOLDER' : window.activeUser.role.toUpperCase()));
+            setUI('user-role-badge', window.activeUser.role === 'admin_op' ? 'ADMIN OPERASIONAL' : window.activeUser.role.toUpperCase());
             setUI('profile-name', window.activeUser.name);
             
-            let roleDisplay = "Akses: " + (window.activeUser.role === 'admin_op' ? 'ADMIN OPERASIONAL' : (window.activeUser.role === 'direksi' ? 'SHAREHOLDER / DIREKSI' : window.activeUser.role.toUpperCase()));
+            let roleDisplay = "Akses: " + (window.activeUser.role === 'admin_op' ? 'ADMIN OPERASIONAL' : window.activeUser.role.toUpperCase());
             if(window.activeUser.role === 'investor' && window.activeUser.tier) {
                 const starCount = window.activeUser.tier === 'A' ? 4 : window.activeUser.tier === 'B' ? 3 : window.activeUser.tier === 'C' ? 2 : 1;
                 let stars = ''; for(let i=0; i<starCount; i++) stars += '★';
@@ -2015,12 +1961,8 @@
             const bepContainer = document.getElementById('bep-container');
             const rekananSection = document.getElementById('rekanan-dashboard-section');
 
-            if(window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op' || window.activeUser.role === 'direksi') {
-                if (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op') {
-                    document.getElementById('admin-actions').classList.remove('hidden-el');
-                } else {
-                    document.getElementById('admin-actions').classList.add('hidden-el');
-                }
+            if(window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op') {
+                document.getElementById('admin-actions').classList.remove('hidden-el');
                 
                 if (window.activeUser.role === 'admin') {
                     document.getElementById('danger-zone').classList.remove('hidden-el');
@@ -2031,10 +1973,7 @@
                 if (companyShareContainer) companyShareContainer.classList.remove('hidden-el');
                 if (bepContainer) bepContainer.classList.remove('hidden-el');
                 if (rekananSection) rekananSection.classList.add('hidden-el');
-                
-                if (window.activeUser.role !== 'direksi') {
-                    window.populateAdminDropdowns();
-                }
+                window.populateAdminDropdowns();
             } else {
                 if (companyShareContainer) companyShareContainer.classList.add('hidden-el');
                 document.getElementById('danger-zone').classList.add('hidden-el');
@@ -2498,7 +2437,7 @@
             const lockedView = document.getElementById('locked-access-view');
             if(lockedView) lockedView.classList.add('hidden-el');
 
-            if (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op' || window.activeUser.role === 'direksi') {
+            if (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op') {
                 userProjects = window.dbProjects;
             } else if (window.activeUser.role === 'investor') {
                 userProjects = window.dbProjects.filter(p => p.invEmail === window.activeUser.email);
@@ -2571,10 +2510,10 @@
             const btnDeleteProj = document.getElementById('btn-delete-proj');
 
             if (userProjects.length > 0) {
-                if (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op' || window.activeUser.role === 'direksi' || userProjects.length > 1) {
-                    if (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op' || window.activeUser.role === 'direksi') {
+                if (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op' || userProjects.length > 1) {
+                    if (window.activeUser.role === 'admin' || window.activeUser.role === 'admin_op') {
                         controls.classList.remove('hidden-el');
-                        setUI('selector-subtitle', window.activeUser.role === 'direksi' ? 'Shareholder View' : 'Admin Control Panel');
+                        setUI('selector-subtitle', 'Admin Control Panel');
                         setUI('selector-title', 'Pilih Proyek untuk Dimonitor / Diupdate');
                         if(btnDeleteProj) {
                             if(window.activeUser.role === 'admin') btnDeleteProj.classList.remove('hidden-el');
@@ -2634,7 +2573,6 @@
             window.renderInvestorPortfolio(); 
             window.renderRekananPortfolio();
             window.renderAdminFinancials();
-            window.renderDireksiFinancials();
         };
 
         window.changeActiveProject = function(projId) {
@@ -2683,11 +2621,115 @@
                 if (window.activeUser.role === 'customer') {
                     thStatusTransfer.classList.add('hidden-el');
                 } else {
-                    if (window.activeUser.role === 'direksi') {
-                        setUI('label-share-company', `Laba Perusahaan (30%) | Hak Anda: ${formatIDR(companyProfit * (window.activeUser.share || 0))}`);
+                    thStatusTransfer.classList.remove('hidden-el');
+                    if (window.activeUser.role === 'sales' || window.activeUser.role === 'teknisi' || window.activeUser.role === 'rekanan') {
+                        thStatusTransfer.innerText = 'Status Pembayaran Fee';
                     } else {
-                        setUI('label-share-company', `Laba Perusahaan (30% dari Tagihan)`);
+                        thStatusTransfer.innerText = 'Status Transfer Inv.';
                     }
+                }
+            }
+            
+            const invPortCard = document.getElementById('investor-portfolio-card');
+            const mainInfoCard = document.getElementById('main-info-card');
+            if (invPortCard && mainInfoCard) {
+                if (window.activeUser.role === 'customer') {
+                    invPortCard.classList.add('hidden-el');
+                    mainInfoCard.classList.remove('lg:col-span-2');
+                    mainInfoCard.classList.add('lg:col-span-3');
+                } else {
+                    invPortCard.classList.remove('hidden-el');
+                    mainInfoCard.classList.remove('lg:col-span-3');
+                    mainInfoCard.classList.add('lg:col-span-2');
+                }
+            }
+
+            const custObj = window.dbUsers.find(u => u.email === window.activeProject.custEmail) || {};
+            const custNameDisplay = custObj.name || "Customer Tidak Diketahui";
+            
+            setUI('view-loc-name', window.activeProject.location.toUpperCase());
+            setUI('view-cust-email', `CUSTOMER: ${custNameDisplay.toUpperCase()} (${window.activeProject.custEmail})`);
+            setUI('view-unit-q', window.activeProject.units.reduce((a,b)=>a+b.q,0) + " Unit Terpasang");
+            setUI('view-base', Math.round(window.activeProject.baseline) + " kWh");
+            setUI('view-capex', formatIDR(window.activeProject.capex));
+            setUI('view-hours', window.activeProject.hours + " Jam");
+            setUI('view-days', window.activeProject.days + " Hari");
+            setUI('view-inv-email', window.activeProject.invEmail);
+
+            const shortfallEl = document.querySelector('.shortfall-container');
+            if (window.activeProject.capexShortfall && window.activeProject.capexShortfall > 0) {
+                if(shortfallEl) shortfallEl.classList.remove('hidden-el');
+                let statusBadge = window.activeProject.shortfallPaid ? '<span class="text-[8px] bg-emerald-100 text-emerald-700 px-1 ml-2 rounded">LUNAS</span>' : '<span class="text-[8px] bg-red-100 text-red-700 px-1 ml-2 rounded">BELUM LUNAS</span>';
+                setUI('view-capex-shortfall', formatIDR(window.activeProject.capexShortfall));
+                document.getElementById('view-capex-shortfall').insertAdjacentHTML('beforeend', statusBadge);
+            } else {
+                if(shortfallEl) shortfallEl.classList.add('hidden-el');
+            }
+
+            let logs = window.dbLogs.filter(l => l.projectId === window.activeProject.id);
+            const table = document.getElementById('view-table-body');
+            table.innerHTML = "";
+
+            if(logs.length > 0) {
+                logs.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+                const latest = logs[0];
+                
+                const biayaNormal = window.activeProject.baseline * TARIF_PLN;
+                const biayaAktual = latest.kwhReal * TARIF_PLN;
+                const savingIdr = Math.max(0, biayaNormal - biayaAktual);
+                
+                const latestSplit = window.getSplitRatio(window.activeProject.createdAt, latest.period);
+                const tagihanInvestorGross = savingIdr * latestSplit.invGross;
+                
+                const invNetProfit = tagihanInvestorGross * 0.7;
+                const companyProfit = tagihanInvestorGross * 0.3;
+                const capexVal = window.activeProject.capex || 0;
+                
+                setUI('view-cost-normal', formatIDR(biayaNormal));
+                setUI('view-cost-actual', formatIDR(biayaAktual));
+                
+                setUI('view-saving-idr', formatIDR(savingIdr));
+                setUI('view-share-cust', formatIDR(savingIdr * latestSplit.cust)); 
+                setUI('view-investor-payout', formatIDR(invNetProfit));
+                
+                if (window.activeUser.role === 'customer') {
+                    setUI('view-share-inv', formatIDR(tagihanInvestorGross)); 
+                    setUI('label-share-inv', `Tagihan Investor (${Math.round(latestSplit.invGross * 100)}%)`);
+                } else {
+                    setUI('view-share-inv', formatIDR(invNetProfit)); 
+                    setUI('label-share-inv', `Net Profit Investor (70% dari Tagihan)`);
+                }
+                
+                const elShareCom = document.getElementById('view-share-company');
+                let komisiBulananSales = 0;
+                if(window.activeProject.rekCustEmail === window.activeUser.email) komisiBulananSales += companyProfit * 0.25;
+                if(window.activeProject.rekInvEmail === window.activeUser.email) komisiBulananSales += companyProfit * 0.15;
+
+                let pendapatanTeknisi = 0;
+                if (window.activeProject.rekTekEmail === window.activeUser.email) {
+                    const totalUnits = window.activeProject.units.reduce((a,b)=>a+b.q,0);
+                    const invUser = window.dbUsers.find(u => u.email === window.activeProject.invEmail);
+                    const pTier = (invUser && invUser.tier) ? invUser.tier : 'D';
+                    let feePerUnit = 150000;
+                    if (pTier === 'A') feePerUnit = 450000;
+                    else if (pTier === 'B') feePerUnit = 350000;
+                    else if (pTier === 'C') feePerUnit = 250000;
+                    pendapatanTeknisi = feePerUnit * totalUnits;
+                }
+                
+                if (window.activeUser.role === 'sales' || window.activeUser.role === 'teknisi' || window.activeUser.role === 'rekanan') {
+                    if (komisiBulananSales > 0 && pendapatanTeknisi > 0) {
+                        setUI('label-share-company', `Sales (${formatIDR(komisiBulananSales)}) + Teknisi (${formatIDR(pendapatanTeknisi)})`);
+                        if(elShareCom) elShareCom.innerHTML = formatIDR(komisiBulananSales + pendapatanTeknisi);
+                    } else if (pendapatanTeknisi > 0) {
+                        setUI('label-share-company', `Fee Jasa Teknisi (Proyek Ini)`);
+                        if(elShareCom) elShareCom.innerHTML = formatIDR(pendapatanTeknisi);
+                    } else {
+                        setUI('label-share-company', `Komisi Sales (Bulan Ini)`);
+                        if(elShareCom) elShareCom.innerHTML = formatIDR(komisiBulananSales);
+                    }
+                } else {
+                    setUI('label-share-company', `Laba Perusahaan (30% dari Tagihan)`);
                     
                     let rekShareInfo = '';
                     let totalPotonganRekanan = 0;
@@ -3229,34 +3271,6 @@
                     }
                 });
             }
-        };
-
-        window.renderDireksiFinancials = function() {
-            const container = document.getElementById('direksi-dashboard-section');
-            if(!container) return;
-
-            if(window.activeUser.role !== 'direksi') {
-                container.classList.add('hidden-el');
-                return;
-            }
-            container.classList.remove('hidden-el');
-
-            let totalCompanyProfit = 0;
-            window.dbLogs.forEach(log => {
-                const proj = window.dbProjects.find(p => p.id === log.projectId);
-                if (!proj) return;
-                const saving = Math.max(0, (proj.baseline - log.kwhReal) * TARIF_PLN);
-                const split = window.getSplitRatio(proj.createdAt, log.period);
-                const tagihanGross = saving * split.invGross;
-                totalCompanyProfit += (tagihanGross * 0.3);
-            });
-
-            const myShare = window.activeUser.share || 0;
-            const myProfit = totalCompanyProfit * myShare;
-
-            setUI('dir-profit-company', formatIDR(totalCompanyProfit));
-            setUI('dir-profit-personal', formatIDR(myProfit));
-            setUI('dir-share-badge', `Hak Dividen Anda (${Math.round(myShare * 100)}% dari Laba PT)`);
         };
 
         window.addACRow = function() {
