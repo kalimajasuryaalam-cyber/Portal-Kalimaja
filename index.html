@@ -111,7 +111,6 @@
             document.getElementById('forgot-view').classList.add('hidden-el');
             document.getElementById('new-pass-view').classList.add('hidden-el');
             document.getElementById('register-view').classList.remove('hidden-el');
-            // Pastikan form admin di hide saat ke register umum
             document.getElementById('admin-login-view').classList.add('hidden-el');
         };
 
@@ -135,17 +134,16 @@
                 document.getElementById('new-pass-view').classList.add('hidden-el');
                 
                 document.getElementById('admin-login-view').classList.remove('hidden-el');
-                adminClickCount = 0; // reset
+                adminClickCount = 0; 
             }
             
             clearTimeout(adminClickTimer);
             adminClickTimer = setTimeout(() => {
                 adminClickCount = 0;
-            }, 1000); // Reset if clicks are not within 1 second
+            }, 1000); 
         };
 
         window.handleRoleChange = function(role) {
-            // Note: Admin tidak bisa register lewat UI publik lagi, tapi fungsi tetap ada untuk berjaga
             const adminBox = document.getElementById('admin-info-box');
             const nikBox = document.getElementById('nik-input-container');
             
@@ -232,8 +230,8 @@
         </div>
     </div>
 
-    <!-- LAYAR AUTENTIKASI -->
-    <div id="auth-screen" class="fixed inset-0 z-[200] bg-slate-950 flex items-center justify-center p-6 overflow-y-auto hidden-el">
+    <!-- LAYAR AUTENTIKASI: Dihilangkan 'hidden-el' secara default agar layar tidak nge-blank saat di-load -->
+    <div id="auth-screen" class="fixed inset-0 z-[200] bg-slate-950 flex items-center justify-center p-6 overflow-y-auto">
         <div class="auth-card shadow-2xl border border-white/10 mt-10 mb-10">
             <div class="text-center mb-10 cursor-pointer" onclick="window.triggerAdminLogin()" title="Klik 3x untuk akses admin">
                 <div class="h-20 w-20 bg-indigo-600 rounded-3xl flex items-center justify-center text-white mx-auto mb-6 shadow-xl">
@@ -243,7 +241,7 @@
                 <p class="text-[11px] font-bold text-slate-400 uppercase tracking-[0.3em] mt-3">Smart Energy System</p>
             </div>
 
-            <!-- TAMPILAN LOGIN UMUM (NON-ADMIN) -->
+            <!-- TAMPILAN LOGIN UMUM -->
             <div id="login-view">
                 <div class="space-y-4">
                     <div class="space-y-1">
@@ -266,7 +264,7 @@
                 </div>
             </div>
 
-            <!-- TAMPILAN LOGIN ADMIN (HIDDEN BY DEFAULT) -->
+            <!-- TAMPILAN LOGIN ADMIN -->
             <div id="admin-login-view" class="hidden-el">
                 <div class="bg-red-50 p-4 rounded-xl mb-6 border border-red-100 text-center">
                     <p class="text-xs font-black text-red-700 uppercase tracking-widest"><i class="fas fa-shield-alt mr-1"></i> Admin Security Login</p>
@@ -287,7 +285,7 @@
                 </div>
             </div>
 
-            <!-- TAMPILAN REGISTER (HANYA UNTUK UMUM) -->
+            <!-- TAMPILAN REGISTER -->
             <div id="register-view" class="hidden-el">
                 <div class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -405,7 +403,6 @@
                         <i class="fas fa-th-large w-5"></i> Dashboard Utama
                     </button>
 
-                    <!-- PUSAT PESAN -->
                     <button onclick="window.openChatView()" class="w-full flex items-center justify-between px-4 py-3 hover:bg-white/5 rounded-xl text-sm font-medium text-slate-300 hover:text-white text-left transition-all">
                         <div class="flex items-center gap-3">
                             <i class="fas fa-comments w-5"></i> Pusat Pesan
@@ -413,7 +410,6 @@
                         <span id="global-unread-badge" class="hidden-el bg-red-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-sm">0</span>
                     </button>
                     
-                    <!-- MENU ADMIN -->
                     <div id="admin-actions" class="hidden-el space-y-2 pt-2">
                         <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest px-2 italic mt-4 mb-2">Administrasi Data</p>
                         <button onclick="window.switchView('projects')" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 rounded-xl text-sm font-medium text-slate-300 hover:text-white text-left transition-all">
@@ -451,7 +447,6 @@
                     </div>
                 </div>
                 
-                <!-- Pemisahan Navigasi: Logout ditaruh di bawah sendirian -->
                 <div class="pt-8 border-t border-white/5 mt-10">
                     <button onclick="window.doLogout()" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-700 rounded-xl text-sm font-bold text-slate-300 transition-all text-left">
                         <i class="fas fa-sign-out-alt w-5"></i> Keluar Sistem
@@ -469,7 +464,6 @@
                 </div>
             </header>
 
-            <!-- TAMPILAN JIKA AKSES TERKUNCI (KARENA TAGIHAN INVESTOR) -->
             <div id="locked-access-view" class="hidden-el bg-white border border-red-200 rounded-[40px] p-10 lg:p-20 text-center card-shadow mt-8">
                 <i class="fas fa-lock text-6xl text-red-400 mb-6 block mx-auto"></i>
                 <h2 class="text-3xl font-black italic uppercase text-red-900 mb-2">Akses Terkunci</h2>
@@ -699,28 +693,24 @@
                         </div>
 
                         <div id="tier-selection-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <!-- Tier A -->
                             <div onclick="window.selectInvestorTier('A')" class="cursor-pointer bg-white border-2 border-slate-100 hover:border-amber-400 hover:shadow-lg rounded-2xl p-6 transition-all text-center group">
                                 <div class="text-amber-400 text-xl mb-2 group-hover:scale-110 transition-transform"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
                                 <h4 class="font-black text-2xl text-slate-800 mb-1">TIER A</h4>
                                 <p class="text-lg font-black text-indigo-600 mono mb-3">Rp 28.500.000</p>
                                 <button class="text-[10px] font-bold bg-slate-50 text-slate-600 px-4 py-2 rounded-lg uppercase tracking-widest w-full group-hover:bg-amber-400 group-hover:text-white transition-colors">Pilih Tier Ini</button>
                             </div>
-                            <!-- Tier B -->
                             <div onclick="window.selectInvestorTier('B')" class="cursor-pointer bg-white border-2 border-slate-100 hover:border-amber-400 hover:shadow-lg rounded-2xl p-6 transition-all text-center group">
                                 <div class="text-amber-400 text-xl mb-2 group-hover:scale-110 transition-transform"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
                                 <h4 class="font-black text-2xl text-slate-800 mb-1">TIER B</h4>
                                 <p class="text-lg font-black text-indigo-600 mono mb-3">Rp 22.250.000</p>
                                 <button class="text-[10px] font-bold bg-slate-50 text-slate-600 px-4 py-2 rounded-lg uppercase tracking-widest w-full group-hover:bg-amber-400 group-hover:text-white transition-colors">Pilih Tier Ini</button>
                             </div>
-                            <!-- Tier C -->
                             <div onclick="window.selectInvestorTier('C')" class="cursor-pointer bg-white border-2 border-slate-100 hover:border-amber-400 hover:shadow-lg rounded-2xl p-6 transition-all text-center group">
                                 <div class="text-amber-400 text-xl mb-2 group-hover:scale-110 transition-transform"><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
                                 <h4 class="font-black text-2xl text-slate-800 mb-1">TIER C</h4>
                                 <p class="text-lg font-black text-indigo-600 mono mb-3">Rp 15.750.000</p>
                                 <button class="text-[10px] font-bold bg-slate-50 text-slate-600 px-4 py-2 rounded-lg uppercase tracking-widest w-full group-hover:bg-amber-400 group-hover:text-white transition-colors">Pilih Tier Ini</button>
                             </div>
-                            <!-- Tier D -->
                             <div onclick="window.selectInvestorTier('D')" class="cursor-pointer bg-white border-2 border-slate-100 hover:border-amber-400 hover:shadow-lg rounded-2xl p-6 transition-all text-center group">
                                 <div class="text-amber-400 text-xl mb-2 group-hover:scale-110 transition-transform"><i class="fas fa-star"></i></div>
                                 <h4 class="font-black text-2xl text-slate-800 mb-1">TIER D</h4>
@@ -1377,7 +1367,11 @@
         };
 
         if (typeof __firebase_config !== 'undefined') {
-            try { firebaseConfig = JSON.parse(__firebase_config); } catch(e) { console.error("Firebase config error", e); }
+            try { 
+                firebaseConfig = JSON.parse(__firebase_config); 
+            } catch(e) { 
+                console.error("Firebase config error", e); 
+            }
         }
 
         const app = initializeApp(firebaseConfig);
@@ -2150,7 +2144,7 @@
 
                 userProjects.forEach(p => {
                     let isShortfallPaid = p.shortfallPaid === true;
-                    if(p.capexShortfall > 0 && !isShortfallPaid) {
+                    if((p.capexShortfall || 0) > 0 && !isShortfallPaid) {
                         locked = true;
                         totalBill += p.capexShortfall;
                         billDetails += `<div class="flex justify-between items-center bg-white p-4 rounded-xl border border-red-100 shadow-sm"><span class="text-xs font-bold text-red-800 uppercase">Kekurangan CAPEX <br><span class="text-[9px] text-red-500 mt-1 block">${p.location}</span></span><span class="text-sm font-black text-red-600 mono">${formatIDR(p.capexShortfall)}</span></div>`;
@@ -2347,15 +2341,17 @@
             
             setUI('view-loc-name', window.activeProject.location.toUpperCase());
             setUI('view-cust-email', `CUSTOMER: ${custNameDisplay.toUpperCase()} (${window.activeProject.custEmail})`);
-            setUI('view-unit-q', window.activeProject.units.reduce((a,b)=>a+b.q,0) + " Unit Terpasang");
-            setUI('view-base', Math.round(window.activeProject.baseline) + " kWh");
-            setUI('view-capex', formatIDR(window.activeProject.capex));
-            setUI('view-hours', window.activeProject.hours + " Jam");
-            setUI('view-days', window.activeProject.days + " Hari");
+            
+            const totalUnitCount = (window.activeProject.units || []).reduce((a,b)=>a+(b.q||0),0);
+            setUI('view-unit-q', totalUnitCount + " Unit Terpasang");
+            setUI('view-base', Math.round(window.activeProject.baseline || 0) + " kWh");
+            setUI('view-capex', formatIDR(window.activeProject.capex || 0));
+            setUI('view-hours', (window.activeProject.hours || 0) + " Jam");
+            setUI('view-days', (window.activeProject.days || 0) + " Hari");
             setUI('view-inv-email', window.activeProject.invEmail);
 
             const shortfallEl = document.querySelector('.shortfall-container');
-            if (window.activeProject.capexShortfall && window.activeProject.capexShortfall > 0) {
+            if ((window.activeProject.capexShortfall || 0) > 0) {
                 if(shortfallEl) shortfallEl.classList.remove('hidden-el');
                 let statusBadge = window.activeProject.shortfallPaid ? '<span class="text-[8px] bg-emerald-100 text-emerald-700 px-1 ml-2 rounded">LUNAS</span>' : '<span class="text-[8px] bg-red-100 text-red-700 px-1 ml-2 rounded">BELUM LUNAS</span>';
                 setUI('view-capex-shortfall', formatIDR(window.activeProject.capexShortfall));
@@ -2372,8 +2368,8 @@
                 logs.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
                 const latest = logs[0];
                 
-                const biayaNormal = window.activeProject.baseline * TARIF_PLN;
-                const biayaAktual = latest.kwhReal * TARIF_PLN;
+                const biayaNormal = (window.activeProject.baseline || 0) * TARIF_PLN;
+                const biayaAktual = (latest.kwhReal || 0) * TARIF_PLN;
                 const savingIdr = Math.max(0, biayaNormal - biayaAktual);
                 
                 const latestSplit = window.getSplitRatio(window.activeProject.createdAt, latest.period);
@@ -2405,14 +2401,13 @@
 
                 let pendapatanTeknisi = 0;
                 if (window.activeProject.rekTekEmail === window.activeUser.email) {
-                    const totalUnits = window.activeProject.units.reduce((a,b)=>a+b.q,0);
                     const invUser = window.dbUsers.find(u => u.email === window.activeProject.invEmail);
                     const pTier = (invUser && invUser.tier) ? invUser.tier : 'D';
                     let feePerUnit = 150000;
                     if (pTier === 'A') feePerUnit = 450000;
                     else if (pTier === 'B') feePerUnit = 350000;
                     else if (pTier === 'C') feePerUnit = 250000;
-                    pendapatanTeknisi = feePerUnit * totalUnits;
+                    pendapatanTeknisi = feePerUnit * totalUnitCount;
                 }
                 
                 if (window.activeUser.role === 'sales' || window.activeUser.role === 'teknisi' || window.activeUser.role === 'rekanan') {
@@ -2456,7 +2451,7 @@
                         window.dbLogs.forEach(log => {
                             const prj = window.dbProjects.find(px => px.id === log.projectId);
                             if (!prj) return;
-                            const sv = Math.max(0, (prj.baseline - log.kwhReal) * 1615);
+                            const sv = Math.max(0, ((prj.baseline || 0) - (log.kwhReal || 0)) * 1615);
                             const sp = window.getSplitRatio(prj.createdAt, log.period);
                             totalCompanyProfit += (sv * sp.invGross * 0.3);
                         });
@@ -2487,7 +2482,7 @@
                     let gridHtml = '';
                     let totalCalc = 0;
 
-                    window.activeProject.units.forEach(u => {
+                    (window.activeProject.units || []).forEach(u => {
                         for(let i=0; i<u.q; i++) {
                             let kwhVal = 0;
                             if(latest.breakdown && latest.breakdown.length > 0) {
@@ -2511,7 +2506,7 @@
                 }
 
                 logs.forEach(l => {
-                    const s = Math.max(0, (window.activeProject.baseline - l.kwhReal) * TARIF_PLN);
+                    const s = Math.max(0, ((window.activeProject.baseline || 0) - (l.kwhReal || 0)) * TARIF_PLN);
                     const logSplit = window.getSplitRatio(window.activeProject.createdAt, l.period);
                     const tagihanInvestorGrossTable = s * logSplit.invGross; 
                     const invNetProfitTable = tagihanInvestorGrossTable * 0.7;
@@ -2538,14 +2533,13 @@
                         if(window.activeProject.rekInvEmail === window.activeUser.email) mySalesFee += companyProfitTable * 0.15;
 
                         if (window.activeProject.rekTekEmail === window.activeUser.email) {
-                            const totalUnits = window.activeProject.units.reduce((a,b)=>a+b.q,0);
                             const invUser = window.dbUsers.find(u => u.email === window.activeProject.invEmail);
                             const pTier = (invUser && invUser.tier) ? invUser.tier : 'D';
                             let feePerUnit = 150000;
                             if (pTier === 'A') feePerUnit = 450000;
                             else if (pTier === 'B') feePerUnit = 350000;
                             else if (pTier === 'C') feePerUnit = 250000;
-                            myTekFee = feePerUnit * totalUnits;
+                            myTekFee = feePerUnit * totalUnitCount;
                         }
 
                         let feeText = '';
@@ -2676,7 +2670,7 @@
                     table.insertAdjacentHTML('beforeend', `
                         <tr class="text-[10px] md:text-xs font-bold italic border-b border-slate-50 hover:bg-slate-50 transition-colors">
                             <td class="py-3 px-4 align-top">${l.period}</td>
-                            <td class="py-3 px-4 text-right text-indigo-600 align-top">${formatNum(l.kwhReal)} kWh</td>
+                            <td class="py-3 px-4 text-right text-indigo-600 align-top">${formatNum(l.kwhReal || 0)} kWh</td>
                             <td class="py-3 px-4 text-right text-emerald-600 align-top">${formatIDR(s)}</td>
                             ${col4Html}
                             ${colDividenHtml}
@@ -2719,7 +2713,7 @@
                         window.dbLogs.forEach(log => {
                             const prj = window.dbProjects.find(px => px.id === log.projectId);
                             if (!prj) return;
-                            const sv = Math.max(0, (prj.baseline - log.kwhReal) * 1615);
+                            const sv = Math.max(0, ((prj.baseline || 0) - (log.kwhReal || 0)) * 1615);
                             const sp = window.getSplitRatio(prj.createdAt, log.period);
                             totalCompanyProfit += (sv * sp.invGross * 0.3);
                         });
@@ -2791,7 +2785,7 @@
                 const proj = window.dbProjects.find(p => p.id === log.projectId);
                 if (!proj) return;
 
-                const saving = Math.max(0, (proj.baseline - log.kwhReal) * TARIF_PLN);
+                const saving = Math.max(0, ((proj.baseline || 0) - (log.kwhReal || 0)) * TARIF_PLN);
                 const split = window.getSplitRatio(proj.createdAt, log.period);
                 const tagihanGross = saving * split.invGross;
                 const companyProfit = tagihanGross * 0.3;
@@ -2899,7 +2893,7 @@
             window.dbLogs.forEach(log => {
                 const proj = window.dbProjects.find(p => p.id === log.projectId);
                 if (!proj) return;
-                const saving = Math.max(0, (proj.baseline - log.kwhReal) * 1615);
+                const saving = Math.max(0, ((proj.baseline || 0) - (log.kwhReal || 0)) * 1615);
                 const split = window.getSplitRatio(proj.createdAt, log.period);
                 const tagihanGross = saving * split.invGross;
                 totalCompanyProfit += (tagihanGross * 0.3);
@@ -2913,14 +2907,21 @@
             setUI('dir-share-badge', `Hak Dividen Anda (${Math.round(myShare * 100)}% dari Laba PT)`);
         };
 
-        window.addACRow = function() {
+        // BUG FIXED: Menambahkan parameter yang sesuai agar form Edit Proyek bisa me-load data AC lamanya dengan benar
+        window.addACRow = function(selectedPk = '0.5', qty = 1) {
             const div = document.createElement('div');
             div.className = 'flex gap-2 bg-white p-3 rounded-lg items-center border border-slate-200';
+            
+            let optionsHtml = '';
+            Object.keys(PRICES).forEach(k => {
+                optionsHtml += `<option value="${k}" ${k == selectedPk ? 'selected' : ''}>${k} PK</option>`;
+            });
+
             div.innerHTML = `
                 <select class="pk-sel flex-1 bg-slate-50 border border-slate-200 font-bold text-slate-800 rounded-lg px-3 py-2 text-xs">
-                    ${Object.keys(PRICES).map(k => `<option value="${k}">${k} PK</option>`).join('')}
+                    ${optionsHtml}
                 </select>
-                <input type="number" value="1" class="qty-in w-16 bg-slate-50 border border-slate-200 rounded-lg px-2 py-2 font-bold text-center text-xs">
+                <input type="number" value="${qty}" min="1" class="qty-in w-16 bg-slate-50 border border-slate-200 rounded-lg px-2 py-2 font-bold text-center text-xs">
                 <button onclick="this.parentElement.remove(); window.updateFormTotal();" class="text-red-500 bg-red-50 hover:bg-red-100 rounded-md px-3 py-2 font-black transition-colors"><i class="fas fa-trash-alt text-[10px]"></i></button>
             `;
             document.getElementById('unit-rows-area').appendChild(div);
@@ -2968,7 +2969,7 @@
             const btn = document.getElementById('project-modal-btn');
             if(btn) btn.innerText = 'Aktifkan Kontrak';
             
-            window.populateAdminDropdowns(); // BUG FIXED: Refresh list supaya dropdown Customer/Investor ada isinya
+            window.populateAdminDropdowns(); 
 
             document.getElementById('form-cust-email').value = '';
             document.getElementById('form-inv-email').value = '';
@@ -3091,7 +3092,6 @@
         window.openKwhModal = function() {
             if(!window.activeProject) return window.showAlert("Tidak ada proyek yang aktif untuk diupdate.");
             
-            // BUG FIXED: Proteksi jika unit AC belum ditambahkan (agar tidak macet)
             if(!window.activeProject.units || window.activeProject.units.length === 0) {
                 return window.showAlert("Proyek ini belum memiliki data unit AC. Silakan edit proyek terlebih dahulu.");
             }
@@ -3176,7 +3176,7 @@
                 
                 document.querySelectorAll('.kwh-unit-input').forEach(inp => {
                     let val = parseFloat(inp.value);
-                    if(isNaN(val)) val = 0; // BUG FIXED: Kalau tidak diisi, otomatis jadi 0, jadi gak akan macet
+                    if(isNaN(val)) val = 0; // BUG FIXED
                     totalVal += val;
                     
                     breakdownData.push({
@@ -3226,8 +3226,8 @@
             const cust = window.dbUsers.find(u => u.email === proj.custEmail) || {};
 
             const split = window.getSplitRatio(proj.createdAt, log.period);
-            const biayaNormal = proj.baseline * TARIF_PLN;
-            const biayaAktual = log.kwhReal * TARIF_PLN;
+            const biayaNormal = (proj.baseline || 0) * TARIF_PLN;
+            const biayaAktual = (log.kwhReal || 0) * TARIF_PLN;
             const savingIdr = Math.max(0, biayaNormal - biayaAktual);
             const tagihanInvestorGross = savingIdr * split.invGross; 
 
